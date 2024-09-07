@@ -1,34 +1,3 @@
-<!-- MFL LIVE SCORING SCRIPT SETTINGS -->
-<script>
-var ls_scoreboardName = "LEAGUE SCOREBOARD";	//enter text to name your scoreboard
-var ls_commish_id = "0002";			//set the franchise ID of commissioners franchise to show those matchup first when logged in as commissioner
-var ls_loader = false;				//use loading screen if scoreboard takes too long to load
-var largeLeagueSB = false;			//set to true if scoreboard doesn't load all the time - this if for large leagues
-var showTeamName = true;                      	//set to true to display franchise names in scoreboard header
-var showTeamIcon = false;                       //set to true to display franchise icons in scoreboard header
-var ls_includeProjections = true;              	//set to true to display projections next to player scores
-var ls_includeInjuryStatus = true;     		//set to true to display injury status as per the norm
-var ls_excludeIR = false;                       //set to true to remove players on fantasy IR
-var ls_excludeTaxi = false;                     //set to true to remove players on taxi squad
-var ls_popup_abbrev_name_icon = 1;             	//-1=disable; 0=abbrev; 1=name; 2=icon
-var ls_orig_proj_when_final = true;         	//set true to change pace to projection when games go final
-var ls_popup_status = true;                    	//set true to add status of player to popup
-var ls_box_abbrev_name_icon = 1;               	//0=abbrev; 1=name; 2=icon; 3=icon+abbrev; 4=icon+name
-var ls_hide_bye_teams = false;                 	//set to true to hide boxscore matchup teams on bye weeks
-var ls_show_win_probability = true;           	//set to true to show MFL H2H win probability - only used for H2H leagues and MFL setting must be set to "true"
-var BreakRows     = 1;       			//1=1 row of matchups(default);   2=2 rows of matchups;  3=3 rows of matchups
-
-// ALL PLAY ----- PLAYOFFS LEAGUES ------ BEST BALL LEAGUES ONLY !!!!!!
-var fixedWidthBox = true;       // Set to true to make box scores same sizes - set box width in next var
-var setBoxWidth   = "9.375";    // MUST BE AT LEAST 9.375rem or 150px WIDE IF USING FULL TEAM NAMES - DO NOT INCLUDE REM or PX IN VALUE - ICONS AND  ABBR YOU CAN SET LESS WIDE - set value in "px" or "rem" - var useREM = true; in header required for REM values
-</script>
-
-<!-- MFL LIVE SCORING JS FILE -->
-<!-- JS FILE BELOW HAS BEEN COMMENTED OUT.  TO USE JS FILE REMOVE THIS LINE
-<script src="https://www.mflscripts.com/mfl-apps/scoreboard/replace-mflScoring/script.js"></script>
-     JS FILE ABOVE HAS BEEN COMMENTED OUT.  TO USE JS FILE REMOVE THIS LINE -->
-
-<!-- BELOW IS THE FULL UNCOMPRESSED SCRIPT - IF USING JS FILE BY REMOVING INDICATED LINES ABOVE DO NOT COPY THIS LINE OR ANYTHING BELOW THIS LINE  -->
 <script>
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
