@@ -901,6 +901,79 @@ if ($('#body_ajax_ls').length) {
             $('.ls_projections.ls_pace_box:contains("NaN"),.ls_projections.ls_pace_box:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:0.875rem" title="Wait..As MFL Prepares Games Starting"></i>');
             $('.ls_projections span:contains("undefined"),.ls_projections span:contains("NaN"),.ls_game_info:contains("NaN"),.ls_game_info:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:1.375rem" title="Wait..As MFL Prepares Games Starting"></i>');
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
+
+
+            function getPlayerImage(position, playerID) {
+                if (position === 'FA') {
+                    return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                } else {
+                    return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
+                }
+            }
+
+            function processAjaxLS() {
+                const table = document.querySelector('#roster_home');
+                if (!table) return;
+
+                table.querySelectorAll('tr').forEach(row => {
+                    const playerCell = row.querySelector('.td-first-type');
+                    if (!playerCell) return;
+
+                    const playerLink = playerCell.querySelector('a');
+                    if (!playerLink) return;
+
+                    const url = playerLink.getAttribute('href');
+                    const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
+
+                    const name = playerLink.textContent.trim();
+                    const nameParts = name.split(',');
+                    const lastName = nameParts[0].trim();
+                    const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+
+                    // Fetch position from next sibling or the inner text (based on your structure)
+                    const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
+                    const position = positionText ? positionText[0].split(' ')[1] : 'FA';
+
+                    const profileImage = getPlayerImage(position, playerID);
+
+                    // Create player wrapper elements
+                    const playerWrapper = document.createElement('div');
+                    playerWrapper.classList.add('player_wrapper');
+
+                    const lastNameDiv = document.createElement('a');
+                    lastNameDiv.classList.add('last_name_roster');
+                    lastNameDiv.textContent = lastName;
+                    lastNameDiv.href = playerLink.href;
+
+                    const firstNameDiv = document.createElement('div');
+                    firstNameDiv.classList.add('first_name_roster');
+                    firstNameDiv.textContent = firstName;
+
+                    const imageWrapper = document.createElement('div');
+                    imageWrapper.classList.add('image_wrapper');
+                    const playerImg = document.createElement('img');
+                    playerImg.classList.add('lineup_photo');
+                    playerImg.src = profileImage;
+                    playerImg.onerror = function () {
+                        playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                    };
+                    imageWrapper.appendChild(playerImg);
+
+                    // Clear the current cell and append the new structure
+                    playerWrapper.appendChild(firstNameDiv);
+                    playerWrapper.appendChild(lastNameDiv);
+                    playerWrapper.appendChild(imageWrapper);
+
+                    playerCell.innerHTML = '';
+                    playerCell.appendChild(playerWrapper);
+                });
+            }
+
+            processAjaxLS();
+
+
+
+
         } // end ls_after_update_scores
 
 
