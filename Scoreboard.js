@@ -912,29 +912,54 @@ if ($('#body_ajax_ls').length) {
             }
 
             function processAjaxLS() {
-                const table = document.querySelector('#roster_home');
-                if (!table) return;
+                console.log("Starting processAjaxLS...");
 
-                table.querySelectorAll('tr').forEach(row => {
+                const table = document.querySelector('#roster_home');
+                if (!table) {
+                    console.log("Table not found.");
+                    return;
+                }
+                console.log("Table found:", table);
+
+                table.querySelectorAll('tr').forEach((row, rowIndex) => {
+                    console.log(`Processing row ${rowIndex + 1}...`);
+
                     const playerCell = row.querySelector('.td-first-type');
-                    if (!playerCell) return;
+                    if (!playerCell) {
+                        console.log(`No player cell found in row ${rowIndex + 1}`);
+                        return;
+                    }
+                    console.log(`Player cell found in row ${rowIndex + 1}:`, playerCell);
 
                     const playerLink = playerCell.querySelector('a');
-                    if (!playerLink) return;
+                    if (!playerLink) {
+                        console.log(`No player link found in row ${rowIndex + 1}`);
+                        return;
+                    }
+                    console.log(`Player link found in row ${rowIndex + 1}:`, playerLink);
 
                     const url = playerLink.getAttribute('href');
                     const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
+                    if (!playerID) {
+                        console.log(`No player ID found in row ${rowIndex + 1}`);
+                        return;
+                    }
+                    console.log(`Player ID found in row ${rowIndex + 1}: ${playerID}`);
 
                     const name = playerLink.textContent.trim();
+                    console.log(`Player name: ${name}`);
                     const nameParts = name.split(',');
                     const lastName = nameParts[0].trim();
                     const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+                    console.log(`Parsed name - First: ${firstName}, Last: ${lastName}`);
 
                     // Fetch position from next sibling or the inner text (based on your structure)
                     const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
                     const position = positionText ? positionText[0].split(' ')[1] : 'FA';
+                    console.log(`Position found: ${position}`);
 
                     const profileImage = getPlayerImage(position, playerID);
+                    console.log(`Profile image URL: ${profileImage}`);
 
                     // Create player wrapper elements
                     const playerWrapper = document.createElement('div');
@@ -955,6 +980,7 @@ if ($('#body_ajax_ls').length) {
                     playerImg.classList.add('lineup_photo');
                     playerImg.src = profileImage;
                     playerImg.onerror = function () {
+                        console.log(`Error loading image for player ID: ${playerID}, using free agent image.`);
                         playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
                     };
                     imageWrapper.appendChild(playerImg);
@@ -964,12 +990,16 @@ if ($('#body_ajax_ls').length) {
                     playerWrapper.appendChild(lastNameDiv);
                     playerWrapper.appendChild(imageWrapper);
 
+                    console.log(`Replacing content in player cell for row ${rowIndex + 1}`);
                     playerCell.innerHTML = '';
                     playerCell.appendChild(playerWrapper);
                 });
+
+                console.log("Finished processing all rows.");
             }
 
             processAjaxLS();
+
 
 
 
