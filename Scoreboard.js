@@ -867,41 +867,107 @@ if ($('#body_ajax_ls').length) {
         ////////////////////////////////////////////////////////////////////
         //              FUNCTION - ls_after_update_scores                 //
         ////////////////////////////////////////////////////////////////////
-        //YOU CAN NOW ADD WHATEVER YOU WANT HERE AND IT WILL RUN IMMEDIATELY AFTER MFLS' update_scores 
         function ls_after_update_scores() {
             $("#LS_AwayTeamPercent div,#LS_HomeTeamPercent div").each(function () {
                 var $this = $(this);
                 var percWidth = $this.text();
                 if (percWidth === "NaN%") {
                     $this.text('50%');
-                    percWidth = '50%'
+                    percWidth = '50%';
                 }
-                number = parseFloat($(this).text());
-                if (number < 50)
-                    $(this).removeClass('greaterthan').addClass('lessthan');
-                if (number > 50)
-                    $(this).removeClass('lessthan').addClass('greaterthan');
-                if (number === 50)
-                    $(this).removeClass('lessthan').addClass('greaterthan');
-                $(this).css('width', percWidth);
+                var number = parseFloat($this.text());
+                if (number < 50) {
+                    $this.removeClass('greaterthan').addClass('lessthan');
+                } else if (number > 50) {
+                    $this.removeClass('lessthan').addClass('greaterthan');
+                } else if (Math.abs(number - 50) < 0.01) {
+                    $this.removeClass('lessthan').addClass('greaterthan');
+                }
+                $this.css('width', percWidth);
             });
+
             ls_format_score();
             ls_update_nfl_box();
             ls_check_if_final();
-            if (ls_includeProjections) ls_update_projections(); //update projections for both other games and rosters
-            // Prevent updates on previous weeks
+            if (ls_includeProjections) ls_update_projections();
+
             if (!ls_is_live_week) {
                 ls_timeout = 0;
                 ls_update_all = 1;
-
                 function reset_ls_timer() {
                     return false;
                 }
             }
-            $('.ls_projections.ls_pace_box:contains("NaN"),.ls_projections.ls_pace_box:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:0.875rem" title="Wait..As MFL Prepares Games Starting"></i>');
-            $('.ls_projections span:contains("undefined"),.ls_projections span:contains("NaN"),.ls_game_info:contains("NaN"),.ls_game_info:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:1.375rem" title="Wait..As MFL Prepares Games Starting"></i>');
-            //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
-        } // end ls_after_update_scores
+
+            const spinnerHTML = '<i class="fa-regular fa-spinner fa-spin" style="font-size:0.875rem" title="Wait..As MFL Prepares Games Starting"></i>';
+            $('.ls_projections.ls_pace_box:contains("NaN"),.ls_projections.ls_pace_box:contains("undefined")').html(spinnerHTML);
+            $('.ls_projections span:contains("undefined"),.ls_projections span:contains("NaN"),.ls_game_info:contains("NaN"),.ls_game_info:contains("undefined")').html(spinnerHTML);
+
+            function getPlayerImage(position, playerID) {
+                if (position === 'FA') {
+                    return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                } else {
+                    return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
+                }
+            }
+
+            function processDepthChart() {
+                const table = document.querySelector('#depth_chart table');
+                if (!table) return;
+
+                table.querySelectorAll('tr').forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length < 3) return;
+
+                    const playerCell = cells[2];
+                    const playerLink = playerCell.querySelector('a');
+                    if (!playerLink) return;
+
+                    const url = playerLink.getAttribute('href');
+                    const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
+
+                    const name = playerLink.textContent.trim();
+                    const nameParts = name.split(' ');
+                    const firstName = nameParts.length > 1 ? nameParts[0] : '';
+                    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : nameParts[0];
+                    const position = Array.from(playerLink.classList).find(cls => cls.startsWith('position_')).replace('position_', '').toUpperCase();
+
+                    const profileImage = getPlayerImage(position, playerID);
+
+                    const playerWrapper = document.createElement('div');
+                    playerWrapper.classList.add('player_wrapper');
+
+                    const lastNameDiv = document.createElement('a');
+                    lastNameDiv.classList.add('last_name_roster');
+                    lastNameDiv.textContent = lastName;
+                    lastNameDiv.href = playerLink.href;
+
+                    const firstNameDiv = document.createElement('div');
+                    firstNameDiv.classList.add('first_name_roster');
+                    firstNameDiv.textContent = firstName;
+
+                    const imageWrapper = document.createElement('div');
+                    imageWrapper.classList.add('image_wrapper');
+                    const playerImg = document.createElement('img');
+                    playerImg.classList.add('lineup_photo');
+                    playerImg.src = profileImage;
+                    playerImg.onerror = function () {
+                        playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                    };
+                    imageWrapper.appendChild(playerImg);
+
+                    playerWrapper.appendChild(firstNameDiv);
+                    playerWrapper.appendChild(lastNameDiv);
+                    playerWrapper.appendChild(imageWrapper);
+
+                    playerCell.innerHTML = '';
+                    playerCell.appendChild(playerWrapper);
+                });
+            }
+
+            processDepthChart();
+        }
+
 
 
         ////////////////////////////////////////////////////////////////////
