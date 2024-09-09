@@ -985,20 +985,20 @@ if ($('#body_ajax_ls').length) {
                     };
                     imageWrapper.appendChild(playerImg);
 
-                    // Clear the current cell and append the new structure
+                    // Append the new structure without clearing the original content
                     playerWrapper.appendChild(firstNameDiv);
                     playerWrapper.appendChild(lastNameDiv);
                     playerWrapper.appendChild(imageWrapper);
 
-                    console.log(`Replacing content in player cell for row ${rowIndex + 1}`);
-                    playerCell.innerHTML = '';
-                    playerCell.appendChild(playerWrapper);
+                    console.log(`Appending new content to player cell for row ${rowIndex + 1}`);
+                    playerCell.appendChild(playerWrapper); // Instead of clearing, we append the new content
                 });
 
                 console.log("Finished processing all rows.");
             }
 
             processAjaxLS();
+
 
 
 
