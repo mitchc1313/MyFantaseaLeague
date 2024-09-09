@@ -912,7 +912,7 @@ if ($('#body_ajax_ls').length) {
             }
 
             function processDepthChart() {
-                const table = document.querySelector('#depth_chart table');
+                const table = document.querySelector('.ls-matchup table');
                 if (!table) return;
 
                 table.querySelectorAll('tr').forEach(row => {
