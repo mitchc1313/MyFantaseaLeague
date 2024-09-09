@@ -912,27 +912,42 @@ if ($('#body_ajax_ls').length) {
             }
 
             function processDepthChart() {
+                console.log("processDepthChart function started.");
                 const table = document.querySelector('.ls-matchup table');
-                if (!table) return;
+                if (!table) {
+                    console.log("No table found in .ls-matchup.");
+                    return;
+                }
 
                 table.querySelectorAll('tr').forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    if (cells.length < 3) return;
+                    if (cells.length < 3) {
+                        console.log("Skipping row with less than 3 cells.");
+                        return;
+                    }
 
                     const playerCell = cells[2];
                     const playerLink = playerCell.querySelector('a');
-                    if (!playerLink) return;
+                    if (!playerLink) {
+                        console.log("No player link found in playerCell.");
+                        return;
+                    }
 
                     const url = playerLink.getAttribute('href');
                     const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
+                    console.log("Player ID:", playerID);
 
                     const name = playerLink.textContent.trim();
                     const nameParts = name.split(' ');
                     const firstName = nameParts.length > 1 ? nameParts[0] : '';
                     const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : nameParts[0];
+                    console.log("First Name:", firstName, "Last Name:", lastName);
+
                     const position = Array.from(playerLink.classList).find(cls => cls.startsWith('position_')).replace('position_', '').toUpperCase();
+                    console.log("Player Position:", position);
 
                     const profileImage = getPlayerImage(position, playerID);
+                    console.log("Profile Image URL:", profileImage);
 
                     const playerWrapper = document.createElement('div');
                     playerWrapper.classList.add('player_wrapper');
@@ -962,12 +977,12 @@ if ($('#body_ajax_ls').length) {
 
                     playerCell.innerHTML = '';
                     playerCell.appendChild(playerWrapper);
+                    console.log("Updated player cell with playerWrapper.");
                 });
             }
 
             processDepthChart();
         }
-
 
 
         ////////////////////////////////////////////////////////////////////
