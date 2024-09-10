@@ -903,6 +903,104 @@ if ($('#body_ajax_ls').length) {
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
 
+            function getPlayerImage(position, playerID) {
+                if (position === 'FA') {
+                    return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                } else {
+                    return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
+                }
+            }
+
+            function processAjaxLS() {
+                console.log("Starting processAjaxLS...");
+
+                const table = document.querySelector('#roster_home');
+                if (!table) {
+                    console.log("Table not found.");
+                    return;
+                }
+                console.log("Table found:", table);
+
+                table.querySelectorAll('tr').forEach((row, rowIndex) => {
+                    console.log(`Processing row ${rowIndex + 1}...`);
+
+                    const playerCell = row.querySelector('.td-first-type');
+                    if (!playerCell) {
+                        console.log(`No player cell found in row ${rowIndex + 1}`);
+                        return;
+                    }
+                    console.log(`Player cell found in row ${rowIndex + 1}:`, playerCell);
+
+                    const playerLink = playerCell.querySelector('a');
+                    if (!playerLink) {
+                        console.log(`No player link found in row ${rowIndex + 1}`);
+                        return;
+                    }
+                    console.log(`Player link found in row ${rowIndex + 1}:`, playerLink);
+
+                    const url = playerLink.getAttribute('href');
+                    const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
+                    if (!playerID) {
+                        console.log(`No player ID found in row ${rowIndex + 1}`);
+                        return;
+                    }
+                    console.log(`Player ID found in row ${rowIndex + 1}: ${playerID}`);
+
+                    const name = playerLink.textContent.trim();
+                    console.log(`Player name: ${name}`);
+                    const nameParts = name.split(',');
+                    const lastName = nameParts[0].trim();
+                    const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+                    console.log(`Parsed name - First: ${firstName}, Last: ${lastName}`);
+
+                    // Fetch position from next sibling or the inner text (based on your structure)
+                    const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
+                    const position = positionText ? positionText[0].split(' ')[1] : 'FA';
+                    console.log(`Position found: ${position}`);
+
+                    const profileImage = getPlayerImage(position, playerID);
+                    console.log(`Profile image URL: ${profileImage}`);
+
+                    // Create player wrapper elements
+                    const playerWrapper = document.createElement('div');
+                    playerWrapper.classList.add('player_wrapper');
+
+                    const lastNameDiv = document.createElement('a');
+                    lastNameDiv.classList.add('last_name_roster');
+                    lastNameDiv.textContent = lastName;
+                    lastNameDiv.href = playerLink.href;
+
+                    const firstNameDiv = document.createElement('div');
+                    firstNameDiv.classList.add('first_name_roster');
+                    firstNameDiv.textContent = firstName;
+
+                    const imageWrapper = document.createElement('div');
+                    imageWrapper.classList.add('image_wrapper');
+                    const playerImg = document.createElement('img');
+                    playerImg.classList.add('lineup_photo');
+                    playerImg.src = profileImage;
+                    playerImg.onerror = function () {
+                        console.log(`Error loading image for player ID: ${playerID}, using free agent image.`);
+                        playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                    };
+                    imageWrapper.appendChild(playerImg);
+
+                    // Hide the original player link
+                    playerLink.style.display = 'none';
+
+                    // Append the new structure without clearing the original content
+                    playerWrapper.appendChild(firstNameDiv);
+                    playerWrapper.appendChild(lastNameDiv);
+                    playerWrapper.appendChild(imageWrapper);
+
+                    console.log(`Appending new content to player cell for row ${rowIndex + 1}`);
+                    playerCell.appendChild(playerWrapper); // Instead of clearing, we append the new content
+                });
+
+                console.log("Finished processing all rows.");
+            }
+
+            processAjaxLS();
 
 
 
