@@ -914,7 +914,7 @@ if ($('#body_ajax_ls').length) {
             function processAjaxLS() {
                 console.log("Starting processAjaxLS...");
 
-                const table = document.querySelector('#roster_home');
+                const table = document.querySelector('#roster_home, #roster_away');
                 if (!table) {
                     console.log("Table not found.");
                     return;
