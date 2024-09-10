@@ -988,13 +988,13 @@ if ($('#body_ajax_ls').length) {
                     // Hide the original player link
                     playerLink.style.display = 'none';
 
-                    // Append the new structure without clearing the original content
+                    // Prepend the new structure to ensure it's the first in the td
                     playerWrapper.appendChild(firstNameDiv);
                     playerWrapper.appendChild(lastNameDiv);
                     playerWrapper.appendChild(imageWrapper);
 
-                    console.log(`Appending new content to player cell for row ${rowIndex + 1} in table ${tableID}`);
-                    playerCell.appendChild(playerWrapper); // Instead of clearing, we append the new content
+                    console.log(`Prepending new content to player cell for row ${rowIndex + 1} in table ${tableID}`);
+                    playerCell.prepend(playerWrapper); // Use prepend() to place the new content at the start
                 });
 
                 console.log(`Finished processing all rows in table ${tableID}.`);
@@ -1011,6 +1011,7 @@ if ($('#body_ajax_ls').length) {
             }
 
             processAjaxLS();
+
 
 
 
