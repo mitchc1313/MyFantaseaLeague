@@ -911,40 +911,40 @@ if ($('#body_ajax_ls').length) {
                 }
             }
 
-            function processAjaxLS() {
-                console.log("Starting processAjaxLS...");
+            function processTable(tableID) {
+                console.log(`Processing table: ${tableID}`);
 
-                const table = document.querySelector('#roster_home, #roster_away');
+                const table = document.querySelector(`#${tableID}`);
                 if (!table) {
-                    console.log("Table not found.");
+                    console.log(`Table ${tableID} not found.`);
                     return;
                 }
-                console.log("Table found:", table);
+                console.log(`Table ${tableID} found:`, table);
 
                 table.querySelectorAll('tr').forEach((row, rowIndex) => {
-                    console.log(`Processing row ${rowIndex + 1}...`);
+                    console.log(`Processing row ${rowIndex + 1} in table ${tableID}...`);
 
                     const playerCell = row.querySelector('.td-first-type');
                     if (!playerCell) {
-                        console.log(`No player cell found in row ${rowIndex + 1}`);
+                        console.log(`No player cell found in row ${rowIndex + 1} of table ${tableID}`);
                         return;
                     }
-                    console.log(`Player cell found in row ${rowIndex + 1}:`, playerCell);
+                    console.log(`Player cell found in row ${rowIndex + 1} of table ${tableID}:`, playerCell);
 
                     const playerLink = playerCell.querySelector('a');
                     if (!playerLink) {
-                        console.log(`No player link found in row ${rowIndex + 1}`);
+                        console.log(`No player link found in row ${rowIndex + 1} of table ${tableID}`);
                         return;
                     }
-                    console.log(`Player link found in row ${rowIndex + 1}:`, playerLink);
+                    console.log(`Player link found in row ${rowIndex + 1} of table ${tableID}:`, playerLink);
 
                     const url = playerLink.getAttribute('href');
                     const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
                     if (!playerID) {
-                        console.log(`No player ID found in row ${rowIndex + 1}`);
+                        console.log(`No player ID found in row ${rowIndex + 1} of table ${tableID}`);
                         return;
                     }
-                    console.log(`Player ID found in row ${rowIndex + 1}: ${playerID}`);
+                    console.log(`Player ID found in row ${rowIndex + 1} of table ${tableID}: ${playerID}`);
 
                     const name = playerLink.textContent.trim();
                     console.log(`Player name: ${name}`);
@@ -993,14 +993,25 @@ if ($('#body_ajax_ls').length) {
                     playerWrapper.appendChild(lastNameDiv);
                     playerWrapper.appendChild(imageWrapper);
 
-                    console.log(`Appending new content to player cell for row ${rowIndex + 1}`);
+                    console.log(`Appending new content to player cell for row ${rowIndex + 1} in table ${tableID}`);
                     playerCell.appendChild(playerWrapper); // Instead of clearing, we append the new content
                 });
 
-                console.log("Finished processing all rows.");
+                console.log(`Finished processing all rows in table ${tableID}.`);
+            }
+
+            function processAjaxLS() {
+                console.log("Starting processAjaxLS...");
+
+                // Process both home and away tables
+                processTable('roster_home');
+                processTable('roster_away');
+
+                console.log("Finished processing all tables.");
             }
 
             processAjaxLS();
+
 
 
 
