@@ -931,6 +931,12 @@ if ($('#body_ajax_ls').length) {
                     }
                     console.log(`Player cell found in row ${rowIndex + 1} of table ${tableID}:`, playerCell);
 
+                    // Check if the player wrapper already exists to prevent reloading on refresh
+                    if (playerCell.querySelector('.player_wrapper')) {
+                        console.log(`Player wrapper already exists in row ${rowIndex + 1} of table ${tableID}, skipping.`);
+                        return;
+                    }
+
                     const playerLink = playerCell.querySelector('a');
                     if (!playerLink) {
                         console.log(`No player link found in row ${rowIndex + 1} of table ${tableID}`);
@@ -1011,6 +1017,7 @@ if ($('#body_ajax_ls').length) {
             }
 
             processAjaxLS();
+
 
 
 
