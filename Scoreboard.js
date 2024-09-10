@@ -931,6 +931,13 @@ if ($('#body_ajax_ls').length) {
                     }
                     console.log(`Player cell found in row ${rowIndex + 1} of table ${tableID}:`, playerCell);
 
+                    // Remove all <br> elements within the player cell
+                    const brElements = playerCell.querySelectorAll('br');
+                    brElements.forEach((br) => {
+                        br.remove();
+                        console.log(`Removed <br> element in row ${rowIndex + 1} of table ${tableID}`);
+                    });
+
                     // Check if the player wrapper already exists to prevent reloading on refresh
                     if (playerCell.querySelector('.player_wrapper')) {
                         console.log(`Player wrapper already exists in row ${rowIndex + 1} of table ${tableID}, skipping.`);
@@ -1017,6 +1024,7 @@ if ($('#body_ajax_ls').length) {
             }
 
             processAjaxLS();
+
 
 
 
