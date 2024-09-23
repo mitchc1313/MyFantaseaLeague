@@ -1027,6 +1027,24 @@ if ($('#body_ajax_ls').length) {
 
 
 
+            // Function to assign img ID to a table
+            function assignImgIdToTable(imgSelector, tableSelector) {
+                const imgElement = document.querySelector(imgSelector);
+                const tableElement = document.querySelector(tableSelector);
+
+                // If both elements are found, assign the img ID as a class to the table
+                if (imgElement && tableElement) {
+                    const imgId = imgElement.id;
+                    // Assign the img ID as a class to the table
+                    tableElement.classList.add(imgId);
+                }
+            }
+
+            // Corrected selectors based on the structure you provided
+            assignImgIdToTable('#LS_AwayTeamName div#ficon_away img', 'table#roster_away');
+            assignImgIdToTable('#LS_HomeTeamName div#ficon_home img', 'table#roster_home');
+
+
 
 
 
