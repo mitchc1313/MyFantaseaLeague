@@ -903,8 +903,7 @@ if ($('#body_ajax_ls').length) {
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
 
-           function getPlayerImage(playerID) {
-    // Defense team ID-to-NFL team abbreviation mapping
+         function getPlayerImage(playerID) {
     const defenseIDs = {
         '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
         '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
@@ -915,38 +914,36 @@ if ($('#body_ajax_ls').length) {
         '0531': 'BAL', '0532': 'HOU'
     };
 
-    // Debugging: Log the player ID being processed
     console.log(`Processing playerID: ${playerID}`);
 
     if (defenseIDs[playerID]) {
-        // Debugging: Log if it's a defense and the abbreviation being used
         console.log(`Defense detected for playerID: ${playerID}, Team Abbreviation: ${defenseIDs[playerID]}`);
         return `https://www.mflscripts.com/playerImages_96x96/mfl_${defenseIDs[playerID]}.svg`;
     } else {
-        // Debugging: Log if it's a non-defense player
-        console.log(`Non-defense player detected: ${playerID}`);
+        console.log(`Non-defense player detected or unknown playerID: ${playerID}`);
         return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
     }
 }
 
 function processPlayerImageLink(playerLink) {
     const url = playerLink.getAttribute('href');
+    if (!url.includes('P=')) {
+        console.error(`Invalid URL format for player link: ${url}`);
+        return;
+    }
+
     const playerID = url.split('P=')[1].split('&')[0];
 
-    // Debugging: Log the extracted player ID from the link
     console.log(`Extracted playerID from link: ${playerID}`);
 
     const profileImage = getPlayerImage(playerID);
 
-    // Debugging: Log the generated image URL
     console.log(`Generated image URL: ${profileImage}`);
 
-    // Create a new img element for the player
     const playerImg = document.createElement('img');
     playerImg.classList.add('lineup_photo');
     playerImg.src = profileImage;
     playerImg.onerror = function () {
-        // Fallback to a default image if the image fails to load
         console.log(`Image failed to load for playerID: ${playerID}, falling back to default image.`);
         playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/default.png';
     };
@@ -957,41 +954,36 @@ function processPlayerImageLink(playerLink) {
 function processTable(tableID) {
     const table = document.querySelector(`#${tableID}`);
     if (!table) {
-        // Debugging: Log if the table is not found
-        console.log(`Table not found: ${tableID}`);
+        console.warn(`Table not found: ${tableID}`);
         return;
     }
 
     table.querySelectorAll('tr').forEach((row) => {
         const playerCell = row.querySelector('.td-first-type');
         if (!playerCell || playerCell.querySelector('.player_wrapper')) {
-            // Debugging: Log if the player cell is not found or already processed
             console.log(`Player cell not found or already processed in row:`, row);
             return;
         }
 
         const playerLink = playerCell.querySelector('a');
         if (!playerLink) {
-            // Debugging: Log if no player link is found
             console.log(`No player link found in playerCell:`, playerCell);
             return;
         }
 
         const playerImg = processPlayerImageLink(playerLink);
 
-        // Append the player image to the player cell
         playerCell.appendChild(playerImg);
     });
 }
 
-// Assuming you have similar functions to initiate processing
 function processAllTables() {
     processTable('roster_home');
     processTable('roster_away');
 }
 
-
 document.addEventListener("DOMContentLoaded", processAllTables);
+
 
 
             function removePreviousFranchiseIconClasses(tableElement) {
