@@ -903,7 +903,7 @@ if ($('#body_ajax_ls').length) {
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
 
-            function getPlayerImage(playerID) {
+            function getPlayerImage(position, playerID) {
                 // Defense team ID-to-NFL team abbreviation mapping
                 const defenseIDs = {
                     '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
@@ -915,56 +915,87 @@ if ($('#body_ajax_ls').length) {
                     '0531': 'BAL', '0532': 'HOU'
                 };
 
-                if (defenseIDs[playerID]) {
+                if (position === 'FA') {
+                    return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                } else if (defenseIDs[playerID]) {
+                    // Use SVG image for defenses
                     return `https://www.mflscripts.com/playerImages_96x96/mfl_${defenseIDs[playerID]}.svg`;
                 } else {
                     return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
                 }
             }
 
-            function processPlayerImageLink(playerLink) {
-                const url = playerLink.getAttribute('href');
-                const playerID = url.split('P=')[1].split('&')[0];
-
-                const profileImage = getPlayerImage(playerID);
-
-                // Create a new img element for the player
-                const playerImg = document.createElement('img');
-                playerImg.classList.add('lineup_photo');
-                playerImg.src = profileImage;
-                playerImg.onerror = function () {
-                    // Fallback to a default image if the image fails to load
-                    playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/default.png';
-                };
-
-                return playerImg;
-            }
-
             function processTable(tableID) {
                 const table = document.querySelector(`#${tableID}`);
-                if (!table) return;
+                if (!table) {
+                    return;
+                }
 
-                table.querySelectorAll('tr').forEach((row) => {
+                table.querySelectorAll('tr').forEach((row, rowIndex) => {
                     const playerCell = row.querySelector('.td-first-type');
-                    if (!playerCell || playerCell.querySelector('.player_wrapper')) return;
+                    if (!playerCell || playerCell.querySelector('.player_wrapper')) {
+                        return;
+                    }
 
                     const playerLink = playerCell.querySelector('a');
-                    if (!playerLink) return;
+                    if (!playerLink) {
+                        return;
+                    }
 
-                    const playerImg = processPlayerImageLink(playerLink);
+                    const url = playerLink.getAttribute('href');
+                    const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
+                    if (!playerID) {
+                        return;
+                    }
 
-                    // Append the player image to the player cell
-                    playerCell.appendChild(playerImg);
+                    const name = playerLink.textContent.trim();
+                    const nameParts = name.split(',');
+                    const lastName = nameParts[0].trim();
+                    const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+
+                    const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
+                    const position = positionText ? positionText[0].split(' ')[1] : 'FA';
+
+                    const profileImage = getPlayerImage(position, playerID);
+
+                    const playerWrapper = document.createElement('div');
+                    playerWrapper.classList.add('player_wrapper');
+
+                    const lastNameDiv = document.createElement('a');
+                    lastNameDiv.classList.add('last_name_roster');
+                    lastNameDiv.textContent = lastName;
+                    lastNameDiv.href = playerLink.href;
+
+                    const firstNameDiv = document.createElement('div');
+                    firstNameDiv.classList.add('first_name_roster');
+                    firstNameDiv.textContent = firstName;
+
+                    const imageWrapper = document.createElement('div');
+                    imageWrapper.classList.add('image_wrapper');
+                    const playerImg = document.createElement('img');
+                    playerImg.classList.add('lineup_photo');
+                    playerImg.src = profileImage;
+                    playerImg.onerror = function () {
+                        playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                    };
+                    imageWrapper.appendChild(playerImg);
+
+                    playerLink.style.display = 'none';
+
+                    playerWrapper.appendChild(firstNameDiv);
+                    playerWrapper.appendChild(lastNameDiv);
+                    playerWrapper.appendChild(imageWrapper);
+
+                    playerCell.prepend(playerWrapper);
                 });
             }
 
-            // Assuming you have similar functions to initiate processing
-            function processAllTables() {
+            function processAjaxLS() {
                 processTable('roster_home');
                 processTable('roster_away');
             }
 
-            document.addEventListener("DOMContentLoaded", processAllTables);
+            processAjaxLS();
 
 
 
