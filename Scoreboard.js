@@ -904,77 +904,60 @@ if ($('#body_ajax_ls').length) {
 
 
             function getPlayerImage(position, playerID) {
+                // Defense team ID-to-NFL team abbreviation mapping
+                const defenseIDs = {
+                    '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
+                    '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
+                    '0511': 'DEN', '0512': 'KCC', '0513': 'LVR', '0514': 'LAC', '0515': 'SEA',
+                    '0516': 'DAL', '0517': 'NYG', '0518': 'PHI', '0519': 'ARI', '0520': 'WAS',
+                    '0521': 'CHI', '0522': 'DET', '0523': 'GBP', '0524': 'MIN', '0525': 'TBB',
+                    '0526': 'ATL', '0527': 'CAR', '0528': 'LAR', '0529': 'NOS', '0530': 'SFO',
+                    '0531': 'BAL', '0532': 'HOU'
+                };
+
                 if (position === 'FA') {
                     return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                } else if (defenseIDs[playerID]) {
+                    // Use SVG image for defenses
+                    return `https://www.mflscripts.com/playerImages_96x96/mfl_${defenseIDs[playerID]}.svg`;
                 } else {
-                    return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
+                    return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
                 }
             }
 
             function processTable(tableID) {
-                console.log(`Processing table: ${tableID}`);
-
                 const table = document.querySelector(`#${tableID}`);
                 if (!table) {
-                    console.log(`Table ${tableID} not found.`);
                     return;
                 }
-                console.log(`Table ${tableID} found:`, table);
 
                 table.querySelectorAll('tr').forEach((row, rowIndex) => {
-                    console.log(`Processing row ${rowIndex + 1} in table ${tableID}...`);
-
                     const playerCell = row.querySelector('.td-first-type');
-                    if (!playerCell) {
-                        console.log(`No player cell found in row ${rowIndex + 1} of table ${tableID}`);
-                        return;
-                    }
-                    console.log(`Player cell found in row ${rowIndex + 1} of table ${tableID}:`, playerCell);
-
-                    // Remove all <br> elements within the player cell
-                    const brElements = playerCell.querySelectorAll('br');
-                    brElements.forEach((br) => {
-                        br.remove();
-                        console.log(`Removed <br> element in row ${rowIndex + 1} of table ${tableID}`);
-                    });
-
-                    // Check if the player wrapper already exists to prevent reloading on refresh
-                    if (playerCell.querySelector('.player_wrapper')) {
-                        console.log(`Player wrapper already exists in row ${rowIndex + 1} of table ${tableID}, skipping.`);
+                    if (!playerCell || playerCell.querySelector('.player_wrapper')) {
                         return;
                     }
 
                     const playerLink = playerCell.querySelector('a');
                     if (!playerLink) {
-                        console.log(`No player link found in row ${rowIndex + 1} of table ${tableID}`);
                         return;
                     }
-                    console.log(`Player link found in row ${rowIndex + 1} of table ${tableID}:`, playerLink);
 
                     const url = playerLink.getAttribute('href');
                     const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
                     if (!playerID) {
-                        console.log(`No player ID found in row ${rowIndex + 1} of table ${tableID}`);
                         return;
                     }
-                    console.log(`Player ID found in row ${rowIndex + 1} of table ${tableID}: ${playerID}`);
 
                     const name = playerLink.textContent.trim();
-                    console.log(`Player name: ${name}`);
                     const nameParts = name.split(',');
                     const lastName = nameParts[0].trim();
                     const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
-                    console.log(`Parsed name - First: ${firstName}, Last: ${lastName}`);
 
-                    // Fetch position from next sibling or the inner text (based on your structure)
                     const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
                     const position = positionText ? positionText[0].split(' ')[1] : 'FA';
-                    console.log(`Position found: ${position}`);
 
                     const profileImage = getPlayerImage(position, playerID);
-                    console.log(`Profile image URL: ${profileImage}`);
 
-                    // Create player wrapper elements
                     const playerWrapper = document.createElement('div');
                     playerWrapper.classList.add('player_wrapper');
 
@@ -993,34 +976,23 @@ if ($('#body_ajax_ls').length) {
                     playerImg.classList.add('lineup_photo');
                     playerImg.src = profileImage;
                     playerImg.onerror = function () {
-                        console.log(`Error loading image for player ID: ${playerID}, using free agent image.`);
                         playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
                     };
                     imageWrapper.appendChild(playerImg);
 
-                    // Hide the original player link
                     playerLink.style.display = 'none';
 
-                    // Prepend the new structure to ensure it's the first in the td
                     playerWrapper.appendChild(firstNameDiv);
                     playerWrapper.appendChild(lastNameDiv);
                     playerWrapper.appendChild(imageWrapper);
 
-                    console.log(`Prepending new content to player cell for row ${rowIndex + 1} in table ${tableID}`);
-                    playerCell.prepend(playerWrapper); // Use prepend() to place the new content at the start
+                    playerCell.prepend(playerWrapper);
                 });
-
-                console.log(`Finished processing all rows in table ${tableID}.`);
             }
 
             function processAjaxLS() {
-                console.log("Starting processAjaxLS...");
-
-                // Process both home and away tables
                 processTable('roster_home');
                 processTable('roster_away');
-
-                console.log("Finished processing all tables.");
             }
 
             processAjaxLS();
@@ -1028,32 +1000,31 @@ if ($('#body_ajax_ls').length) {
 
 
 
-
             function removePreviousFranchiseIconClasses(tableElement) {
-        const classes = tableElement.className.split(' ').filter(function(c) {
-            return !c.startsWith('franchiseicon_');
-        });
-        tableElement.className = classes.join(' ');
-    }
+                const classes = tableElement.className.split(' ').filter(function (c) {
+                    return !c.startsWith('franchiseicon_');
+                });
+                tableElement.className = classes.join(' ');
+            }
 
-    // Function to assign img ID to a table
-    function assignImgIdToTable(imgSelector, tableSelector) {
-        const imgElement = document.querySelector(imgSelector);
-        const tableElement = document.querySelector(tableSelector);
+            // Function to assign img ID to a table
+            function assignImgIdToTable(imgSelector, tableSelector) {
+                const imgElement = document.querySelector(imgSelector);
+                const tableElement = document.querySelector(tableSelector);
 
-        if (imgElement && tableElement) {
-            // Remove any previous franchiseicon_* class
-            removePreviousFranchiseIconClasses(tableElement);
+                if (imgElement && tableElement) {
+                    // Remove any previous franchiseicon_* class
+                    removePreviousFranchiseIconClasses(tableElement);
 
-            // Add the new img ID as a class
-            const imgId = imgElement.id;
-            tableElement.classList.add(imgId);
-        }
-    }
+                    // Add the new img ID as a class
+                    const imgId = imgElement.id;
+                    tableElement.classList.add(imgId);
+                }
+            }
 
-    // Corrected selectors based on the structure you provided
-    assignImgIdToTable('#LS_AwayTeamName div#ficon_away img', 'table#roster_away');
-    assignImgIdToTable('#LS_HomeTeamName div#ficon_home img', 'table#roster_home');
+            // Corrected selectors based on the structure you provided
+            assignImgIdToTable('#LS_AwayTeamName div#ficon_away img', 'table#roster_away');
+            assignImgIdToTable('#LS_HomeTeamName div#ficon_home img', 'table#roster_home');
 
 
 
