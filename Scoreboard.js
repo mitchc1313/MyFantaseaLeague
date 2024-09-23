@@ -903,99 +903,93 @@ if ($('#body_ajax_ls').length) {
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
 
-            function getPlayerImage(position, playerID) {
-                // Defense team ID-to-NFL team abbreviation mapping
-                const defenseIDs = {
-                    '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
-                    '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
-                    '0511': 'DEN', '0512': 'KCC', '0513': 'LVR', '0514': 'LAC', '0515': 'SEA',
-                    '0516': 'DAL', '0517': 'NYG', '0518': 'PHI', '0519': 'ARI', '0520': 'WAS',
-                    '0521': 'CHI', '0522': 'DET', '0523': 'GBP', '0524': 'MIN', '0525': 'TBB',
-                    '0526': 'ATL', '0527': 'CAR', '0528': 'LAR', '0529': 'NOS', '0530': 'SFO',
-                    '0531': 'BAL', '0532': 'HOU'
-                };
+           function getPlayerImage(playerID) {
+    // Defense team ID-to-NFL team abbreviation mapping
+    const defenseIDs = {
+        '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
+        '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
+        '0511': 'DEN', '0512': 'KCC', '0513': 'LVR', '0514': 'LAC', '0515': 'SEA',
+        '0516': 'DAL', '0517': 'NYG', '0518': 'PHI', '0519': 'ARI', '0520': 'WAS',
+        '0521': 'CHI', '0522': 'DET', '0523': 'GBP', '0524': 'MIN', '0525': 'TBB',
+        '0526': 'ATL', '0527': 'CAR', '0528': 'LAR', '0529': 'NOS', '0530': 'SFO',
+        '0531': 'BAL', '0532': 'HOU'
+    };
 
-                if (position === 'FA') {
-                    return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
-                } else if (defenseIDs[playerID]) {
-                    // Use SVG image for defenses
-                    return `https://www.mflscripts.com/playerImages_96x96/mfl_${defenseIDs[playerID]}.svg`;
-                } else {
-                    return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
-                }
-            }
+    // Debugging: Log the player ID being processed
+    console.log(`Processing playerID: ${playerID}`);
 
-            function processTable(tableID) {
-                const table = document.querySelector(`#${tableID}`);
-                if (!table) {
-                    return;
-                }
+    if (defenseIDs[playerID]) {
+        // Debugging: Log if it's a defense and the abbreviation being used
+        console.log(`Defense detected for playerID: ${playerID}, Team Abbreviation: ${defenseIDs[playerID]}`);
+        return `https://www.mflscripts.com/playerImages_96x96/mfl_${defenseIDs[playerID]}.svg`;
+    } else {
+        // Debugging: Log if it's a non-defense player
+        console.log(`Non-defense player detected: ${playerID}`);
+        return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
+    }
+}
 
-                table.querySelectorAll('tr').forEach((row, rowIndex) => {
-                    const playerCell = row.querySelector('.td-first-type');
-                    if (!playerCell || playerCell.querySelector('.player_wrapper')) {
-                        return;
-                    }
+function processPlayerImageLink(playerLink) {
+    const url = playerLink.getAttribute('href');
+    const playerID = url.split('P=')[1].split('&')[0];
 
-                    const playerLink = playerCell.querySelector('a');
-                    if (!playerLink) {
-                        return;
-                    }
+    // Debugging: Log the extracted player ID from the link
+    console.log(`Extracted playerID from link: ${playerID}`);
 
-                    const url = playerLink.getAttribute('href');
-                    const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
-                    if (!playerID) {
-                        return;
-                    }
+    const profileImage = getPlayerImage(playerID);
 
-                    const name = playerLink.textContent.trim();
-                    const nameParts = name.split(',');
-                    const lastName = nameParts[0].trim();
-                    const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+    // Debugging: Log the generated image URL
+    console.log(`Generated image URL: ${profileImage}`);
 
-                    const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
-                    const position = positionText ? positionText[0].split(' ')[1] : 'FA';
+    // Create a new img element for the player
+    const playerImg = document.createElement('img');
+    playerImg.classList.add('lineup_photo');
+    playerImg.src = profileImage;
+    playerImg.onerror = function () {
+        // Fallback to a default image if the image fails to load
+        console.log(`Image failed to load for playerID: ${playerID}, falling back to default image.`);
+        playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/default.png';
+    };
 
-                    const profileImage = getPlayerImage(position, playerID);
+    return playerImg;
+}
 
-                    const playerWrapper = document.createElement('div');
-                    playerWrapper.classList.add('player_wrapper');
+function processTable(tableID) {
+    const table = document.querySelector(`#${tableID}`);
+    if (!table) {
+        // Debugging: Log if the table is not found
+        console.log(`Table not found: ${tableID}`);
+        return;
+    }
 
-                    const lastNameDiv = document.createElement('a');
-                    lastNameDiv.classList.add('last_name_roster');
-                    lastNameDiv.textContent = lastName;
-                    lastNameDiv.href = playerLink.href;
+    table.querySelectorAll('tr').forEach((row) => {
+        const playerCell = row.querySelector('.td-first-type');
+        if (!playerCell || playerCell.querySelector('.player_wrapper')) {
+            // Debugging: Log if the player cell is not found or already processed
+            console.log(`Player cell not found or already processed in row:`, row);
+            return;
+        }
 
-                    const firstNameDiv = document.createElement('div');
-                    firstNameDiv.classList.add('first_name_roster');
-                    firstNameDiv.textContent = firstName;
+        const playerLink = playerCell.querySelector('a');
+        if (!playerLink) {
+            // Debugging: Log if no player link is found
+            console.log(`No player link found in playerCell:`, playerCell);
+            return;
+        }
 
-                    const imageWrapper = document.createElement('div');
-                    imageWrapper.classList.add('image_wrapper');
-                    const playerImg = document.createElement('img');
-                    playerImg.classList.add('lineup_photo');
-                    playerImg.src = profileImage;
-                    playerImg.onerror = function () {
-                        playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
-                    };
-                    imageWrapper.appendChild(playerImg);
+        const playerImg = processPlayerImageLink(playerLink);
 
-                    playerLink.style.display = 'none';
+        // Append the player image to the player cell
+        playerCell.appendChild(playerImg);
+    });
+}
 
-                    playerWrapper.appendChild(firstNameDiv);
-                    playerWrapper.appendChild(lastNameDiv);
-                    playerWrapper.appendChild(imageWrapper);
+// Assuming you have similar functions to initiate processing
+function processAllTables() {
+    processTable('roster_home');
+    processTable('roster_away');
+}
 
-                    playerCell.prepend(playerWrapper);
-                });
-            }
-
-            function processAjaxLS() {
-                processTable('roster_home');
-                processTable('roster_away');
-            }
-
-            processAjaxLS();
 
 
 
