@@ -1,4 +1,6 @@
-
+if (typeof liveScoringWeek === 'undefined') {
+    liveScoringWeek = 1; // or any default/fallback value
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -902,119 +904,133 @@ if ($('#body_ajax_ls').length) {
             $('.ls_projections span:contains("undefined"),.ls_projections span:contains("NaN"),.ls_game_info:contains("NaN"),.ls_game_info:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:1.375rem" title="Wait..As MFL Prepares Games Starting"></i>');
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
-
-         function getPlayerImage(playerID) {
-    const defenseIDs = {
-        '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
-        '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
-        '0511': 'DEN', '0512': 'KCC', '0513': 'LVR', '0514': 'LAC', '0515': 'SEA',
-        '0516': 'DAL', '0517': 'NYG', '0518': 'PHI', '0519': 'ARI', '0520': 'WAS',
-        '0521': 'CHI', '0522': 'DET', '0523': 'GBP', '0524': 'MIN', '0525': 'TBB',
-        '0526': 'ATL', '0527': 'CAR', '0528': 'LAR', '0529': 'NOS', '0530': 'SFO',
-        '0531': 'BAL', '0532': 'HOU'
-    };
-
-    console.log(`Processing playerID: ${playerID}`);
-
-    if (defenseIDs[playerID]) {
-        console.log(`Defense detected for playerID: ${playerID}, Team Abbreviation: ${defenseIDs[playerID]}`);
-        return `https://www.mflscripts.com/playerImages_96x96/mfl_${defenseIDs[playerID]}.svg`;
-    } else {
-        console.log(`Non-defense player detected or unknown playerID: ${playerID}`);
-        return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
-    }
-}
-
-function processPlayerImageLink(playerLink) {
-    const url = playerLink.getAttribute('href');
-    if (!url.includes('P=')) {
-        console.error(`Invalid URL format for player link: ${url}`);
-        return;
-    }
-
-    const playerID = url.split('P=')[1].split('&')[0];
-
-    console.log(`Extracted playerID from link: ${playerID}`);
-
-    const profileImage = getPlayerImage(playerID);
-
-    console.log(`Generated image URL: ${profileImage}`);
-
-    const playerImg = document.createElement('img');
-    playerImg.classList.add('lineup_photo');
-    playerImg.src = profileImage;
-    playerImg.onerror = function () {
-        console.log(`Image failed to load for playerID: ${playerID}, falling back to default image.`);
-        playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/default.png';
-    };
-
-    return playerImg;
-}
-
-function processTable(tableID) {
-    const table = document.querySelector(`#${tableID}`);
-    if (!table) {
-        console.warn(`Table not found: ${tableID}`);
-        return;
-    }
-
-    table.querySelectorAll('tr').forEach((row) => {
-        const playerCell = row.querySelector('.td-first-type');
-        if (!playerCell || playerCell.querySelector('.player_wrapper')) {
-            console.log(`Player cell not found or already processed in row:`, row);
-            return;
-        }
-
-        const playerLink = playerCell.querySelector('a');
-        if (!playerLink) {
-            console.log(`No player link found in playerCell:`, playerCell);
-            return;
-        }
-
-        const playerImg = processPlayerImageLink(playerLink);
-
-        playerCell.appendChild(playerImg);
-    });
-}
-
-function processAllTables() {
-    processTable('roster_home');
-    processTable('roster_away');
-}
-
-document.addEventListener("DOMContentLoaded", processAllTables);
-
-
-
-            function removePreviousFranchiseIconClasses(tableElement) {
-                const classes = tableElement.className.split(' ').filter(function (c) {
-                    return !c.startsWith('franchiseicon_');
-                });
-                tableElement.className = classes.join(' ');
-            }
-
-            // Function to assign img ID to a table
-            function assignImgIdToTable(imgSelector, tableSelector) {
-                const imgElement = document.querySelector(imgSelector);
-                const tableElement = document.querySelector(tableSelector);
-
-                if (imgElement && tableElement) {
-                    // Remove any previous franchiseicon_* class
-                    removePreviousFranchiseIconClasses(tableElement);
-
-                    // Add the new img ID as a class
-                    const imgId = imgElement.id;
-                    tableElement.classList.add(imgId);
-                }
-            }
-
-            // Corrected selectors based on the structure you provided
-            assignImgIdToTable('#LS_AwayTeamName div#ficon_away img', 'table#roster_away');
-            assignImgIdToTable('#LS_HomeTeamName div#ficon_home img', 'table#roster_home');
-
-
-
-
+            /*
+                        function getPlayerImage(position, playerID) {
+                            // Defense team ID-to-NFL team abbreviation mapping
+                            const defenseIDs = {
+                                '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
+                                '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
+                                '0511': 'DEN', '0512': 'KCC', '0513': 'LVR', '0514': 'LAC', '0515': 'SEA',
+                                '0516': 'DAL', '0517': 'NYG', '0518': 'PHI', '0519': 'ARI', '0520': 'WAS',
+                                '0521': 'CHI', '0522': 'DET', '0523': 'GBP', '0524': 'MIN', '0525': 'TBB',
+                                '0526': 'ATL', '0527': 'CAR', '0528': 'LAR', '0529': 'NOS', '0530': 'SFO',
+                                '0531': 'BAL', '0532': 'HOU'
+                            };
+            
+                            if (position === 'FA') {
+                                return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                            } else if (defenseIDs[playerID]) {
+                                // Use SVG image for defenses
+                                return `https://www.mflscripts.com/playerImages_96x96/mfl_${defenseIDs[playerID]}.svg`;
+                            } else {
+                                return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
+                            }
+                        }
+            
+                        function processTable(tableID) {
+                            const table = document.querySelector(`#${tableID}`);
+                            if (!table) {
+                                return;
+                            }
+            
+                            table.querySelectorAll('tr').forEach((row, rowIndex) => {
+                                const playerCell = row.querySelector('.td-first-type');
+                                if (!playerCell || playerCell.querySelector('.player_wrapper')) {
+                                    return;
+                                }
+            
+                                const playerLink = playerCell.querySelector('a');
+                                if (!playerLink) {
+                                    return;
+                                }
+            
+                                const url = playerLink.getAttribute('href');
+                                const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
+                                if (!playerID) {
+                                    return;
+                                }
+            
+                                const name = playerLink.textContent.trim();
+                                const nameParts = name.split(',');
+                                const lastName = nameParts[0].trim();
+                                const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+            
+                                const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
+                                const position = positionText ? positionText[0].split(' ')[1] : 'FA';
+            
+                                const profileImage = getPlayerImage(position, playerID);
+            
+                                const playerWrapper = document.createElement('div');
+                                playerWrapper.classList.add('player_wrapper');
+            
+                                const lastNameDiv = document.createElement('a');
+                                lastNameDiv.classList.add('last_name_roster');
+                                lastNameDiv.textContent = lastName;
+                                lastNameDiv.href = playerLink.href;
+            
+                                const firstNameDiv = document.createElement('div');
+                                firstNameDiv.classList.add('first_name_roster');
+                                firstNameDiv.textContent = firstName;
+            
+                                const imageWrapper = document.createElement('div');
+                                imageWrapper.classList.add('image_wrapper');
+                                const playerImg = document.createElement('img');
+                                playerImg.classList.add('lineup_photo');
+                                playerImg.src = profileImage;
+                                playerImg.onerror = function () {
+                                    playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                                };
+                                imageWrapper.appendChild(playerImg);
+            
+                                playerLink.style.display = 'none';
+            
+                                playerWrapper.appendChild(firstNameDiv);
+                                playerWrapper.appendChild(lastNameDiv);
+                                playerWrapper.appendChild(imageWrapper);
+            
+                                playerCell.prepend(playerWrapper);
+                            });
+                        }
+            
+                        function processAjaxLS() {
+                            processTable('roster_home');
+                            processTable('roster_away');
+                        }
+            
+                        processAjaxLS();
+            
+            
+            
+            
+                        function removePreviousFranchiseIconClasses(tableElement) {
+                            const classes = tableElement.className.split(' ').filter(function (c) {
+                                return !c.startsWith('franchiseicon_');
+                            });
+                            tableElement.className = classes.join(' ');
+                        }
+            
+                        // Function to assign img ID to a table
+                        function assignImgIdToTable(imgSelector, tableSelector) {
+                            const imgElement = document.querySelector(imgSelector);
+                            const tableElement = document.querySelector(tableSelector);
+            
+                            if (imgElement && tableElement) {
+                                // Remove any previous franchiseicon_* class
+                                removePreviousFranchiseIconClasses(tableElement);
+            
+                                // Add the new img ID as a class
+                                const imgId = imgElement.id;
+                                tableElement.classList.add(imgId);
+                            }
+                        }
+            
+                        // Corrected selectors based on the structure you provided
+                        assignImgIdToTable('#LS_AwayTeamName div#ficon_away img', 'table#roster_away');
+                        assignImgIdToTable('#LS_HomeTeamName div#ficon_home img', 'table#roster_home');
+            
+            
+            
+            */
 
 
 
