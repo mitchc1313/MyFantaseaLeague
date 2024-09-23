@@ -1028,6 +1028,34 @@ if ($('#body_ajax_ls').length) {
 
 
 
+            function removePreviousFranchiseIconClasses(tableElement) {
+                const classes = tableElement.className.split(' ').filter(function (c) {
+                    return !c.startsWith('franchiseicon_');
+                });
+                tableElement.className = classes.join(' ');
+            }
+
+            // Function to assign img ID to a table
+            function assignImgIdToTable(imgSelector, tableSelector) {
+                const imgElement = document.querySelector(imgSelector);
+                const tableElement = document.querySelector(tableSelector);
+
+                if (imgElement && tableElement) {
+                    // Remove any previous franchiseicon_* class
+                    removePreviousFranchiseIconClasses(tableElement);
+
+                    // Add the new img ID as a class
+                    const imgId = imgElement.id;
+                    tableElement.classList.add(imgId);
+                }
+            }
+
+            // Corrected selectors based on the structure you provided
+            assignImgIdToTable('#LS_AwayTeamName div#ficon_away img', 'table#roster_away');
+            assignImgIdToTable('#LS_HomeTeamName div#ficon_home img', 'table#roster_home');
+
+
+
 
 
 
