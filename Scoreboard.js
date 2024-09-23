@@ -991,7 +991,7 @@ function processAllTables() {
 }
 
 
-
+document.addEventListener("DOMContentLoaded", processAllTables);
 
 
             function removePreviousFranchiseIconClasses(tableElement) {
