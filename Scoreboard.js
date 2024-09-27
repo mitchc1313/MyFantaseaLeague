@@ -927,62 +927,45 @@ function getPlayerImage(playerID) {
 }
 
 function processTable(tableID) {
-    console.log(`Processing table: ${tableID}`);
-
     const table = document.querySelector(`#${tableID}`);
     if (!table) {
-        console.log(`Table ${tableID} not found.`);
         return;
     }
-    console.log(`Table ${tableID} found:`, table);
 
     table.querySelectorAll('tr').forEach((row, rowIndex) => {
-        console.log(`Processing row ${rowIndex + 1} in table ${tableID}...`);
-
         const playerCell = row.querySelector('.td-first-type');
         if (!playerCell) {
-            console.log(`No player cell found in row ${rowIndex + 1} of table ${tableID}`);
             return;
         }
-        console.log(`Player cell found in row ${rowIndex + 1} of table ${tableID}:`, playerCell);
 
         // Remove all <br> elements within the player cell
         const brElements = playerCell.querySelectorAll('br');
         brElements.forEach((br) => {
             br.remove();
-            console.log(`Removed <br> element in row ${rowIndex + 1} of table ${tableID}`);
         });
 
         // Check if the player wrapper already exists to prevent reloading on refresh
         if (playerCell.querySelector('.player_wrapper')) {
-            console.log(`Player wrapper already exists in row ${rowIndex + 1} of table ${tableID}, skipping.`);
             return;
         }
 
         const playerLink = playerCell.querySelector('a');
         if (!playerLink) {
-            console.log(`No player link found in row ${rowIndex + 1} of table ${tableID}`);
             return;
         }
-        console.log(`Player link found in row ${rowIndex + 1} of table ${tableID}:`, playerLink);
 
         const url = playerLink.getAttribute('href');
         const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
         if (!playerID) {
-            console.log(`No player ID found in row ${rowIndex + 1} of table ${tableID}`);
             return;
         }
-        console.log(`Player ID found in row ${rowIndex + 1} of table ${tableID}: ${playerID}`);
 
         const name = playerLink.textContent.trim();
-        console.log(`Player name: ${name}`);
         const nameParts = name.split(',');
         const lastName = nameParts[0].trim();
         const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
-        console.log(`Parsed name - First: ${firstName}, Last: ${lastName}`);
 
         const profileImage = getPlayerImage(playerID);
-        console.log(`Profile image URL: ${profileImage}`);
 
         // Create player wrapper elements
         const playerWrapper = document.createElement('div');
@@ -1022,7 +1005,6 @@ function processTable(tableID) {
         playerImg.classList.add('lineup_photo');
         playerImg.src = profileImage;
         playerImg.onerror = function () {
-            console.log(`Error loading image for player ID: ${playerID}, using fallback.`);
             playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
         };
         imageWrapper.appendChild(playerImg);
@@ -1035,21 +1017,14 @@ function processTable(tableID) {
         playerWrapper.appendChild(lastNameWrapper); // Use the wrapper div that contains the last name and news icon
         playerWrapper.appendChild(imageWrapper);
 
-        console.log(`Prepending new content to player cell for row ${rowIndex + 1} in table ${tableID}`);
         playerCell.prepend(playerWrapper); // Use prepend() to place the new content at the start
     });
-
-    console.log(`Finished processing all rows in table ${tableID}.`);
 }
 
 function processAjaxLS() {
-    console.log("Starting processAjaxLS...");
-
     // Process both home and away tables
     processTable('roster_home');
     processTable('roster_away');
-
-    console.log("Finished processing all tables.");
 }
 
 processAjaxLS();
