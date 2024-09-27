@@ -1028,31 +1028,35 @@ if ($('#body_ajax_ls').length) {
 
 
 
-            function removePreviousFranchiseIconClasses(tableElement) {
-                const classes = tableElement.className.split(' ').filter(function (c) {
-                    return !c.startsWith('franchiseicon_');
-                });
-                tableElement.className = classes.join(' ');
-            }
+function removePreviousFranchiseIconClasses(element) {
+    const classes = element.className.split(' ').filter(function (c) {
+        return !c.startsWith('franchiseicon_');
+    });
+    element.className = classes.join(' ');
+}
 
-            // Function to assign img ID to a table
-            function assignImgIdToTable(imgSelector, tableSelector) {
-                const imgElement = document.querySelector(imgSelector);
-                const tableElement = document.querySelector(tableSelector);
+// Function to assign img ID as a class to a table and the ls_team_name div
+function assignImgIdToTableAndDiv(imgSelector, tableSelector, divSelector) {
+    const imgElement = document.querySelector(imgSelector);
+    const tableElement = document.querySelector(tableSelector);
+    const divElement = document.querySelector(divSelector);
 
-                if (imgElement && tableElement) {
-                    // Remove any previous franchiseicon_* class
-                    removePreviousFranchiseIconClasses(tableElement);
+    if (imgElement && tableElement && divElement) {
+        // Remove any previous franchiseicon_* class from both elements
+        removePreviousFranchiseIconClasses(tableElement);
+        removePreviousFranchiseIconClasses(divElement);
 
-                    // Add the new img ID as a class
-                    const imgId = imgElement.id;
-                    tableElement.classList.add(imgId);
-                }
-            }
+        // Add the new img ID as a class to both elements
+        const imgId = imgElement.id;
+        tableElement.classList.add(imgId);
+        divElement.classList.add(imgId);
+    }
+}
 
-            // Corrected selectors based on the structure you provided
-            assignImgIdToTable('#LS_AwayTeamName div#ficon_away img', 'table#roster_away');
-            assignImgIdToTable('#LS_HomeTeamName div#ficon_home img', 'table#roster_home');
+// Corrected selectors to handle both the table and div.ls_team_name
+assignImgIdToTableAndDiv('#LS_AwayTeamName div#ficon_away img', 'table#roster_away', 'div.ls_team_name');
+assignImgIdToTableAndDiv('#LS_HomeTeamName div#ficon_home img', 'table#roster_home', 'div.ls_team_name');
+
 
 
 
