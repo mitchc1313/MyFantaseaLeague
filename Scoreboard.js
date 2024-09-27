@@ -977,10 +977,11 @@ function processTable(tableID) {
         lastNameLink.textContent = lastName;
         lastNameLink.href = playerLink.href;
 
-        // Move the span.warning.injurystatus inside the last name wrapper
+        // Move the span.warning.injurystatus inside the last name wrapper, but after the last name link
         const injuryStatus = playerCell.querySelector('span.warning.injurystatus');
+        lastNameWrapper.appendChild(lastNameLink); // First append the last name link
         if (injuryStatus) {
-            lastNameWrapper.appendChild(injuryStatus); // Append the injury status inside the last_name_roster div
+            lastNameWrapper.appendChild(injuryStatus); // Then append the injury status
         }
 
         // Create player news icon element
@@ -992,8 +993,7 @@ function processTable(tableID) {
         newsIcon.style.cursor = "pointer";
         newsIcon.style.pointerEvents = "all";
 
-        // Append last name link and news icon to the lastNameWrapper
-        lastNameWrapper.appendChild(lastNameLink);
+        // Append the news icon to the lastNameWrapper
         lastNameWrapper.appendChild(newsIcon);
 
         // Create first name div
@@ -1012,12 +1012,12 @@ function processTable(tableID) {
         };
         imageWrapper.appendChild(playerImg);
 
-        // Extract the remaining text outside of <a> and assign it to position_name_roster
+        // Extract the remaining text (e.g., "PHI PK") and assign "PK" to position_name_roster
         let remainingText = playerCell.childNodes;
         let positionText = '';
         remainingText.forEach((node) => {
-            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
-                positionText = node.textContent.trim().slice(4); // Remove team abbreviation (first 3 characters and space)
+            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '' && !node.classList?.contains('warning')) {
+                positionText = node.textContent.trim().split(' ').pop(); // Extract the position (last word after team abbreviation)
                 node.textContent = ''; // Hide/remove the original text
             }
         });
