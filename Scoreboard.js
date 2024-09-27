@@ -903,12 +903,8 @@ if ($('#body_ajax_ls').length) {
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
 
-function getPlayerImage(position, playerID) {
-    if (position === 'FA') {
-        return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
-    } else {
-        return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
-    }
+function getPlayerImage(playerID) {
+    return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
 }
 
 function processTable(tableID) {
@@ -966,12 +962,7 @@ function processTable(tableID) {
         const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
         console.log(`Parsed name - First: ${firstName}, Last: ${lastName}`);
 
-        // Fetch position from next sibling or the inner text (based on your structure)
-        const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
-        const position = positionText ? positionText[0].split(' ')[1] : 'FA';
-        console.log(`Position found: ${position}`);
-
-        const profileImage = getPlayerImage(position, playerID);
+        const profileImage = getPlayerImage(playerID);
         console.log(`Profile image URL: ${profileImage}`);
 
         // Create player wrapper elements
@@ -1012,7 +1003,7 @@ function processTable(tableID) {
         playerImg.classList.add('lineup_photo');
         playerImg.src = profileImage;
         playerImg.onerror = function () {
-            console.log(`Error loading image for player ID: ${playerID}, using free agent image.`);
+            console.log(`Error loading image for player ID: ${playerID}, using fallback.`);
             playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
         };
         imageWrapper.appendChild(playerImg);
