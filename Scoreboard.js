@@ -1012,12 +1012,12 @@ function processTable(tableID) {
         };
         imageWrapper.appendChild(playerImg);
 
-        // Extract the remaining text (e.g., "PHI PK") and assign "PK" to position_name_roster
-        let remainingText = playerCell.childNodes;
+        // Extract the remaining text outside of <a> and assign it to position_name_roster
         let positionText = '';
-        remainingText.forEach((node) => {
+        playerCell.childNodes.forEach((node) => {
             if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '' && !node.classList?.contains('warning')) {
-                positionText = node.textContent.trim().split(' ').pop(); // Extract the position (last word after team abbreviation)
+                const textParts = node.textContent.trim().split(' ');
+                positionText = textParts.slice(-1)[0]; // Extract the last word (position) and remove leading text
                 node.textContent = ''; // Hide/remove the original text
             }
         });
