@@ -916,11 +916,9 @@ const defenseTeams = {
 // Function to get the player image, checking if it's a defense
 function getPlayerImage(playerID) {
     if (defenseTeams[playerID]) {
-        // If the player ID is a defense, return the image using the team abbreviation
         const teamAbbreviation = defenseTeams[playerID];
         return `https://www.mflscripts.com/playerImages_96x96/mfl_${teamAbbreviation}.svg`; // Using .svg for defenses
     } else {
-        // Otherwise, return the image using the player ID
         return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
     }
 }
@@ -1014,6 +1012,7 @@ function processTable(tableID) {
         remainingText.forEach((node) => {
             if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
                 positionText = node.textContent.trim().slice(4); // Remove team abbreviation (first 3 characters and space)
+                node.textContent = ''; // Hide/remove the original text
             }
         });
 
@@ -1042,7 +1041,6 @@ function processAjaxLS() {
 }
 
 processAjaxLS();
-
 
 
 
