@@ -1035,27 +1035,31 @@ function removePreviousFranchiseIconClasses(element) {
     element.className = classes.join(' ');
 }
 
-// Function to assign img ID as a class to a table and the fname_home / fname_away div
-function assignImgIdToTableAndDiv(imgSelector, tableSelector, divSelector) {
+// Function to assign img ID as a class to a table, div, and span
+function assignImgIdToTableDivAndSpan(imgSelector, tableSelector, divSelector, spanSelector) {
     const imgElement = document.querySelector(imgSelector);
     const tableElement = document.querySelector(tableSelector);
     const divElement = document.querySelector(divSelector);
+    const spanElement = document.querySelector(spanSelector);
 
-    if (imgElement && tableElement && divElement) {
-        // Remove any previous franchiseicon_* class from both elements
+    if (imgElement && tableElement && divElement && spanElement) {
+        // Remove any previous franchiseicon_* class from the elements
         removePreviousFranchiseIconClasses(tableElement);
         removePreviousFranchiseIconClasses(divElement);
+        removePreviousFranchiseIconClasses(spanElement);
 
-        // Add the new img ID as a class to both elements
+        // Add the new img ID as a class to the elements
         const imgId = imgElement.id;
         tableElement.classList.add(imgId);
         divElement.classList.add(imgId);
+        spanElement.classList.add(imgId);
     }
 }
 
-// Apply the appropriate franchise class to both home and away divs and tables
-assignImgIdToTableAndDiv('#LS_AwayTeamName div#ficon_away img', 'table#roster_away', 'div#fname_away');
-assignImgIdToTableAndDiv('#LS_HomeTeamName div#ficon_home img', 'table#roster_home', 'div#fname_home');
+// Apply the appropriate franchise class to both home and away divs, tables, and spans
+assignImgIdToTableDivAndSpan('#LS_AwayTeamName div#ficon_away img', 'table#roster_away', 'div#fname_away', 'table#roster_away span.ls_og_icon_abbrev');
+assignImgIdToTableDivAndSpan('#LS_HomeTeamName div#ficon_home img', 'table#roster_home', 'div#fname_home', 'table#roster_home span.ls_og_icon_abbrev');
+
 
 
 
