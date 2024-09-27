@@ -903,137 +903,147 @@ if ($('#body_ajax_ls').length) {
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
 
-            function getPlayerImage(position, playerID) {
-                if (position === 'FA') {
-                    return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
-                } else {
-                    return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
-                }
-            }
-            
-            function processTable(tableID) {
-                console.log(`Processing table: ${tableID}`);
-            
-                const table = document.querySelector(`#${tableID}`);
-                if (!table) {
-                    console.log(`Table ${tableID} not found.`);
-                    return;
-                }
-                console.log(`Table ${tableID} found:`, table);
-            
-                table.querySelectorAll('tr').forEach((row, rowIndex) => {
-                    console.log(`Processing row ${rowIndex + 1} in table ${tableID}...`);
-            
-                    const playerCell = row.querySelector('.td-first-type');
-                    if (!playerCell) {
-                        console.log(`No player cell found in row ${rowIndex + 1} of table ${tableID}`);
-                        return;
-                    }
-                    console.log(`Player cell found in row ${rowIndex + 1} of table ${tableID}:`, playerCell);
-            
-                    // Remove all <br> elements within the player cell
-                    const brElements = playerCell.querySelectorAll('br');
-                    brElements.forEach((br) => {
-                        br.remove();
-                        console.log(`Removed <br> element in row ${rowIndex + 1} of table ${tableID}`);
-                    });
-            
-                    // Check if the player wrapper already exists to prevent reloading on refresh
-                    if (playerCell.querySelector('.player_wrapper')) {
-                        console.log(`Player wrapper already exists in row ${rowIndex + 1} of table ${tableID}, skipping.`);
-                        return;
-                    }
-            
-                    const playerLink = playerCell.querySelector('a');
-                    if (!playerLink) {
-                        console.log(`No player link found in row ${rowIndex + 1} of table ${tableID}`);
-                        return;
-                    }
-                    console.log(`Player link found in row ${rowIndex + 1} of table ${tableID}:`, playerLink);
-            
-                    const url = playerLink.getAttribute('href');
-                    const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
-                    if (!playerID) {
-                        console.log(`No player ID found in row ${rowIndex + 1} of table ${tableID}`);
-                        return;
-                    }
-                    console.log(`Player ID found in row ${rowIndex + 1} of table ${tableID}: ${playerID}`);
-            
-                    const name = playerLink.textContent.trim();
-                    console.log(`Player name: ${name}`);
-                    const nameParts = name.split(',');
-                    const lastName = nameParts[0].trim();
-                    const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
-                    console.log(`Parsed name - First: ${firstName}, Last: ${lastName}`);
-            
-                    // Fetch position from next sibling or the inner text (based on your structure)
-                    const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
-                    const position = positionText ? positionText[0].split(' ')[1] : 'FA';
-                    console.log(`Position found: ${position}`);
-            
-                    const profileImage = getPlayerImage(position, playerID);
-                    console.log(`Profile image URL: ${profileImage}`);
-            
-                    // Create player wrapper elements
-                    const playerWrapper = document.createElement('div');
-                    playerWrapper.classList.add('player_wrapper');
-            
-                    const lastNameDiv = document.createElement('a');
-                    lastNameDiv.classList.add('last_name_roster');
-                    lastNameDiv.textContent = lastName;
-                    lastNameDiv.href = playerLink.href;
-            
-                    const firstNameDiv = document.createElement('div');
-                    firstNameDiv.classList.add('first_name_roster');
-                    firstNameDiv.textContent = firstName;
-            
-                    const imageWrapper = document.createElement('div');
-                    imageWrapper.classList.add('image_wrapper');
-                    const playerImg = document.createElement('img');
-                    playerImg.classList.add('lineup_photo');
-                    playerImg.src = profileImage;
-                    playerImg.onerror = function () {
-                        console.log(`Error loading image for player ID: ${playerID}, using free agent image.`);
-                        playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
-                    };
-                    imageWrapper.appendChild(playerImg);
-            
-                    // Create player news icon element
-                    const newsIcon = document.createElement('img');
-                    newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
-                    newsIcon.alt = "recent news";
-                    newsIcon.title = "recent news";
-                    newsIcon.classList.add('playerPopupIcon');
-                    newsIcon.style.cursor = "pointer";
-                    newsIcon.style.pointerEvents = "all";
-            
-                    // Hide the original player link
-                    playerLink.style.display = 'none';
-            
-                    // Prepend the new structure to ensure it's the first in the td
-                    playerWrapper.appendChild(firstNameDiv);
-                    playerWrapper.appendChild(lastNameDiv);
-                    playerWrapper.appendChild(newsIcon);  // Add the news icon after the last name
-                    playerWrapper.appendChild(imageWrapper);
-            
-                    console.log(`Prepending new content to player cell for row ${rowIndex + 1} in table ${tableID}`);
-                    playerCell.prepend(playerWrapper); // Use prepend() to place the new content at the start
-                });
-            
-                console.log(`Finished processing all rows in table ${tableID}.`);
-            }
-            
-            function processAjaxLS() {
-                console.log("Starting processAjaxLS...");
-            
-                // Process both home and away tables
-                processTable('roster_home');
-                processTable('roster_away');
-            
-                console.log("Finished processing all tables.");
-            }
-            
-            processAjaxLS();
+function getPlayerImage(position, playerID) {
+    if (position === 'FA') {
+        return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+    } else {
+        return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
+    }
+}
+
+function processTable(tableID) {
+    console.log(`Processing table: ${tableID}`);
+
+    const table = document.querySelector(`#${tableID}`);
+    if (!table) {
+        console.log(`Table ${tableID} not found.`);
+        return;
+    }
+    console.log(`Table ${tableID} found:`, table);
+
+    table.querySelectorAll('tr').forEach((row, rowIndex) => {
+        console.log(`Processing row ${rowIndex + 1} in table ${tableID}...`);
+
+        const playerCell = row.querySelector('.td-first-type');
+        if (!playerCell) {
+            console.log(`No player cell found in row ${rowIndex + 1} of table ${tableID}`);
+            return;
+        }
+        console.log(`Player cell found in row ${rowIndex + 1} of table ${tableID}:`, playerCell);
+
+        // Remove all <br> elements within the player cell
+        const brElements = playerCell.querySelectorAll('br');
+        brElements.forEach((br) => {
+            br.remove();
+            console.log(`Removed <br> element in row ${rowIndex + 1} of table ${tableID}`);
+        });
+
+        // Check if the player wrapper already exists to prevent reloading on refresh
+        if (playerCell.querySelector('.player_wrapper')) {
+            console.log(`Player wrapper already exists in row ${rowIndex + 1} of table ${tableID}, skipping.`);
+            return;
+        }
+
+        const playerLink = playerCell.querySelector('a');
+        if (!playerLink) {
+            console.log(`No player link found in row ${rowIndex + 1} of table ${tableID}`);
+            return;
+        }
+        console.log(`Player link found in row ${rowIndex + 1} of table ${tableID}:`, playerLink);
+
+        const url = playerLink.getAttribute('href');
+        const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
+        if (!playerID) {
+            console.log(`No player ID found in row ${rowIndex + 1} of table ${tableID}`);
+            return;
+        }
+        console.log(`Player ID found in row ${rowIndex + 1} of table ${tableID}: ${playerID}`);
+
+        const name = playerLink.textContent.trim();
+        console.log(`Player name: ${name}`);
+        const nameParts = name.split(',');
+        const lastName = nameParts[0].trim();
+        const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+        console.log(`Parsed name - First: ${firstName}, Last: ${lastName}`);
+
+        // Fetch position from next sibling or the inner text (based on your structure)
+        const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
+        const position = positionText ? positionText[0].split(' ')[1] : 'FA';
+        console.log(`Position found: ${position}`);
+
+        const profileImage = getPlayerImage(position, playerID);
+        console.log(`Profile image URL: ${profileImage}`);
+
+        // Create player wrapper elements
+        const playerWrapper = document.createElement('div');
+        playerWrapper.classList.add('player_wrapper');
+
+        // Create last name wrapper div
+        const lastNameWrapper = document.createElement('div');
+        lastNameWrapper.classList.add('last_name_roster');
+
+        // Move the last name link into the lastNameWrapper div
+        const lastNameLink = document.createElement('a');
+        lastNameLink.textContent = lastName;
+        lastNameLink.href = playerLink.href;
+
+        // Create player news icon element
+        const newsIcon = document.createElement('img');
+        newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
+        newsIcon.alt = "recent news";
+        newsIcon.title = "recent news";
+        newsIcon.classList.add('playerPopupIcon');
+        newsIcon.style.cursor = "pointer";
+        newsIcon.style.pointerEvents = "all";
+
+        // Append last name link and news icon to the lastNameWrapper
+        lastNameWrapper.appendChild(lastNameLink);
+        lastNameWrapper.appendChild(newsIcon);
+
+        // Create first name div
+        const firstNameDiv = document.createElement('div');
+        firstNameDiv.classList.add('first_name_roster');
+        firstNameDiv.textContent = firstName;
+
+        // Create image wrapper div
+        const imageWrapper = document.createElement('div');
+        imageWrapper.classList.add('image_wrapper');
+        const playerImg = document.createElement('img');
+        playerImg.classList.add('lineup_photo');
+        playerImg.src = profileImage;
+        playerImg.onerror = function () {
+            console.log(`Error loading image for player ID: ${playerID}, using free agent image.`);
+            playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+        };
+        imageWrapper.appendChild(playerImg);
+
+        // Hide the original player link
+        playerLink.style.display = 'none';
+
+        // Prepend the new structure to ensure it's the first in the td
+        playerWrapper.appendChild(firstNameDiv);
+        playerWrapper.appendChild(lastNameWrapper); // Use the wrapper div that contains the last name and news icon
+        playerWrapper.appendChild(imageWrapper);
+
+        console.log(`Prepending new content to player cell for row ${rowIndex + 1} in table ${tableID}`);
+        playerCell.prepend(playerWrapper); // Use prepend() to place the new content at the start
+    });
+
+    console.log(`Finished processing all rows in table ${tableID}.`);
+}
+
+function processAjaxLS() {
+    console.log("Starting processAjaxLS...");
+
+    // Process both home and away tables
+    processTable('roster_home');
+    processTable('roster_away');
+
+    console.log("Finished processing all tables.");
+}
+
+processAjaxLS();
+
             
 
 
