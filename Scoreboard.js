@@ -977,10 +977,10 @@ function processTable(tableID) {
         lastNameLink.textContent = lastName;
         lastNameLink.href = playerLink.href;
 
-        // Move any existing injury status span into the last name wrapper
-        const injuryStatus = playerCell.querySelector('span.injurystatus');
+        // Move the span.warning.injurystatus inside the last name wrapper
+        const injuryStatus = playerCell.querySelector('span.warning.injurystatus');
         if (injuryStatus) {
-            lastNameWrapper.appendChild(injuryStatus); // Append injury status inside last_name_roster div
+            lastNameWrapper.appendChild(injuryStatus); // Append the injury status inside the last_name_roster div
         }
 
         // Create player news icon element
