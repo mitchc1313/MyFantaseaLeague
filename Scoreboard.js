@@ -1035,7 +1035,7 @@ function removePreviousFranchiseIconClasses(element) {
     element.className = classes.join(' ');
 }
 
-// Function to assign img ID as a class to a table and the ls_team_name div
+// Function to assign img ID as a class to a table and the fname_home / fname_away div
 function assignImgIdToTableAndDiv(imgSelector, tableSelector, divSelector) {
     const imgElement = document.querySelector(imgSelector);
     const tableElement = document.querySelector(tableSelector);
@@ -1053,9 +1053,10 @@ function assignImgIdToTableAndDiv(imgSelector, tableSelector, divSelector) {
     }
 }
 
-// Corrected selectors to handle both the table and div.ls_team_name
-assignImgIdToTableAndDiv('#LS_AwayTeamName div#ficon_away img', 'table#roster_away', 'div.ls_team_name');
-assignImgIdToTableAndDiv('#LS_HomeTeamName div#ficon_home img', 'table#roster_home', 'div.ls_team_name');
+// Apply the appropriate franchise class to both home and away divs and tables
+assignImgIdToTableAndDiv('#LS_AwayTeamName div#ficon_away img', 'table#roster_away', 'div#fname_away');
+assignImgIdToTableAndDiv('#LS_HomeTeamName div#ficon_home img', 'table#roster_home', 'div#fname_home');
+
 
 
 
