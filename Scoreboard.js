@@ -903,8 +903,27 @@ if ($('#body_ajax_ls').length) {
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
 
+// Mapping of defense IDs to team abbreviations
+const defenseTeams = {
+    '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
+    '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
+    '0511': 'DEN', '0512': 'KCC', '0513': 'LVR', '0514': 'LAC', '0515': 'SEA',
+    '0516': 'DAL', '0517': 'NYG', '0518': 'PHI', '0519': 'ARI', '0520': 'WAS',
+    '0521': 'CHI', '0522': 'DET', '0523': 'GBP', '0524': 'MIN', '0525': 'TBB',
+    '0526': 'ATL', '0527': 'CAR', '0528': 'LAR', '0529': 'NOS', '0530': 'SFO',
+    '0531': 'BAL', '0532': 'HOU'
+};
+
+// Function to get the player image, checking if it's a defense
 function getPlayerImage(playerID) {
-    return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
+    if (defenseTeams[playerID]) {
+        // If the player ID is a defense, return the image using the team abbreviation
+        const teamAbbreviation = defenseTeams[playerID];
+        return `https://www.mflscripts.com/playerImages_96x96/mfl_${teamAbbreviation}.svg`; // Using .svg for defenses
+    } else {
+        // Otherwise, return the image using the player ID
+        return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
+    }
 }
 
 function processTable(tableID) {
