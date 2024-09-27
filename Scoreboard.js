@@ -966,11 +966,6 @@ function processTable(tableID) {
 
         const profileImage = getPlayerImage(playerID);
 
-        // Extract the remaining text (e.g., "PHI PK") and assign "PK" to position_name_roster
-        const fullText = playerCell.textContent.trim();
-        const teamAbbr = fullText.slice(-6, -3); // Extract the 3-character team abbreviation (assumed to be last 6th to 4th character)
-        const positionText = fullText.slice(-2); // Extract the position (last two characters)
-        
         // Create player wrapper elements
         const playerWrapper = document.createElement('div');
         playerWrapper.classList.add('player_wrapper');
@@ -1013,7 +1008,16 @@ function processTable(tableID) {
         };
         imageWrapper.appendChild(playerImg);
 
-        // Create position div and add "PK" to it
+        // Extract the remaining text outside of <a> and assign it to position_name_roster
+        let remainingText = playerCell.childNodes;
+        let positionText = '';
+        remainingText.forEach((node) => {
+            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
+                positionText = node.textContent.trim().slice(4); // Remove team abbreviation (first 3 characters and space)
+            }
+        });
+
+        // Create position div and add the extracted text
         const positionDiv = document.createElement('div');
         positionDiv.classList.add('position_name_roster');
         positionDiv.textContent = positionText;
