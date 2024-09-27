@@ -977,6 +977,12 @@ function processTable(tableID) {
         lastNameLink.textContent = lastName;
         lastNameLink.href = playerLink.href;
 
+        // Move any existing injury status span into the last name wrapper
+        const injuryStatus = playerCell.querySelector('span.injurystatus');
+        if (injuryStatus) {
+            lastNameWrapper.appendChild(injuryStatus); // Append injury status inside last_name_roster div
+        }
+
         // Create player news icon element
         const newsIcon = document.createElement('img');
         newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
@@ -1041,6 +1047,7 @@ function processAjaxLS() {
 }
 
 processAjaxLS();
+
 
 
 
