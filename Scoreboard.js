@@ -901,6 +901,7 @@ if ($('#body_ajax_ls').length) {
             $('.ls_projections.ls_pace_box:contains("NaN"),.ls_projections.ls_pace_box:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:0.875rem" title="Wait..As MFL Prepares Games Starting"></i>');
             $('.ls_projections span:contains("undefined"),.ls_projections span:contains("NaN"),.ls_game_info:contains("NaN"),.ls_game_info:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:1.375rem" title="Wait..As MFL Prepares Games Starting"></i>');
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
+
 // Mapping of defense IDs to team abbreviations
 const defenseTeams = {
     '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
@@ -1025,17 +1026,21 @@ function processTable(tableID) {
         };
         imageWrapper.appendChild(playerImg);
 
-        // Extract the remaining text outside of <a> and clean unwanted characters
-        let positionText = '';
-        playerCell.childNodes.forEach((node, nodeIndex) => {
+        // Combine all text nodes and clean unwanted characters
+        let combinedText = '';
+        playerCell.childNodes.forEach((node) => {
             if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
-                console.log(`Found remaining text node in row ${rowIndex + 1}: "${node.textContent.trim()}"`);
-                let textParts = node.textContent.trim().split(' ');
-                positionText = textParts.pop().replace(/[()]/g, ''); // Remove parentheses or other unwanted characters
-                console.log(`Extracted position: "${positionText}" in row ${rowIndex + 1}`);
+                combinedText += node.textContent.trim() + ' ';
                 node.textContent = ''; // Hide/remove the original text
             }
         });
+
+        console.log(`Combined text: "${combinedText.trim()}"`);
+
+        // Extract the position from the combined text, removing unwanted characters
+        let positionText = combinedText.match(/[A-Z]{2,3}$/); // Match last 2-3 uppercase letters
+        positionText = positionText ? positionText[0] : '';
+        console.log(`Extracted position: "${positionText}"`);
 
         // Create position div and add the extracted text
         const positionDiv = document.createElement('div');
