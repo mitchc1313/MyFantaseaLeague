@@ -1038,8 +1038,8 @@ function processTable(tableID) {
         console.log(`Combined text: "${combinedText.trim()}"`);
 
         // Extract the position from the combined text, removing unwanted characters
-        let positionText = combinedText.match(/[A-Z]{2,3}$/); // Match last 2-3 uppercase letters
-        positionText = positionText ? positionText[0] : '';
+        let textParts = combinedText.split(' ');
+        let positionText = textParts.length > 1 ? textParts[1].replace(/[()]/g, '') : '';
         console.log(`Extracted position: "${positionText}"`);
 
         // Create position div and add the extracted text
@@ -1070,6 +1070,7 @@ function processAjaxLS() {
 }
 
 processAjaxLS();
+
 
 
 
