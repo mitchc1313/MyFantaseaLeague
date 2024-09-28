@@ -917,65 +917,52 @@ const defenseTeams = {
 function getPlayerImage(playerID) {
     if (defenseTeams[playerID]) {
         const teamAbbreviation = defenseTeams[playerID];
-        console.log(`Player ID ${playerID} is a defense. Using team abbreviation: ${teamAbbreviation}`);
         return `https://www.mflscripts.com/playerImages_96x96/mfl_${teamAbbreviation}.svg`; // Using .svg for defenses
     } else {
-        console.log(`Player ID ${playerID} is not a defense. Using player ID for image.`);
         return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
     }
 }
 
 function processTable(tableID) {
-    console.log(`Processing table: ${tableID}`);
     const table = document.querySelector(`#${tableID}`);
     if (!table) {
-        console.log(`Table ${tableID} not found.`);
         return;
     }
 
-    table.querySelectorAll('tr').forEach((row, rowIndex) => {
-        console.log(`Processing row ${rowIndex + 1}`);
+    table.querySelectorAll('tr').forEach((row) => {
         const playerCell = row.querySelector('.td-first-type');
         if (!playerCell) {
-            console.log(`No player cell found in row ${rowIndex + 1}`);
             return;
         }
 
         // Remove all <br> elements within the player cell
         const brElements = playerCell.querySelectorAll('br');
-        brElements.forEach((br, brIndex) => {
+        brElements.forEach((br) => {
             br.remove();
-            console.log(`Removed <br> element ${brIndex + 1} in row ${rowIndex + 1}`);
         });
 
         // Check if the player wrapper already exists to prevent reloading on refresh
         if (playerCell.querySelector('.player_wrapper')) {
-            console.log(`Player wrapper already exists in row ${rowIndex + 1}, skipping.`);
             return;
         }
 
         const playerLink = playerCell.querySelector('a');
         if (!playerLink) {
-            console.log(`No player link found in row ${rowIndex + 1}`);
             return;
         }
 
         const url = playerLink.getAttribute('href');
         const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
         if (!playerID) {
-            console.log(`No player ID found in row ${rowIndex + 1}`);
             return;
         }
-        console.log(`Player ID ${playerID} found in row ${rowIndex + 1}`);
 
         const name = playerLink.textContent.trim();
         const nameParts = name.split(',');
         const lastName = nameParts[0].trim();
         const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
-        console.log(`Parsed name: First Name - ${firstName}, Last Name - ${lastName}`);
 
         const profileImage = getPlayerImage(playerID);
-        console.log(`Profile image URL: ${profileImage}`);
 
         // Create player wrapper elements
         const playerWrapper = document.createElement('div');
@@ -994,7 +981,6 @@ function processTable(tableID) {
         const injuryStatus = playerCell.querySelector('span.warning.injurystatus');
         lastNameWrapper.appendChild(lastNameLink); // First append the last name link
         if (injuryStatus) {
-            console.log(`Injury status found for player ${lastName} in row ${rowIndex + 1}`);
             lastNameWrapper.appendChild(injuryStatus); // Then append the injury status
         }
 
@@ -1035,18 +1021,14 @@ function processTable(tableID) {
             }
         });
 
-        console.log(`Combined text: "${combinedText.trim()}"`);
-
         // Extract the position from the combined text, removing unwanted characters
         let textParts = combinedText.split(' ');
         let positionText = textParts.length > 1 ? textParts[1].replace(/[()]/g, '') : '';
-        console.log(`Extracted position: "${positionText}"`);
 
         // Create position div and add the extracted text
         const positionDiv = document.createElement('div');
         positionDiv.classList.add('position_name_roster');
         positionDiv.textContent = positionText;
-        console.log(`Assigned position: "${positionText}" to row ${rowIndex + 1}`);
 
         // Hide the original player link
         playerLink.style.display = 'none';
@@ -1062,14 +1044,13 @@ function processTable(tableID) {
 }
 
 function processAjaxLS() {
-    console.log("Starting processAjaxLS...");
     // Process both home and away tables
     processTable('roster_home');
     processTable('roster_away');
-    console.log("Finished processing tables.");
 }
 
 processAjaxLS();
+
 
 
 
