@@ -901,8 +901,7 @@ if ($('#body_ajax_ls').length) {
             $('.ls_projections.ls_pace_box:contains("NaN"),.ls_projections.ls_pace_box:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:0.875rem" title="Wait..As MFL Prepares Games Starting"></i>');
             $('.ls_projections span:contains("undefined"),.ls_projections span:contains("NaN"),.ls_game_info:contains("NaN"),.ls_game_info:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:1.375rem" title="Wait..As MFL Prepares Games Starting"></i>');
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
-
-         // Mapping of defense IDs to team abbreviations
+// Mapping of defense IDs to team abbreviations
 const defenseTeams = {
     '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
     '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
@@ -917,52 +916,65 @@ const defenseTeams = {
 function getPlayerImage(playerID) {
     if (defenseTeams[playerID]) {
         const teamAbbreviation = defenseTeams[playerID];
+        console.log(`Player ID ${playerID} is a defense. Using team abbreviation: ${teamAbbreviation}`);
         return `https://www.mflscripts.com/playerImages_96x96/mfl_${teamAbbreviation}.svg`; // Using .svg for defenses
     } else {
+        console.log(`Player ID ${playerID} is not a defense. Using player ID for image.`);
         return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
     }
 }
 
 function processTable(tableID) {
+    console.log(`Processing table: ${tableID}`);
     const table = document.querySelector(`#${tableID}`);
     if (!table) {
+        console.log(`Table ${tableID} not found.`);
         return;
     }
 
-    table.querySelectorAll('tr').forEach((row) => {
+    table.querySelectorAll('tr').forEach((row, rowIndex) => {
+        console.log(`Processing row ${rowIndex + 1}`);
         const playerCell = row.querySelector('.td-first-type');
         if (!playerCell) {
+            console.log(`No player cell found in row ${rowIndex + 1}`);
             return;
         }
 
         // Remove all <br> elements within the player cell
         const brElements = playerCell.querySelectorAll('br');
-        brElements.forEach((br) => {
+        brElements.forEach((br, brIndex) => {
             br.remove();
+            console.log(`Removed <br> element ${brIndex + 1} in row ${rowIndex + 1}`);
         });
 
         // Check if the player wrapper already exists to prevent reloading on refresh
         if (playerCell.querySelector('.player_wrapper')) {
+            console.log(`Player wrapper already exists in row ${rowIndex + 1}, skipping.`);
             return;
         }
 
         const playerLink = playerCell.querySelector('a');
         if (!playerLink) {
+            console.log(`No player link found in row ${rowIndex + 1}`);
             return;
         }
 
         const url = playerLink.getAttribute('href');
         const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
         if (!playerID) {
+            console.log(`No player ID found in row ${rowIndex + 1}`);
             return;
         }
+        console.log(`Player ID ${playerID} found in row ${rowIndex + 1}`);
 
         const name = playerLink.textContent.trim();
         const nameParts = name.split(',');
         const lastName = nameParts[0].trim();
         const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+        console.log(`Parsed name: First Name - ${firstName}, Last Name - ${lastName}`);
 
         const profileImage = getPlayerImage(playerID);
+        console.log(`Profile image URL: ${profileImage}`);
 
         // Create player wrapper elements
         const playerWrapper = document.createElement('div');
@@ -981,6 +993,7 @@ function processTable(tableID) {
         const injuryStatus = playerCell.querySelector('span.warning.injurystatus');
         lastNameWrapper.appendChild(lastNameLink); // First append the last name link
         if (injuryStatus) {
+            console.log(`Injury status found for player ${lastName} in row ${rowIndex + 1}`);
             lastNameWrapper.appendChild(injuryStatus); // Then append the injury status
         }
 
@@ -1014,11 +1027,12 @@ function processTable(tableID) {
 
         // Extract the remaining text outside of <a> and clean unwanted characters
         let positionText = '';
-        playerCell.childNodes.forEach((node) => {
+        playerCell.childNodes.forEach((node, nodeIndex) => {
             if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
-                // Extract the last word, clean out unwanted characters like ()
+                console.log(`Found remaining text node in row ${rowIndex + 1}: "${node.textContent.trim()}"`);
                 let textParts = node.textContent.trim().split(' ');
                 positionText = textParts.pop().replace(/[()]/g, ''); // Remove parentheses or other unwanted characters
+                console.log(`Extracted position: "${positionText}" in row ${rowIndex + 1}`);
                 node.textContent = ''; // Hide/remove the original text
             }
         });
@@ -1027,6 +1041,7 @@ function processTable(tableID) {
         const positionDiv = document.createElement('div');
         positionDiv.classList.add('position_name_roster');
         positionDiv.textContent = positionText;
+        console.log(`Assigned position: "${positionText}" to row ${rowIndex + 1}`);
 
         // Hide the original player link
         playerLink.style.display = 'none';
@@ -1042,9 +1057,11 @@ function processTable(tableID) {
 }
 
 function processAjaxLS() {
+    console.log("Starting processAjaxLS...");
     // Process both home and away tables
     processTable('roster_home');
     processTable('roster_away');
+    console.log("Finished processing tables.");
 }
 
 processAjaxLS();
