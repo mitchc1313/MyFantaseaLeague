@@ -903,7 +903,7 @@ if ($('#body_ajax_ls').length) {
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
 
-       // Mapping of defense IDs to team abbreviations
+     // Mapping of defense IDs to team abbreviations
 const defenseTeams = {
     '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
     '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
@@ -973,26 +973,14 @@ function processTable(tableID) {
         const lastNameWrapper = document.createElement('div');
         lastNameWrapper.classList.add('last_name_roster');
 
-        // Create player news icon element
-        const newsIcon = document.createElement('img');
-        newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
-        newsIcon.alt = "recent news";
-        newsIcon.title = "recent news";
-        newsIcon.classList.add('playerPopupIcon');
-        newsIcon.style.cursor = "pointer";
-        newsIcon.style.pointerEvents = "all";
-
-        // Move the last name link into the lastNameWrapper div and append the news icon inside the <a>
+        // Move the last name link into the lastNameWrapper div
         const lastNameLink = document.createElement('a');
         lastNameLink.textContent = lastName;
         lastNameLink.href = playerLink.href;
-        lastNameLink.appendChild(newsIcon);  // Append the news icon inside the <a>
-
-        // Append the last name link (with the news icon) to the last name wrapper
-        lastNameWrapper.appendChild(lastNameLink);
 
         // Move the span.warning.injurystatus inside the last name wrapper, but after the last name link
         const injuryStatus = playerCell.querySelector('span.warning.injurystatus');
+        lastNameWrapper.appendChild(lastNameLink); // First append the last name link
         if (injuryStatus) {
             lastNameWrapper.appendChild(injuryStatus); // Then append the injury status
         }
@@ -1036,7 +1024,7 @@ function processTable(tableID) {
 
         // Prepend the new structure to ensure it's the first in the td
         playerWrapper.appendChild(firstNameDiv);
-        playerWrapper.appendChild(lastNameWrapper); // Use the wrapper div that contains the last name and news icon
+        playerWrapper.appendChild(lastNameWrapper); // Use the wrapper div that contains the last name
         playerWrapper.appendChild(imageWrapper);
         playerWrapper.appendChild(positionDiv); // Add position div to playerWrapper
 
