@@ -985,32 +985,38 @@ function processTable(tableID) {
         }
 
         // Create player news icon element
-        const newsIcon = document.createElement('img');
-        newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
-        newsIcon.alt = "recent news";
-        newsIcon.title = "recent news";
-        newsIcon.classList.add('playerPopupIcon');
-        newsIcon.style.cursor = "pointer";
-        newsIcon.style.pointerEvents = "all";
+const newsIcon = document.createElement('img');
+newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
+newsIcon.alt = "recent news";
+newsIcon.title = "recent news";
+newsIcon.classList.add('playerPopupIcon');
+newsIcon.style.cursor = "pointer";
+newsIcon.style.pointerEvents = "all";
 
-        // Append the news icon to the lastNameWrapper
-        lastNameWrapper.appendChild(newsIcon);
+// Move the last name link into the lastNameWrapper div and append the news icon inside the <a>
+const lastNameLink = document.createElement('a');
+lastNameLink.textContent = lastName;
+lastNameLink.href = playerLink.href;
+lastNameLink.appendChild(newsIcon);  // Append the news icon inside the <a>
 
-        // Create first name div
-        const firstNameDiv = document.createElement('div');
-        firstNameDiv.classList.add('first_name_roster');
-        firstNameDiv.textContent = firstName;
+// Append the last name link (with the news icon) to the last name wrapper
+lastNameWrapper.appendChild(lastNameLink);
 
-        // Create image wrapper div
-        const imageWrapper = document.createElement('div');
-        imageWrapper.classList.add('image_wrapper');
-        const playerImg = document.createElement('img');
-        playerImg.classList.add('lineup_photo');
-        playerImg.src = profileImage;
-        playerImg.onerror = function () {
-            playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
-        };
-        imageWrapper.appendChild(playerImg);
+// Create first name div
+const firstNameDiv = document.createElement('div');
+firstNameDiv.classList.add('first_name_roster');
+firstNameDiv.textContent = firstName;
+
+// Create image wrapper div
+const imageWrapper = document.createElement('div');
+imageWrapper.classList.add('image_wrapper');
+const playerImg = document.createElement('img');
+playerImg.classList.add('lineup_photo');
+playerImg.src = profileImage;
+playerImg.onerror = function () {
+    playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+};
+imageWrapper.appendChild(playerImg);
 
         // Combine all text nodes and clean unwanted characters
         let combinedText = '';
