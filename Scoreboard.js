@@ -322,7 +322,7 @@ if ($('#body_ajax_ls').length) {
         //                   FUNCTION - ls_append_css                     //
         ////////////////////////////////////////////////////////////////////
         function ls_append_css() {
-            $('head').append('<style>.LS_MainScoreboard .ls_team_name{white-space:nowrap}.ls_other_game .ls_og_full_name,.LS_MainScoreboard .ls_team_name{overflow:hidden;text-overflow:ellipsis}.ls-outer-table td.ls_game_info br{display:none}.ls-outer-table td.ls_game_info br + br{display:block}td.ls_projections span:empty:before{content:"0"}.ls-matchup caption span{max-width:unset!important;}.ls_player_stats div:empty:before{content:"- stats - "}.ls_allplay_final{width:0.625rem;text-align:right;padding-left:0.188rem}.wp_bar div{border-radius:0.5rem;}#TeamWinPctRow td{padding:0.188rem}#winprob_away{float:right;text-align:right;padding: 0 0.188rem;min-width: 1.563rem;min-width: fit-content;}#winprob_home{float:left;text-align:left;padding: 0 0.188rem;min-width: 1.563rem;min-width: fit-content;}h3#ls_error{max-width:37.5rem;margin:0 auto;background:red;color:#fff;padding:0.625rem;border-radius:0.313rem}h3#ls_error a{background:#fff;color:red;padding:0.063rem 0.313rem;border-radius:0.188rem;text-decoration:none;display:block;width:6.25rem;text-align:center;margin:0 auto;}#body_ajax_ls h4,#body_ajax_ls table[style="margin-top: 0.313rem"],#body_ajax_ls #ls_ticker_tab_id,#body_ajax_ls #ls_ticker_tab_id,#ls_ticker_tab_id + p,#body_ajax_ls #ls_ticker_tab_id + p + p,#body_ajax_ls #ls_ticker_tab_id + p + p + p,#body_ajax_ls #myNavigationHolder,#body_ajax_ls #ls_setting_drop,#body_ajax_ls table[style*="margin-top: 0.313rem"],#body_ajax_ls #ls_mfl_notes,#body_ajax_ls #ls_ticker_tab_id,#body_ajax_ls table[style*="margin-top: 0.313rem"] + div.mobile-wrap,#body_ajax_ls table[style="margin-top: 0.313rem"] + div.mobile-wrap{visibility:hidden!important}#other_games > tbody > tr > td{font-size:0}#other_games div.ls_other_game {margin: 0 0.125rem;font-size:0.813rem}#body_ajax_ls #ls-modal-container.hide-overlay .ls-modal-content{display:none}#body_ajax_ls #other_games td.ls_og_cell{font-size:0.813rem}#body_ajax_ls #nfl_games td.ls_box_possession:after{content:"";background-size:0.75rem 0.75rem;height:0.75rem;width:0.75rem;position:absolute;margin-left:0.313rem;top:50%;transform:translateY(-50%)}#body_ajax_ls #nfl_games td.ls_box_possession.ls_has_ball+td,#body_ajax_ls #nfl_games td.ls_box_possession.ls_in_redzone+td{width:5.625rem}#body_ajax_ls #nfl_games td.ls_box_possession.ls_has_ball,#body_ajax_ls #nfl_games td.ls_box_possession.ls_in_redzone{width:2.625rem}#body_ajax_ls #nfl_games td.ls_box_possession.ls_in_redzone:after{background-image:url(https://www.mflscripts.com/ImageDirectory/script-images/goal-post.svg)}#body_ajax_ls #nfl_games td.ls_box_possession.ls_has_ball:after{background-image:url(https://www.mflscripts.com/ImageDirectory/script-images/football.svg)}#body_ajax_ls #nfl_games div.ls_other_game td{padding:0.063rem 0.125rem}#nfl_games td[style="border:none;"]:last-of-type{padding:0!important}div.ls_team_name{font-size:1.25rem!important;line-height:3.125rem}.ls-modal{display:none;position:fixed;z-index:99999;padding-top:1.875rem;left:0;top:0;width:100%;height:100%;overflow:auto}.ls-modal-content{position:relative;margin:auto;padding:0;width:96%;-webkit-animation-name:animatetop;-webkit-animation-duration:.4s;animation-name:animatetop;animation-duration:.4s;margin-bottom:1.875rem;max-width:25rem;border-radius:0.188rem}#ls-modal-content{max-height:31.25rem;overflow-x:auto}@-webkit-keyframes animatetop{from{top:-18.75rem;opacity:0}to{top:0;opacity:1}}@keyframes animatetop{from{top:-18.75rem;opacity:0}to{top:0;opacity:1}}.ls-modal-header{padding:0.188rem;background:none}.ls-modal-header h2{text-align:left;margin:0;padding:0;padding-left:0.313rem;text-transform:uppercase}.ls-modal-header .close{font-size:1.25rem;font-weight:700;position:absolute;right:0.313rem;top:0.313rem;text-align:center;border-radius:0.188rem;padding:0;height:1.375rem;width:1.375rem;line-height:1.375rem}.ls-modal-header .close:hover,.ls-modal-header .close:focus{text-decoration:none;cursor:pointer}.ls-modal-body{padding:0 0.125rem;font-size:0.813rem;padding-bottom:0.063rem}#ls-modal-content li,#ls-modal-content ul{margin:0;padding:0;list-style:none}#ls-modal-content .ls-popup-position-li{font-weight:700;font-size:0.875rem;padding-left:0.313rem}#ls-modal-content .ls-popup-player-li{position:relative;padding-left:0.5rem}#ls-modal-content .ls-popup-player-li:last-child{border:0}#ls-modal-content .ls-popup-stats{font-style:italic;display:block;font-size:0.688rem;line-height:0.688rem;font-weight:400;padding:0.125rem 0;padding-left:0.188rem;max-width:21.875rem}#ls-modal-content span.ls-popup-points{text-indent:0;display:inline;position:absolute;top:50%;-ms-transform:translateY(-50%);transform:translateY(-50%);right:0.313rem;font-weight:700;font-size:0.813rem;border:0}.ls-explain-points-total::before{content:"Total Points :";padding-right:0.313rem}.ls-explain-points-li::before{content:"\\f005";font-family:"Font Awesome 6 Pro";padding-right:0.188rem;margin-left:-1.5em}tr[onclick^="ls_nfl_stats_popup_setup"]{cursor:pointer}div.mobile-wrap.ls-boxscore{padding:0 0.625rem;padding-bottom:0.313rem}.ls_scroller{padding:0.625rem 0;padding-bottom:0.313rem;overflow-x:auto;-webkit-overflow-scrolling:touch}#ls-modal-content span.ls-popup-text{font-style:italic;font-weight:700}.ls-popup-text::before,.ls-popup-icon-wrapper::before{content:"-";padding:0 0.125rem}#ls-modal-content img.ls-popup-icon{max-height:1rem;max-width:5rem}#body_ajax_ls table#roster_away,#body_ajax_ls table#roster_home{table-layout:fixed}#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:6.25rem}#body_ajax_ls td.ls_marquee_value{padding-left:0;padding-right:0}#body_ajax_ls .ls-matchup th:last-of-type,#body_ajax_ls .ls-matchup td:last-of-type{width:3.125rem}.ls_other_game .ls_projections{cursor:pointer}.ls_pace_box .ls_projected{display:none}.hide-overlay{background:none!important}@media only screen and (max-width:26.875em){#ls-modal-content .ls-popup-stats{max-width:17.5rem}}@media only screen and (max-width:22.5em){#ls-modal-content .ls-popup-stats{max-width:12.5rem}}@media only screen and (max-width:20em){#ls-modal-content .ls-popup-stats{max-width:11.25rem}}@media only screen and (max-height:37.5em) and (orientation:landscape){#ls-modal-content{max-height:28.75rem}}@media only screen and (max-height:31.25em) and (orientation:landscape){#ls-modal-content{max-height:22.5rem}}@media only screen and (max-height:28.125em) and (orientation:landscape){#ls-modal-content{max-height:19.375rem}}@media only screen and (max-height:25em) and (orientation:landscape){#ls-modal-content{max-height:16.25rem}}@media only screen and (max-height:21.875em) and (orientation:landscape){#ls-modal-content{max-height:13.125rem}}@media only screen and (max-height:18.75em) and (orientation:landscape){#ls-modal-content{max-height:10rem}}@media only screen and (max-height:15.625em) and (orientation:landscape){#ls-modal-content{max-height:6.875rem}}@media only screen and (max-height:12.5em) and (orientation:landscape){#ls-modal-content{max-height:9.375rem}}@media only screen and (max-width:70em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:5rem}}@media only screen and (max-width:60em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:3.75rem}}@media only screen and (max-width:55em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:2.5rem}}@media only screen and (max-width:48em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:8.75rem}}@media only screen and (max-width:33em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:5rem}}@media only screen and (max-width:30em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:2.5rem}}@media only screen and (max-width: 30em){.ls_pace_legend_title{display:block}#body_ajax_ls .ls-has-bye #LS_TopTableHolder .LS_ScoreboardTitle,#body_ajax_ls .ls-has-bye #LS_TopTableHolder .prmin{font-size:0.625rem}}@media only screen and (max-width: 25em){.ls_projected{display:block}}#body_ajax_ls #roster_away .no_stats td,#body_ajax_ls #roster_home .no_stats td{padding-bottom:0}#body_ajax_ls .no_stats div.ls_player_stats{display:none!important}</style>');
+            $('head').append('<style>.LS_MainScoreboard .ls_team_name{white-space:nowrap}.ls_other_game .ls_og_full_name,.LS_MainScoreboard .ls_team_name{overflow:hidden;text-overflow:ellipsis}.ls-outer-table td.ls_game_info br{display:none}.ls-outer-table td.ls_game_info br + br{display:block}td.ls_projections span:empty:before{content:"0"}.ls-matchup caption span{max-width:unset!important;display:unset!important}.ls_player_stats div:empty:before{content:"- stats - "}.ls_allplay_final{width:0.625rem;text-align:right;padding-left:0.188rem}.wp_bar div{border-radius:0.5rem;}#TeamWinPctRow td{padding:0.188rem}#winprob_away{float:right;text-align:right;padding: 0 0.188rem;min-width: 1.563rem;min-width: fit-content;}#winprob_home{float:left;text-align:left;padding: 0 0.188rem;min-width: 1.563rem;min-width: fit-content;}h3#ls_error{max-width:37.5rem;margin:0 auto;background:red;color:#fff;padding:0.625rem;border-radius:0.313rem}h3#ls_error a{background:#fff;color:red;padding:0.063rem 0.313rem;border-radius:0.188rem;text-decoration:none;display:block;width:6.25rem;text-align:center;margin:0 auto;}#body_ajax_ls h4,#body_ajax_ls table[style="margin-top: 0.313rem"],#body_ajax_ls #ls_ticker_tab_id,#body_ajax_ls #ls_ticker_tab_id,#ls_ticker_tab_id + p,#body_ajax_ls #ls_ticker_tab_id + p + p,#body_ajax_ls #ls_ticker_tab_id + p + p + p,#body_ajax_ls #myNavigationHolder,#body_ajax_ls #ls_setting_drop,#body_ajax_ls table[style*="margin-top: 0.313rem"],#body_ajax_ls #ls_mfl_notes,#body_ajax_ls #ls_ticker_tab_id,#body_ajax_ls table[style*="margin-top: 0.313rem"] + div.mobile-wrap,#body_ajax_ls table[style="margin-top: 0.313rem"] + div.mobile-wrap{visibility:hidden!important}#other_games > tbody > tr > td{font-size:0}#other_games div.ls_other_game {margin: 0 0.125rem;font-size:0.813rem}#body_ajax_ls #ls-modal-container.hide-overlay .ls-modal-content{display:none}#body_ajax_ls #other_games td.ls_og_cell{font-size:0.813rem}#body_ajax_ls #nfl_games td.ls_box_possession:after{content:"";background-size:0.75rem 0.75rem;height:0.75rem;width:0.75rem;position:absolute;margin-left:0.313rem;top:50%;transform:translateY(-50%)}#body_ajax_ls #nfl_games td.ls_box_possession.ls_has_ball+td,#body_ajax_ls #nfl_games td.ls_box_possession.ls_in_redzone+td{width:5.625rem}#body_ajax_ls #nfl_games td.ls_box_possession.ls_has_ball,#body_ajax_ls #nfl_games td.ls_box_possession.ls_in_redzone{width:2.625rem}#body_ajax_ls #nfl_games td.ls_box_possession.ls_in_redzone:after{background-image:url(https://www.mflscripts.com/ImageDirectory/script-images/goal-post.svg)}#body_ajax_ls #nfl_games td.ls_box_possession.ls_has_ball:after{background-image:url(https://www.mflscripts.com/ImageDirectory/script-images/football.svg)}#body_ajax_ls #nfl_games div.ls_other_game td{padding:0.063rem 0.125rem}#nfl_games td[style="border:none;"]:last-of-type{padding:0!important}div.ls_team_name{font-size:1.25rem!important;line-height:3.125rem}.ls-modal{display:none;position:fixed;z-index:99999;padding-top:1.875rem;left:0;top:0;width:100%;height:100%;overflow:auto}.ls-modal-content{position:relative;margin:auto;padding:0;width:96%;-webkit-animation-name:animatetop;-webkit-animation-duration:.4s;animation-name:animatetop;animation-duration:.4s;margin-bottom:1.875rem;max-width:25rem;border-radius:0.188rem}#ls-modal-content{max-height:31.25rem;overflow-x:auto}@-webkit-keyframes animatetop{from{top:-18.75rem;opacity:0}to{top:0;opacity:1}}@keyframes animatetop{from{top:-18.75rem;opacity:0}to{top:0;opacity:1}}.ls-modal-header{padding:0.188rem;background:none}.ls-modal-header h2{text-align:left;margin:0;padding:0;padding-left:0.313rem;text-transform:uppercase}.ls-modal-header .close{font-size:1.25rem;font-weight:700;position:absolute;right:0.313rem;top:0.313rem;text-align:center;border-radius:0.188rem;padding:0;height:1.375rem;width:1.375rem;line-height:1.375rem}.ls-modal-header .close:hover,.ls-modal-header .close:focus{text-decoration:none;cursor:pointer}.ls-modal-body{padding:0 0.125rem;font-size:0.813rem;padding-bottom:0.063rem}#ls-modal-content li,#ls-modal-content ul{margin:0;padding:0;list-style:none}#ls-modal-content .ls-popup-position-li{font-weight:700;font-size:0.875rem;padding-left:0.313rem}#ls-modal-content .ls-popup-player-li{position:relative;padding-left:0.5rem}#ls-modal-content .ls-popup-player-li:last-child{border:0}#ls-modal-content .ls-popup-stats{font-style:italic;display:block;font-size:0.688rem;line-height:0.688rem;font-weight:400;padding:0.125rem 0;padding-left:0.188rem;max-width:21.875rem}#ls-modal-content span.ls-popup-points{text-indent:0;display:inline;position:absolute;top:50%;-ms-transform:translateY(-50%);transform:translateY(-50%);right:0.313rem;font-weight:700;font-size:0.813rem;border:0}.ls-explain-points-total::before{content:"Total Points :";padding-right:0.313rem}.ls-explain-points-li::before{content:"\\f005";font-family:"Font Awesome 6 Pro";padding-right:0.188rem;margin-left:-1.5em}tr[onclick^="ls_nfl_stats_popup_setup"]{cursor:pointer}div.mobile-wrap.ls-boxscore{padding:0 0.625rem;padding-bottom:0.313rem}.ls_scroller{padding:0.625rem 0;padding-bottom:0.313rem;overflow-x:auto;-webkit-overflow-scrolling:touch}#ls-modal-content span.ls-popup-text{font-style:italic;font-weight:700}.ls-popup-text::before,.ls-popup-icon-wrapper::before{content:"-";padding:0 0.125rem}#ls-modal-content img.ls-popup-icon{max-height:1rem;max-width:5rem}#body_ajax_ls table#roster_away,#body_ajax_ls table#roster_home{table-layout:fixed}#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:6.25rem}#body_ajax_ls td.ls_marquee_value{padding-left:0;padding-right:0}#body_ajax_ls .ls-matchup th:last-of-type,#body_ajax_ls .ls-matchup td:last-of-type{width:3.125rem}.ls_other_game .ls_projections{cursor:pointer}.ls_pace_box .ls_projected{display:none}.hide-overlay{background:none!important}@media only screen and (max-width:26.875em){#ls-modal-content .ls-popup-stats{max-width:17.5rem}}@media only screen and (max-width:22.5em){#ls-modal-content .ls-popup-stats{max-width:12.5rem}}@media only screen and (max-width:20em){#ls-modal-content .ls-popup-stats{max-width:11.25rem}}@media only screen and (max-height:37.5em) and (orientation:landscape){#ls-modal-content{max-height:28.75rem}}@media only screen and (max-height:31.25em) and (orientation:landscape){#ls-modal-content{max-height:22.5rem}}@media only screen and (max-height:28.125em) and (orientation:landscape){#ls-modal-content{max-height:19.375rem}}@media only screen and (max-height:25em) and (orientation:landscape){#ls-modal-content{max-height:16.25rem}}@media only screen and (max-height:21.875em) and (orientation:landscape){#ls-modal-content{max-height:13.125rem}}@media only screen and (max-height:18.75em) and (orientation:landscape){#ls-modal-content{max-height:10rem}}@media only screen and (max-height:15.625em) and (orientation:landscape){#ls-modal-content{max-height:6.875rem}}@media only screen and (max-height:12.5em) and (orientation:landscape){#ls-modal-content{max-height:9.375rem}}@media only screen and (max-width:70em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:5rem}}@media only screen and (max-width:60em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:3.75rem}}@media only screen and (max-width:55em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:2.5rem}}@media only screen and (max-width:48em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:8.75rem}}@media only screen and (max-width:33em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:5rem}}@media only screen and (max-width:30em){#body_ajax_ls .ls-matchup td.ls_projections,#body_ajax_ls th.ls_projections{width:2.5rem}}@media only screen and (max-width: 30em){.ls_pace_legend_title{display:block}#body_ajax_ls .ls-has-bye #LS_TopTableHolder .LS_ScoreboardTitle,#body_ajax_ls .ls-has-bye #LS_TopTableHolder .prmin{font-size:0.625rem}}@media only screen and (max-width: 25em){.ls_projected{display:block}}#body_ajax_ls #roster_away .no_stats td,#body_ajax_ls #roster_home .no_stats td{padding-bottom:0}#body_ajax_ls .no_stats div.ls_player_stats{display:none!important}</style>');
             if (isAllPlay) {
                 $('head').append('<style>#ls_setting_drop,.ls-outer-table,.ls-outer-table+div.mobile-wrap,.ls-outer-table+table{max-width:50rem;margin:0 auto}#body_ajax_ls div.ls_other_game{min-width:7.5rem}#body_ajax_ls .mobile-wrap.ls-matchup,#LS_TopTableHolder div.mobile-wrap{margin:0 auto;margin-bottom:0.625rem}#body_ajax_ls #other_games td.ls_og_cell{font-size:0.813rem}div.ls_team_name{font-size:20pt}#LS_HomeTeamName,#LS_CenterTop{width:50%}#other_games .ls_other_game tr{height:1.5rem}#other_games th{display:none}@media only screen and (max-width: 54.25em){#LS_TopTableHolder #LS_CenterTop,#LS_TopTableHolder .prmin,#LS_TopTableHolder .LS_ScoreboardTitle{display:table-cell}}@media only screen and (min-width:48.1em){#body_ajax_ls .ls-outer-table{table-layout:fixed}#body_ajax_ls #roster_away caption,#roster_home caption{display:none}}@media only screen and (max-width:40em){#LS_TopTableHolder #LS_CenterTop,#LS_TopTableHolder .prmin,#LS_TopTableHolder .LS_ScoreboardTitle{display:none}#LS_HomeTeamName{width:50%}.LS_MainScoreboard{table-layout:auto!important}}@media only screen and (max-width:28.000em){#LS_HomeScore span{font-size:1.875rem;min-width:1.5rem}}@media only screen and (max-width:22.5em){td.ls_projections,th.ls_projections,#ls_pace_wrapper{display:none!important}}</style>');
             } else {
@@ -902,133 +902,125 @@ if ($('#body_ajax_ls').length) {
             $('.ls_projections span:contains("undefined"),.ls_projections span:contains("NaN"),.ls_game_info:contains("NaN"),.ls_game_info:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:1.375rem" title="Wait..As MFL Prepares Games Starting"></i>');
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
-            // Mapping of defense IDs to team abbreviations
-            const defenseTeams = {
-                '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
-                '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
-                '0511': 'DEN', '0512': 'KCC', '0513': 'LVR', '0514': 'LAC', '0515': 'SEA',
-                '0516': 'DAL', '0517': 'NYG', '0518': 'PHI', '0519': 'ARI', '0520': 'WAS',
-                '0521': 'CHI', '0522': 'DET', '0523': 'GBP', '0524': 'MIN', '0525': 'TBB',
-                '0526': 'ATL', '0527': 'CAR', '0528': 'LAR', '0529': 'NOS', '0530': 'SFO',
-                '0531': 'BAL', '0532': 'HOU'
-            };
 
-            // Function to get the player image, checking if it's a defense
-            function getPlayerImage(playerID) {
-                if (defenseTeams[playerID]) {
-                    const teamAbbreviation = defenseTeams[playerID];
-                    return `https://www.mflscripts.com/playerImages_96x96/mfl_${teamAbbreviation}.svg`; // Using .svg for defenses
+            function getPlayerImage(position, playerID) {
+                if (position === 'FA') {
+                    return 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
                 } else {
-                    return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
+                    return "https://www.mflscripts.com/playerImages_96x96/mfl_" + playerID + ".png";
                 }
             }
 
             function processTable(tableID) {
+                console.log(`Processing table: ${tableID}`);
+
                 const table = document.querySelector(`#${tableID}`);
                 if (!table) {
+                    console.log(`Table ${tableID} not found.`);
                     return;
                 }
+                console.log(`Table ${tableID} found:`, table);
 
-                table.querySelectorAll('tr').forEach((row) => {
+                table.querySelectorAll('tr').forEach((row, rowIndex) => {
+                    console.log(`Processing row ${rowIndex + 1} in table ${tableID}...`);
+
                     const playerCell = row.querySelector('.td-first-type');
                     if (!playerCell) {
+                        console.log(`No player cell found in row ${rowIndex + 1} of table ${tableID}`);
                         return;
                     }
+                    console.log(`Player cell found in row ${rowIndex + 1} of table ${tableID}:`, playerCell);
 
                     // Remove all <br> elements within the player cell
                     const brElements = playerCell.querySelectorAll('br');
                     brElements.forEach((br) => {
                         br.remove();
+                        console.log(`Removed <br> element in row ${rowIndex + 1} of table ${tableID}`);
                     });
 
                     // Check if the player wrapper already exists to prevent reloading on refresh
                     if (playerCell.querySelector('.player_wrapper')) {
+                        console.log(`Player wrapper already exists in row ${rowIndex + 1} of table ${tableID}, skipping.`);
                         return;
                     }
 
                     const playerLink = playerCell.querySelector('a');
                     if (!playerLink) {
+                        console.log(`No player link found in row ${rowIndex + 1} of table ${tableID}`);
                         return;
                     }
+                    console.log(`Player link found in row ${rowIndex + 1} of table ${tableID}:`, playerLink);
 
                     const url = playerLink.getAttribute('href');
                     const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
                     if (!playerID) {
+                        console.log(`No player ID found in row ${rowIndex + 1} of table ${tableID}`);
                         return;
                     }
+                    console.log(`Player ID found in row ${rowIndex + 1} of table ${tableID}: ${playerID}`);
 
                     const name = playerLink.textContent.trim();
+                    console.log(`Player name: ${name}`);
                     const nameParts = name.split(',');
                     const lastName = nameParts[0].trim();
                     const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+                    console.log(`Parsed name - First: ${firstName}, Last: ${lastName}`);
 
-                    const profileImage = getPlayerImage(playerID);
+                    // Fetch position from next sibling or the inner text (based on your structure)
+                    const positionText = playerCell.innerHTML.match(/([A-Z]{2,3})\s+[A-Z]{2,3}/);
+                    const position = positionText ? positionText[0].split(' ')[1] : 'FA';
+                    console.log(`Position found: ${position}`);
+
+                    const profileImage = getPlayerImage(position, playerID);
+                    console.log(`Profile image URL: ${profileImage}`);
 
                     // Create player wrapper elements
                     const playerWrapper = document.createElement('div');
                     playerWrapper.classList.add('player_wrapper');
 
-                    // Create last name wrapper div
-                    const lastNameWrapper = document.createElement('div');
-                    lastNameWrapper.classList.add('last_name_roster');
+                    const lastNameDiv = document.createElement('a');
+                    lastNameDiv.classList.add('last_name_roster');
+                    lastNameDiv.textContent = lastName;
+                    lastNameDiv.href = playerLink.href;
 
-                    // Move the last name link into the lastNameWrapper div
-                    const lastNameLink = document.createElement('a');
-                    lastNameLink.textContent = lastName;
-                    lastNameLink.href = playerLink.href;
-
-                    // Move the span.warning.injurystatus inside the last name wrapper, but after the last name link
-                    const injuryStatus = playerCell.querySelector('span.warning.injurystatus');
-                    lastNameWrapper.appendChild(lastNameLink); // First append the last name link
-                    if (injuryStatus) {
-                        lastNameWrapper.appendChild(injuryStatus); // Then append the injury status
-                    }
-
-                     // Create player news icon element
-                    const newsIcon = document.createElement('img');
-                    newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
-                    newsIcon.alt = "recent news";
-                    newsIcon.title = "recent news";
-                    newsIcon.classList.add('playerPopupIcon');
-                    newsIcon.style.cursor = "pointer";
-                    newsIcon.style.pointerEvents = "all";
-
-                    // Append the news icon to the lastNameWrapper
-                    lastNameWrapper.appendChild(newsIcon);
-
-                    // Create first name div
                     const firstNameDiv = document.createElement('div');
                     firstNameDiv.classList.add('first_name_roster');
                     firstNameDiv.textContent = firstName;
 
-                    // Create image wrapper div
                     const imageWrapper = document.createElement('div');
                     imageWrapper.classList.add('image_wrapper');
                     const playerImg = document.createElement('img');
                     playerImg.classList.add('lineup_photo');
                     playerImg.src = profileImage;
                     playerImg.onerror = function () {
+                        console.log(`Error loading image for player ID: ${playerID}, using free agent image.`);
                         playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
                     };
                     imageWrapper.appendChild(playerImg);
-
 
                     // Hide the original player link
                     playerLink.style.display = 'none';
 
                     // Prepend the new structure to ensure it's the first in the td
                     playerWrapper.appendChild(firstNameDiv);
-                    playerWrapper.appendChild(lastNameWrapper); // Use the wrapper div that contains the last name and news icon
+                    playerWrapper.appendChild(lastNameDiv);
                     playerWrapper.appendChild(imageWrapper);
 
+                    console.log(`Prepending new content to player cell for row ${rowIndex + 1} in table ${tableID}`);
                     playerCell.prepend(playerWrapper); // Use prepend() to place the new content at the start
                 });
+
+                console.log(`Finished processing all rows in table ${tableID}.`);
             }
 
             function processAjaxLS() {
+                console.log("Starting processAjaxLS...");
+
                 // Process both home and away tables
                 processTable('roster_home');
                 processTable('roster_away');
+
+                console.log("Finished processing all tables.");
             }
 
             processAjaxLS();
@@ -1036,41 +1028,31 @@ if ($('#body_ajax_ls').length) {
 
 
 
-
-
-
-            function removePreviousFranchiseIconClasses(element) {
-                const classes = element.className.split(' ').filter(function (c) {
+            function removePreviousFranchiseIconClasses(tableElement) {
+                const classes = tableElement.className.split(' ').filter(function (c) {
                     return !c.startsWith('franchiseicon_');
                 });
-                element.className = classes.join(' ');
+                tableElement.className = classes.join(' ');
             }
 
-            // Function to assign img ID as a class to a table and the fname_home / fname_away div
-            function assignImgIdToTableAndDiv(imgSelector, tableSelector, divSelector) {
+            // Function to assign img ID to a table
+            function assignImgIdToTable(imgSelector, tableSelector) {
                 const imgElement = document.querySelector(imgSelector);
                 const tableElement = document.querySelector(tableSelector);
-                const divElement = document.querySelector(divSelector);
 
-                if (imgElement && tableElement && divElement) {
-                    // Remove any previous franchiseicon_* class from both elements
+                if (imgElement && tableElement) {
+                    // Remove any previous franchiseicon_* class
                     removePreviousFranchiseIconClasses(tableElement);
-                    removePreviousFranchiseIconClasses(divElement);
 
-                    // Add the new img ID as a class to both elements
+                    // Add the new img ID as a class
                     const imgId = imgElement.id;
                     tableElement.classList.add(imgId);
-                    divElement.classList.add(imgId);
                 }
             }
 
-            // Apply the appropriate franchise class to both home and away divs and tables
-            assignImgIdToTableAndDiv('#LS_AwayTeamName div#ficon_away img', 'table#roster_away', 'div#fname_away');
-            assignImgIdToTableAndDiv('#LS_HomeTeamName div#ficon_home img', 'table#roster_home', 'div#fname_home');
-
-
-
-
+            // Corrected selectors based on the structure you provided
+            assignImgIdToTable('#LS_AwayTeamName div#ficon_away img', 'table#roster_away');
+            assignImgIdToTable('#LS_HomeTeamName div#ficon_home img', 'table#roster_home');
 
 
 
