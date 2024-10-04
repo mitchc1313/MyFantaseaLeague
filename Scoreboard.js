@@ -902,162 +902,142 @@ if ($('#body_ajax_ls').length) {
             $('.ls_projections span:contains("undefined"),.ls_projections span:contains("NaN"),.ls_game_info:contains("NaN"),.ls_game_info:contains("undefined")').html('<i class="fa-regular fa-spinner fa-spin" style="font-size:1.375rem" title="Wait..As MFL Prepares Games Starting"></i>');
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
-// Mapping of defense IDs to team abbreviations
-const defenseTeams = {
-    '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
-    '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
-    '0511': 'DEN', '0512': 'KCC', '0513': 'LVR', '0514': 'LAC', '0515': 'SEA',
-    '0516': 'DAL', '0517': 'NYG', '0518': 'PHI', '0519': 'ARI', '0520': 'WAS',
-    '0521': 'CHI', '0522': 'DET', '0523': 'GBP', '0524': 'MIN', '0525': 'TBB',
-    '0526': 'ATL', '0527': 'CAR', '0528': 'LAR', '0529': 'NOS', '0530': 'SFO',
-    '0531': 'BAL', '0532': 'HOU'
-};
+            // Mapping of defense IDs to team abbreviations
+            const defenseTeams = {
+                '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
+                '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
+                '0511': 'DEN', '0512': 'KCC', '0513': 'LVR', '0514': 'LAC', '0515': 'SEA',
+                '0516': 'DAL', '0517': 'NYG', '0518': 'PHI', '0519': 'ARI', '0520': 'WAS',
+                '0521': 'CHI', '0522': 'DET', '0523': 'GBP', '0524': 'MIN', '0525': 'TBB',
+                '0526': 'ATL', '0527': 'CAR', '0528': 'LAR', '0529': 'NOS', '0530': 'SFO',
+                '0531': 'BAL', '0532': 'HOU'
+            };
 
-// Function to get the player image, checking if it's a defense
-function getPlayerImage(playerID) {
-    if (defenseTeams[playerID]) {
-        const teamAbbreviation = defenseTeams[playerID];
-        return `https://www.mflscripts.com/playerImages_96x96/mfl_${teamAbbreviation}.svg`; // Using .svg for defenses
-    } else {
-        return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
-    }
-}
-
-function processTable(tableID) {
-    const table = document.querySelector(`#${tableID}`);
-    if (!table) {
-        return;
-    }
-
-    table.querySelectorAll('tr').forEach((row) => {
-        const playerCell = row.querySelector('.td-first-type');
-        if (!playerCell) {
-            return;
-        }
-
-        // Remove all <br> elements within the player cell
-        const brElements = playerCell.querySelectorAll('br');
-        brElements.forEach((br) => {
-            br.remove();
-        });
-
-        // Check if the player wrapper already exists to prevent reloading on refresh
-        if (playerCell.querySelector('.player_wrapper')) {
-            return;
-        }
-
-        const playerLink = playerCell.querySelector('a');
-        if (!playerLink) {
-            return;
-        }
-
-        const url = playerLink.getAttribute('href');
-        const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
-        if (!playerID) {
-            return;
-        }
-
-        const name = playerLink.textContent.trim();
-        const nameParts = name.split(',');
-        const lastName = nameParts[0].trim();
-        const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
-
-        const profileImage = getPlayerImage(playerID);
-
-        // Create player wrapper elements
-        const playerWrapper = document.createElement('div');
-        playerWrapper.classList.add('player_wrapper');
-
-        // Create last name wrapper div
-        const lastNameWrapper = document.createElement('div');
-        lastNameWrapper.classList.add('last_name_roster');
-
-        // Move the last name link into the lastNameWrapper div
-        const lastNameLink = document.createElement('a');
-        lastNameLink.textContent = lastName;
-        lastNameLink.href = playerLink.href;
-
-        // Move the span.warning.injurystatus inside the last name wrapper, but after the last name link
-        const injuryStatus = playerCell.querySelector('span.warning.injurystatus');
-        lastNameWrapper.appendChild(lastNameLink); // First append the last name link
-        if (injuryStatus) {
-            lastNameWrapper.appendChild(injuryStatus); // Then append the injury status
-        }
-
-        // Create player news icon element
-const newsIcon = document.createElement('img');
-newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
-newsIcon.alt = "recent news";
-newsIcon.title = "recent news";
-newsIcon.classList.add('playerPopupIcon');
-newsIcon.style.cursor = "pointer";
-newsIcon.style.pointerEvents = "all";
-
-// Move the last name link into the lastNameWrapper div and append the news icon inside the <a>
-const lastNameLink = document.createElement('a');
-lastNameLink.textContent = lastName;
-lastNameLink.href = playerLink.href;
-lastNameLink.appendChild(newsIcon);  // Append the news icon inside the <a>
-
-// Append the last name link (with the news icon) to the last name wrapper
-lastNameWrapper.appendChild(lastNameLink);
-
-// Create first name div
-const firstNameDiv = document.createElement('div');
-firstNameDiv.classList.add('first_name_roster');
-firstNameDiv.textContent = firstName;
-
-// Create image wrapper div
-const imageWrapper = document.createElement('div');
-imageWrapper.classList.add('image_wrapper');
-const playerImg = document.createElement('img');
-playerImg.classList.add('lineup_photo');
-playerImg.src = profileImage;
-playerImg.onerror = function () {
-    playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
-};
-imageWrapper.appendChild(playerImg);
-
-        // Combine all text nodes and clean unwanted characters
-        let combinedText = '';
-        playerCell.childNodes.forEach((node) => {
-            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
-                combinedText += node.textContent.trim() + ' ';
-                node.textContent = ''; // Hide/remove the original text
+            // Function to get the player image, checking if it's a defense
+            function getPlayerImage(playerID) {
+                if (defenseTeams[playerID]) {
+                    const teamAbbreviation = defenseTeams[playerID];
+                    return `https://www.mflscripts.com/playerImages_96x96/mfl_${teamAbbreviation}.svg`; // Using .svg for defenses
+                } else {
+                    return `https://www.mflscripts.com/playerImages_96x96/mfl_${playerID}.png`;
+                }
             }
-        });
 
-        // Extract the position from the combined text, removing unwanted characters
-        let textParts = combinedText.split(' ');
-        let positionText = textParts.length > 1 ? textParts[1].replace(/[()]/g, '') : '';
+            function processTable(tableID) {
+                const table = document.querySelector(`#${tableID}`);
+                if (!table) {
+                    return;
+                }
 
-        // Create position div and add the extracted text
-        const positionDiv = document.createElement('div');
-        positionDiv.classList.add('position_name_roster');
-        positionDiv.textContent = positionText;
+                table.querySelectorAll('tr').forEach((row) => {
+                    const playerCell = row.querySelector('.td-first-type');
+                    if (!playerCell) {
+                        return;
+                    }
 
-        // Hide the original player link
-        playerLink.style.display = 'none';
+                    // Remove all <br> elements within the player cell
+                    const brElements = playerCell.querySelectorAll('br');
+                    brElements.forEach((br) => {
+                        br.remove();
+                    });
 
-        // Prepend the new structure to ensure it's the first in the td
-        playerWrapper.appendChild(firstNameDiv);
-        playerWrapper.appendChild(lastNameWrapper); // Use the wrapper div that contains the last name and news icon
-        playerWrapper.appendChild(imageWrapper);
-        playerWrapper.appendChild(positionDiv); // Add position div to playerWrapper
+                    // Check if the player wrapper already exists to prevent reloading on refresh
+                    if (playerCell.querySelector('.player_wrapper')) {
+                        return;
+                    }
 
-        playerCell.prepend(playerWrapper); // Use prepend() to place the new content at the start
-    });
-}
+                    const playerLink = playerCell.querySelector('a');
+                    if (!playerLink) {
+                        return;
+                    }
 
-function processAjaxLS() {
-    // Process both home and away tables
-    processTable('roster_home');
-    processTable('roster_away');
-}
+                    const url = playerLink.getAttribute('href');
+                    const playerID = url.includes('P=') ? url.split('P=')[1].split('&')[0] : null;
+                    if (!playerID) {
+                        return;
+                    }
 
-processAjaxLS();
+                    const name = playerLink.textContent.trim();
+                    const nameParts = name.split(',');
+                    const lastName = nameParts[0].trim();
+                    const firstName = nameParts.length > 1 ? nameParts[1].trim() : '';
+
+                    const profileImage = getPlayerImage(playerID);
+
+                    // Create player wrapper elements
+                    const playerWrapper = document.createElement('div');
+                    playerWrapper.classList.add('player_wrapper');
+
+                    // Create last name wrapper div
+                    const lastNameWrapper = document.createElement('div');
+                    lastNameWrapper.classList.add('last_name_roster');
+
+                    // Move the last name link into the lastNameWrapper div
+                    const lastNameLink = document.createElement('a');
+                    lastNameLink.textContent = lastName;
+                    lastNameLink.href = playerLink.href;
+
+                    // Move the span.warning.injurystatus inside the last name wrapper, but after the last name link
+                    const injuryStatus = playerCell.querySelector('span.warning.injurystatus');
+                    lastNameWrapper.appendChild(lastNameLink); // First append the last name link
+                    if (injuryStatus) {
+                        lastNameWrapper.appendChild(injuryStatus); // Then append the injury status
+                    }
+
+                    // Create player news icon element
+                    const newsIcon = document.createElement('img');
+                    newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
+                    newsIcon.alt = "recent news";
+                    newsIcon.title = "recent news";
+                    newsIcon.classList.add('playerPopupIcon');
+                    newsIcon.style.cursor = "pointer";
+                    newsIcon.style.pointerEvents = "all";
+
+                    // Move the last name link into the lastNameWrapper div and append the news icon inside the <a>
+                    const lastNameLink = document.createElement('a');
+                    lastNameLink.textContent = lastName;
+                    lastNameLink.href = playerLink.href;
+                    lastNameLink.appendChild(newsIcon);  // Append the news icon inside the <a>
+
+                    // Append the last name link (with the news icon) to the last name wrapper
+                    lastNameWrapper.appendChild(lastNameLink);
+
+                    // Create first name div
+                    const firstNameDiv = document.createElement('div');
+                    firstNameDiv.classList.add('first_name_roster');
+                    firstNameDiv.textContent = firstName;
+
+                    // Create image wrapper div
+                    const imageWrapper = document.createElement('div');
+                    imageWrapper.classList.add('image_wrapper');
+                    const playerImg = document.createElement('img');
+                    playerImg.classList.add('lineup_photo');
+                    playerImg.src = profileImage;
+                    playerImg.onerror = function () {
+                        playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+                    };
+                    imageWrapper.appendChild(playerImg);
 
 
+                    // Hide the original player link
+                    playerLink.style.display = 'none';
+
+                    // Prepend the new structure to ensure it's the first in the td
+                    playerWrapper.appendChild(firstNameDiv);
+                    playerWrapper.appendChild(lastNameWrapper); // Use the wrapper div that contains the last name and news icon
+                    playerWrapper.appendChild(imageWrapper);
+
+                    playerCell.prepend(playerWrapper); // Use prepend() to place the new content at the start
+                });
+            }
+
+            function processAjaxLS() {
+                // Process both home and away tables
+                processTable('roster_home');
+                processTable('roster_away');
+            }
+
+            processAjaxLS();
 
 
 
