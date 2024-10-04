@@ -903,7 +903,7 @@ if ($('#body_ajax_ls').length) {
             //console.log("ls_after_update_scores"); // REMOVE AFTER TESTING - CONSOLE LOGGING
 
 
-           // Mapping of defense IDs to team abbreviations
+       // Mapping of defense IDs to team abbreviations
 const defenseTeams = {
     '0501': 'BUF', '0502': 'IND', '0503': 'MIA', '0504': 'NEP', '0505': 'NYJ',
     '0506': 'CIN', '0507': 'CLE', '0508': 'TEN', '0509': 'JAC', '0510': 'PIT',
@@ -973,52 +973,45 @@ function processTable(tableID) {
         const lastNameWrapper = document.createElement('div');
         lastNameWrapper.classList.add('last_name_roster');
 
-        // Move the last name link into the lastNameWrapper div
+        // Create player news icon element
+        const newsIcon = document.createElement('img');
+        newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
+        newsIcon.alt = "recent news";
+        newsIcon.title = "recent news";
+        newsIcon.classList.add('playerPopupIcon');
+        newsIcon.style.cursor = "pointer";
+        newsIcon.style.pointerEvents = "all";
+
+        // Move the last name link into the lastNameWrapper div and append the news icon inside the <a>
         const lastNameLink = document.createElement('a');
         lastNameLink.textContent = lastName;
         lastNameLink.href = playerLink.href;
+        lastNameLink.appendChild(newsIcon);  // Append the news icon inside the <a>
+
+        // Append the last name link (with the news icon) to the last name wrapper
+        lastNameWrapper.appendChild(lastNameLink);
 
         // Move the span.warning.injurystatus inside the last name wrapper, but after the last name link
         const injuryStatus = playerCell.querySelector('span.warning.injurystatus');
-        lastNameWrapper.appendChild(lastNameLink); // First append the last name link
         if (injuryStatus) {
             lastNameWrapper.appendChild(injuryStatus); // Then append the injury status
         }
 
-       // Create player news icon element
-const newsIcon = document.createElement('img');
-newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
-newsIcon.alt = "recent news";
-newsIcon.title = "recent news";
-newsIcon.classList.add('playerPopupIcon');
-newsIcon.style.cursor = "pointer";
-newsIcon.style.pointerEvents = "all";
+        // Create first name div
+        const firstNameDiv = document.createElement('div');
+        firstNameDiv.classList.add('first_name_roster');
+        firstNameDiv.textContent = firstName;
 
-// Move the last name link into the lastNameWrapper div and append the news icon inside the <a>
-const lastNameLink = document.createElement('a');
-lastNameLink.textContent = lastName;
-lastNameLink.href = playerLink.href;
-lastNameLink.appendChild(newsIcon);  // Append the news icon inside the <a>
-
-// Append the last name link (with the news icon) to the last name wrapper
-lastNameWrapper.appendChild(lastNameLink);
-
-// Create first name div
-const firstNameDiv = document.createElement('div');
-firstNameDiv.classList.add('first_name_roster');
-firstNameDiv.textContent = firstName;
-
-// Create image wrapper div
-const imageWrapper = document.createElement('div');
-imageWrapper.classList.add('image_wrapper');
-const playerImg = document.createElement('img');
-playerImg.classList.add('lineup_photo');
-playerImg.src = profileImage;
-playerImg.onerror = function () {
-    playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
-};
-imageWrapper.appendChild(playerImg);
-
+        // Create image wrapper div
+        const imageWrapper = document.createElement('div');
+        imageWrapper.classList.add('image_wrapper');
+        const playerImg = document.createElement('img');
+        playerImg.classList.add('lineup_photo');
+        playerImg.src = profileImage;
+        playerImg.onerror = function () {
+            playerImg.src = 'https://www.mflscripts.com/playerImages_96x96/free_agent.png';
+        };
+        imageWrapper.appendChild(playerImg);
 
         // Combine all text nodes and clean unwanted characters
         let combinedText = '';
@@ -1058,7 +1051,6 @@ function processAjaxLS() {
 }
 
 processAjaxLS();
-
 
 
 
