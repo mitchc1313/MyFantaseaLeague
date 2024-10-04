@@ -984,7 +984,7 @@ if ($('#body_ajax_ls').length) {
                         lastNameWrapper.appendChild(injuryStatus); // Then append the injury status
                     }
 
-                    // Create player news icon element
+                     // Create player news icon element
                     const newsIcon = document.createElement('img');
                     newsIcon.src = "https://www.mflscripts.com/ImageDirectory/script-images/newsOld.svg";
                     newsIcon.alt = "recent news";
@@ -993,14 +993,8 @@ if ($('#body_ajax_ls').length) {
                     newsIcon.style.cursor = "pointer";
                     newsIcon.style.pointerEvents = "all";
 
-                    // Move the last name link into the lastNameWrapper div and append the news icon inside the <a>
-                    const lastNameLink = document.createElement('a');
-                    lastNameLink.textContent = lastName;
-                    lastNameLink.href = playerLink.href;
-                    lastNameLink.appendChild(newsIcon);  // Append the news icon inside the <a>
-
-                    // Append the last name link (with the news icon) to the last name wrapper
-                    lastNameWrapper.appendChild(lastNameLink);
+                    // Append the news icon to the lastNameWrapper
+                    lastNameWrapper.appendChild(newsIcon);
 
                     // Create first name div
                     const firstNameDiv = document.createElement('div');
