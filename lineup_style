@@ -1,0 +1,931 @@
+:root {
+  --red-color-warning: #91071e;
+}
+
+#body_lineup form table.report {
+  visibility: hidden;
+}
+
+.lineupContainer {
+  font-family: "Industry", sans-serif;
+  padding: 0px;
+  margin: auto;
+  line-height: 1.5;
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.lineupContainer h1,
+.lineupContainer h2 {
+  text-align: center;
+  background: none;
+}
+
+.lineupContainer .player-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 700px;
+  margin: 0px auto;
+  min-width: 358px;
+}
+
+.lineupContainer .player-card {
+  display: grid;
+  grid-template-columns: 55px 62px auto 1fr 1fr 126px;
+  /* Adjust flexible and fixed sizes */
+  grid-template-rows: repeat(4, 20px);
+  grid-template-areas: "position image first-name . . ." "position image last-name . . projected-points" ". image team jersey . bench" ". image opponent opponent-rank ytdpoints .";
+  gap: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0px;
+  box-shadow: 2px 2px 5px var(--box-shadow);
+  align-items: center;
+  width: 100%;
+  grid-gap: 0;
+  background-color: white;
+}
+
+.lineupContainer .placeholder-card.player-card {
+  display: grid;
+  grid-template-columns: 55px 62px auto 1fr 1fr 126px;
+  grid-template-rows: auto;
+  grid-template-areas: "position . . .  ";
+  gap: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0px;
+  box-shadow: 2px 2px 5px var(--box-shadow);
+  align-items: center;
+  width: 100%;
+  min-width: 358px;
+  max-width: 700px;
+  height: 50px;
+  grid-gap: 0;
+  margin: 0 auto;
+}
+
+.lineupContainer .player-ytd-points {
+  grid-area: ytdpoints;
+  font-size: 12px;
+  color: var(--dark-color);
+  font-weight: 700;
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.lineupContainer .player-ytd-points span {
+  font-weight: 400;
+}
+
+.lineupContainer .add-position-btn {
+  grid-area: add;
+  grid-row: 1;
+  padding: 5px 10px;
+  background-color: var(--dark-color);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: center;
+  width: 75px;
+  margin: auto;
+  margin-right: 26px;
+}
+
+.lineupContainer .player-image-container {
+  grid-area: image;
+  position: relative;
+  /* Keep as positioning context for child elements */
+  width: 60px;
+  /* Keep fixed width for the image */
+  height: 100%;
+  /* Maintain consistent dimensions */
+  overflow: visible;
+  /* Allow the `.overlay-top` to extend outside */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lineupContainer .player-image-container img {
+  width: 100%;
+  /* Fill the container width */
+  height: auto;
+  /* Maintain aspect ratio */
+  max-height: 100%;
+  /* Ensure the image doesn't exceed the container height */
+  border-radius: 5px;
+  z-index: 1;
+  display: block;
+}
+
+.lineupContainer .first-name,
+.lineupContainer .last-name,
+.lineupContainer .player-team,
+.lineupContainer .player-opponent {
+  padding-left: 10px;
+}
+
+.lineupContainer .last-name a {
+  padding: 0;
+  color: var(--dark-color);
+}
+
+.lineupContainer .player-team-jersey {
+  grid-area: team;
+  /* Matches your grid-template-area */
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  /* Space between elements */
+  padding-left: 10px;
+  padding-bottom: 0px;
+}
+
+.lineupContainer .team-logo {
+  width: 20px;
+  /* Adjust size as needed */
+  height: 20px;
+  border-radius: 3px;
+  /* Optional for a rounded logo */
+}
+
+.lineupContainer .team-name {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--dark-color);
+}
+
+.lineupContainer .player-jersey {
+  font-size: 12px;
+  color: var(--dark-color);
+  font-weight: 400;
+  /* Space between team name and jersey */
+}
+
+.lineupContainer .first-name {
+  grid-area: first-name;
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--dark-color);
+  align-self: end;
+  padding-top: 10px;
+  grid-row: 1/3;
+  margin-bottom: 13px;
+}
+
+.lineupContainer .last-name {
+  grid-area: last-name;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--dark-color);
+  align-self: start;
+}
+
+.lineupContainer .player-position {
+  grid-area: position;
+  font-size: 18px;
+  color: var(--dark-color);
+  font-weight: 900;
+  padding-left: 10px;
+  text-transform: uppercase;
+}
+
+.lineupContainer .placeholder-card .player-position {
+  padding-top: 5px;
+}
+
+.lineupContainer .player-team {
+  grid-area: team;
+  font-size: 12px;
+  color: var(--dark-color);
+}
+
+.lineupContainer .player-opponent {
+  grid-area: opponent;
+  font-size: 12px;
+  color: var(--dark-color);
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.lineupContainer .player-opponent span {
+  font-weight: 400;
+}
+
+.lineupContainer .player-opponent-rank {
+  grid-area: opponent-rank;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark-color);
+  text-align: left;
+  margin-bottom: 5px;
+  padding-left: 15px;
+  white-space: nowrap;
+}
+
+.lineupContainer .player-opponent-rank span {
+  font-weight: 400;
+}
+
+.lineupContainer .player-projected-points {
+  grid-area: projected-points;
+  grid-row: 2/4;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--dark-color);
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  margin-right: 0px;
+  padding-bottom: 10px;
+}
+
+.lineupContainer .player-salary {
+  grid-area: projected-points;
+  grid-row: 1/3;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--dark-color);
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  margin-right: 0px;
+  padding-bottom: 0px;
+  padding-top: 10px;
+}
+
+.lineupContainer .player-projected-points.contest-league {
+  grid-row: 4;
+  grid-column: 5;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.lineupContainer .player-projected-points.contest-league::before {
+  content: "PROJ: ";
+  font-weight: 400;
+  font-size: 12px;
+  padding-bottom: 0px;
+  position: relative;
+  z-index: unset;
+  font-style: normal;
+  color: var(--dark-color);
+}
+
+.lineupContainer .player-projected-points::before {
+  content: "Projected";
+  font-weight: 400;
+  font-style: italic;
+  font-size: 12px;
+  color: #c7c7c7;
+  position: absolute;
+  /* Allows precise placement */
+  bottom: 88%;
+  /* Moves it directly below the parent */
+  left: 0;
+  /* Aligns it with the parent's left edge */
+  width: 100%;
+  /* Match the parent's width */
+  z-index: 1;
+  /* Pushes it below the parent visually */
+  padding-bottom: 0px;
+}
+
+.lineupContainer .player-projected-points::after,
+.lineupContainer .player-projected-points.contest-league::after {
+  content: " PTS";
+}
+
+.lineupContainer .bench-btn,
+.lineupContainer .add-btn {
+  grid-area: bench;
+  grid-row: 3/5;
+  padding: 0px;
+  background-color: var(--dark-color);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: center;
+  width: 75px;
+  height: 27px;
+  margin: auto;
+  margin-right: 26px;
+}
+
+.lineupContainer .player-card.contest-league .bench-btn,
+.lineupContainer .player-card.contest-league .add-btn {
+  grid-row: 3/4;
+}
+
+.lineupContainer .bench-btn:hover,
+.lineupContainer .add-btn:hover {
+  background-color: var(--primary-color);
+}
+
+.lineupContainer .hidden {
+  display: none !important;
+}
+
+.lineupContainer button {
+  font-size: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: var(--dark-color);
+  color: white;
+}
+
+.lineupContainer .add-more-btn {
+  /* Increase horizontal padding for pill shape */
+  background-color: var(--dark-color);
+  color: white;
+  border: none;
+  border-radius: 40px;
+  /* Large border-radius for pill shape */
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow for depth */
+  height: 35px;
+  width: 95px;
+}
+
+.lineupContainer .add-more-btn:hover {
+  background-color: var(--dark-color);
+  transform: scale(1.05);
+  /* Slight scaling effect on hover */
+}
+
+.lineupContainer .back-btn {
+  margin: auto;
+  height: 40px;
+  width: 150px;
+}
+
+.lineupContainer #submit-starters-btn {
+  height: 40px;
+  width: 150px;
+}
+
+.lineupContainer .back-btn:hover,
+.lineupContainer #submit-starters-btn:hover {
+  background-color: var(--primary-color);
+}
+
+.lineupContainer .add-button-container {
+  display: flex;
+  justify-content: center;
+  /* Center the button horizontally */
+  margin-top: 10px;
+  margin-bottom: 20px;
+  margin: auto;
+  border: none;
+  box-shadow: none;
+  height: 27px;
+}
+
+.lineupContainer .button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.lineupContainer .dot {
+  font-size: 45px;
+  line-height: 0px;
+  color: #c7c7c7;
+}
+
+.lineupContainer .lineupContainer .placeholder-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto;
+  grid-template-areas: "position add-button";
+  gap: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 2px 2px 5px var(--box-shadow);
+  align-items: center;
+  width: 100%;
+}
+
+.lineupContainer .lineupContainer .placeholder-card .player-position {
+  grid-area: position;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--dark-color);
+  padding-top: 0;
+  padding-left: 0;
+}
+
+.lineupContainer .lineupContainer .placeholder-card .add-position-btn {
+  grid-area: add-button;
+  padding: 5px 10px;
+  background-color: var(--dark-color);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: center;
+  width: 75px;
+  margin: auto;
+  margin-right: 15px;
+}
+
+.lineupContainer .lineupContainer .placeholder-card .add-position-btn:hover {
+  background-color: #a3a3a3;
+}
+
+.lineupContainer .add-position-btn:hover {
+  background-color: var(--primary-color);
+}
+
+.background-layer-1,
+.background-layer-2,
+.overlay-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.background-layer-1 {
+  position: relative;
+  z-index: 0;
+  transform: skew(-8deg) translateZ(0);
+}
+
+.background-layer-1::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 13px;
+  height: 100%;
+  width: 10px;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+  z-index: -1;
+  transform: skew(-8deg) translateX(7px);
+}
+
+.lineupContainer .team-icon {
+  max-height: 125px;
+}
+
+.lineupContainer h2 {
+  text-transform: uppercase;
+  color: var(--dark-color);
+  font-weight: 900;
+  margin-bottom: 0;
+  font-size: 18px;
+}
+
+.lineupContainer h1.lineupForm {
+  display: flex;
+  /* Use flexbox for alignment */
+  align-items: center;
+  /* Align items vertically in the center */
+  gap: 10px;
+  /* Add spacing between the icon and the name */
+  justify-content: center;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 29px;
+  text-align: left;
+}
+
+.lineupContainer h1.team-0001 {
+  color: var(--team_0001);
+}
+
+.lineupContainer h1.team-0002 {
+  color: var(--team_0002);
+}
+
+.lineupContainer h1.team-0003 {
+  color: var(--team_0003);
+}
+
+.lineupContainer h1.team-0004 {
+  color: var(--team_0004);
+}
+
+.lineupContainer h1.team-0005 {
+  color: var(--team_0005);
+}
+
+.lineupContainer h1.team-0006 {
+  color: var(--team_0006);
+}
+
+.lineupContainer h1.team-0007 {
+  color: var(--team_0007);
+}
+
+.lineupContainer h1.team-0008 {
+  color: var(--team_0008);
+}
+
+.lineupContainer h1.team-0009 {
+  color: var(--team_0009);
+}
+
+.lineupContainer h1.team-0010 {
+  color: var(--team_0010);
+}
+
+.lineupContainer #player-count {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Industry" sans-serif;
+  color: var(--dark-color);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.lineupContainer span.injury-status {
+  color: var(--red-color-warning);
+  font-size: 14px;
+}
+
+.lineupContainer .player-card.bye-week,
+.lineupContainer .player-card.injury-out {
+  background-color: #dfdfdf;
+  border: 1px solid #c9c9c9;
+}
+
+.lineupContainer .player-card.bye-week .player-projected-points,
+.lineupContainer .player-card.injury-out .player-projected-points {
+  display: none;
+}
+
+.lineupContainer .player-card.bye-week .bench-btn,
+.lineupContainer .player-card.injury-out .bench-btn,
+.lineupContainer .player-card.bye-week .add-btn,
+.lineupContainer .player-card.injury-out .add-btn {
+  grid-row: 2/4;
+}
+
+.lineupContainer .player-card.injured-reserve .bench-btn .player-card.bye-week .first-name,
+.lineupContainer .player-card.injured-reserve .add-btn .player-card.bye-week .first-name,
+.lineupContainer .player-card.bye-week .last-name,
+.lineupContainer .player-card.bye-week .player-team-jersey .team-name,
+.lineupContainer .player-card.bye-week .player-team-jersey .dot,
+.lineupContainer .player-card.bye-week .player-team-jersey .player-jersey,
+.lineupContainer .player-card.bye-week .player-opponent,
+.lineupContainer .player-card.bye-week .player-opponent-rank,
+.lineupContainer .player-card.bye-week .player-projected-points,
+.lineupContainer .player-card.bye-week .player-position .player-card.injury-out .first-name,
+.lineupContainer .player-card.injury-out .last-name,
+.lineupContainer .player-card.injury-out .first-name,
+.lineupContainer .player-card.injury-out .player-team-jersey .team-name,
+.lineupContainer .player-card.injury-out .player-team-jersey .dot,
+.lineupContainer .player-card.injury-out .player-team-jersey .player-jersey,
+.lineupContainer .player-card.injury-out .player-opponent,
+.lineupContainer .player-card.injury-out .player-opponent-rank,
+.lineupContainer .player-card.injury-out .player-projected-points,
+.lineupContainer .player-card.injury-out .player-position {
+  color: #a3a3a3;
+}
+
+.lineupContainer .player-card.bye-week .bench-btn,
+.lineupContainer .player-card.injury-out .bench-btn,
+.lineupContainer .player-card.bye-week .add-btn,
+.lineupContainer .player-card.injury-out .add-btn {
+  background-color: #a3a3a3;
+}
+
+.lineupContainer .player-card.bye-week .bench-btn:hover,
+.lineupContainer .player-card.injury-out .bench-btn:hover,
+.lineupContainer .player-card.bye-week .add-btn:hover,
+.lineupContainer .player-card.injury-out .add-btn:hover {
+  background-color: var(--red-color-warning);
+}
+
+.lineupContainer .player-opponent-rank[data-rank="1"],
+.lineupContainer .player-opponent-rank[data-rank="2"],
+.lineupContainer .player-opponent-rank[data-rank="3"],
+.lineupContainer .player-opponent-rank[data-rank="4"],
+.lineupContainer .player-opponent-rank[data-rank="5"],
+.lineupContainer .player-opponent-rank[data-rank="6"],
+.lineupContainer .player-opponent-rank[data-rank="7"],
+.lineupContainer .player-opponent-rank[data-rank="8"],
+.lineupContainer .player-opponent-rank[data-rank="9"],
+.lineupContainer .player-opponent-rank[data-rank="10"] {
+  color: var(--red-color-warning);
+}
+
+.lineupContainer .player-opponent-rank[data-rank="11"],
+.lineupContainer .player-opponent-rank[data-rank="12"],
+.lineupContainer .player-opponent-rank[data-rank="13"],
+.lineupContainer .player-opponent-rank[data-rank="14"],
+.lineupContainer .player-opponent-rank[data-rank="15"],
+.lineupContainer .player-opponent-rank[data-rank="16"],
+.lineupContainer .player-opponent-rank[data-rank="17"],
+.lineupContainer .player-opponent-rank[data-rank="18"],
+.lineupContainer .player-opponent-rank[data-rank="19"],
+.lineupContainer .player-opponent-rank[data-rank="20"] {
+  color: var(--dark-color);
+}
+
+.lineupContainer .player-opponent-rank[data-rank="21"],
+.lineupContainer .player-opponent-rank[data-rank="22"],
+.lineupContainer .player-opponent-rank[data-rank="23"],
+.lineupContainer .player-opponent-rank[data-rank="24"],
+.lineupContainer .player-opponent-rank[data-rank="25"],
+.lineupContainer .player-opponent-rank[data-rank="26"],
+.lineupContainer .player-opponent-rank[data-rank="27"],
+.lineupContainer .player-opponent-rank[data-rank="28"],
+.lineupContainer .player-opponent-rank[data-rank="29"],
+.lineupContainer .player-opponent-rank[data-rank="30"],
+.lineupContainer .player-opponent-rank[data-rank="31"],
+.lineupContainer .player-opponent-rank[data-rank="32"] {
+  color: var(--green-color);
+}
+
+.lineupContainer .player-opponent-rank[data-rank="1"] span,
+.lineupContainer .player-opponent-rank[data-rank="2"] span,
+.lineupContainer .player-opponent-rank[data-rank="3"] span,
+.lineupContainer .player-opponent-rank[data-rank="4"] span,
+.lineupContainer .player-opponent-rank[data-rank="5"] span,
+.lineupContainer .player-opponent-rank[data-rank="6"] span,
+.lineupContainer .player-opponent-rank[data-rank="7"] span,
+.lineupContainer .player-opponent-rank[data-rank="8"] span,
+.lineupContainer .player-opponent-rank[data-rank="9"] span,
+.lineupContainer .player-opponent-rank[data-rank="10"] span,
+.lineupContainer .player-opponent-rank[data-rank="11"] span,
+.lineupContainer .player-opponent-rank[data-rank="12"] span,
+.lineupContainer .player-opponent-rank[data-rank="13"] span,
+.lineupContainer .player-opponent-rank[data-rank="14"] span,
+.lineupContainer .player-opponent-rank[data-rank="15"] span,
+.lineupContainer .player-opponent-rank[data-rank="16"] span,
+.lineupContainer .player-opponent-rank[data-rank="17"] span,
+.lineupContainer .player-opponent-rank[data-rank="18"] span,
+.lineupContainer .player-opponent-rank[data-rank="19"] span,
+.lineupContainer .player-opponent-rank[data-rank="20"] span,
+.lineupContainer .player-opponent-rank[data-rank="21"] span,
+.lineupContainer .player-opponent-rank[data-rank="22"] span,
+.lineupContainer .player-opponent-rank[data-rank="23"] span,
+.lineupContainer .player-opponent-rank[data-rank="24"] span,
+.lineupContainer .player-opponent-rank[data-rank="25"] span,
+.lineupContainer .player-opponent-rank[data-rank="26"] span,
+.lineupContainer .player-opponent-rank[data-rank="27"] span,
+.lineupContainer .player-opponent-rank[data-rank="28"] span,
+.lineupContainer .player-opponent-rank[data-rank="29"] span,
+.lineupContainer .player-opponent-rank[data-rank="30"] span,
+.lineupContainer .player-opponent-rank[data-rank="31"] span,
+.lineupContainer .player-opponent-rank[data-rank="32"] span {
+  color: var(--dark-color);
+}
+
+.lineupContainer .bye-week.game-started .bench-btn,
+.lineupContainer .injury-out.game-started .bench-btn,
+.lineupContainer .bye-week.game-started .add-btn,
+.lineupContainer .injury-out.game-started .add-btn {
+  background: none;
+  border: solid 1px #a3a3a3;
+  color: var(--red-color-warning);
+}
+
+.lineupContainer .bye-week.game-started .bench-btn:hover,
+.lineupContainer .injury-out.game-started .bench-btn:hover,
+.lineupContainer .bye-week.game-started .add-btn:hover,
+.lineupContainer .injury-out.game-started .add-btn:hover {
+  background: var(--red-color-warning);
+  border: solid 1px var(--red-color-warning);
+  color: white;
+}
+
+.lineupContainer .game-started .bench-btn,
+.lineupContainer .game-started .add-btn {
+  background: none;
+  border: solid 1px var(--dark-color);
+  color: var(--dark-color);
+}
+
+#commish-controls {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0 15px;
+}
+
+#commish-controls label {
+  font-weight: 900;
+  padding-right: 10px;
+  color: var(--primary-color);
+}
+
+#count-btn-container {
+  display: flex;
+  gap: 10px;
+  max-width: 700px;
+  margin: 20px auto;
+  min-width: 358px;
+  justify-content: space-between;
+}
+
+#clear-lineup-btn {
+  font-size: 14px;
+  width: 107px;
+  border-radius: 6px;
+  height: 25px;
+  background-color: #c9a426;
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+.hidden#lineup-container {
+  margin-top: 15px;
+}
+
+#error-container,
+#submission-message {
+  max-width: 700px;
+  margin: 20px auto;
+  min-width: 358px;
+  font-weight: 900;
+}
+
+#error-container {
+  color: var(--red-color-warning);
+}
+
+#salary-remaining,
+#avg-salary-remaining {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark-color);
+}
+
+#salary-remaining.negative-salary,
+#avg-salary-remaining.warning-salary {
+  color: var(--red-color-warning);
+  font-weight: 700;
+}
+
+#salary-remaining::before {
+  content: "Salary Remaining: ";
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--dark-color);
+}
+
+#avg-salary-remaining::before {
+  content: "Avg/Player: ";
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--dark-color);
+}
+
+.over-budget .player-salary {
+  color: var(--red-color-warning);
+}
+
+#bench-bottom-container {
+  order: 999;
+  display: flex;
+}
+
+#body_lineup div.mobile-wrap {
+  margin: 0 auto;
+  padding: 0;
+}
+
+#body_lineup .franchiselogo,
+#body_lineup .standingslogo {
+  max-width: 700px;
+  margin: 0px auto;
+  min-width: 358px;
+  width: 100%;
+}
+
+#starters-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 700px;
+  min-width: 358px;
+  margin: 0 auto;
+}
+
+#body_lineup form .reportnavigation {
+  display: none;
+}
+
+#body_lineup div input[type=submit] {
+  margin: 15px 2px;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+#body_lineup #lineup p.form_buttons,
+#body_lineup #go-back.form_buttons {
+  margin-left: 0px;
+  display: flex;
+  justify-content: center;
+}
+
+@media only screen and (max-width: 620px) {
+  .lineupContainer .player-card {
+    display: grid;
+    grid-template-columns: 55px 50px auto 1fr;
+    grid-template-rows: 25px 20px 20px;
+    grid-template-areas: "position image first-name projected-points" "position image last-name bench" ". image opponent .";
+  }
+  .lineupContainer .player-ytd-points {
+    display: none;
+  }
+  .lineupContainer .player-card.bye-week .first-name,
+  .lineupContainer .player-card.injury-out .first-name {
+    padding-top: 0;
+  }
+  .lineupContainer .player-opponent-rank {
+    padding-left: 10px;
+    margin-bottom: 0;
+    display: none;
+  }
+  .lineupContainer .player-opponent {
+    margin-bottom: 0px;
+    grid-row: 3;
+  }
+  .lineupContainer .player-position {
+    font-size: 16px;
+  }
+  .lineupContainer .player-image-container {
+    align-items: baseline;
+    width: 45px;
+  }
+  .lineupContainer .first-name {
+    padding-top: 5px;
+    grid-row: 1/3;
+    margin-bottom: 15px;
+  }
+  .lineupContainer .player-team-jersey {
+    padding-bottom: 0;
+    display: none;
+  }
+  .lineupContainer .player-projected-points::before {
+    left: -16px;
+    display: none;
+  }
+  .lineupContainer .player-projected-points {
+    text-align: right;
+    margin-right: 30px;
+    grid-row: 1/3;
+    padding-top: 0px;
+  }
+  .lineupContainer .bench-btn,
+  .lineupContainer .add-btn {
+    grid-row: 2/4;
+    padding: 0;
+  }
+  .lineupContainer .player-card.bye-week .bench-btn,
+  .lineupContainer .player-card.injury-out .bench-btn,
+  .lineupContainer .player-card.bye-week .add-btn,
+  .lineupContainer .player-card.injury-out .add-btn {
+    grid-row: 2;
+    margin-bottom: 0px;
+    margin-top: 0;
+  }
+  .lineupContainer .placeholder-card.player-card {
+    grid-template-columns: 55px 1fr;
+    grid-template-areas: "position add";
+  }
+  .lineupContainer .team-icon {
+    max-height: 75px;
+  }
+  .lineupContainer .player-projected-points.contest-league {
+    display: none;
+  }
+  .lineupContainer .player-card.contest-league .bench-btn,
+  .lineupContainer .player-card.contest-league .add-btn {
+    grid-row: 2/4;
+  }
+  .lineupContainer .player-salary {
+    text-align: right;
+    margin-right: 30px;
+    grid-row: 1/3;
+    padding-top: 0px;
+    padding-bottom: 8px;
+  }
+  .lineupContainer .add-button-container {
+    display: flex;
+    justify-content: center;
+    margin: auto;
+  }
+}/*# sourceMappingURL=LineupStyle.css.map */
