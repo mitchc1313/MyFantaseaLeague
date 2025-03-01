@@ -753,6 +753,8 @@
   background-color: #c9a426;
   padding: 0;
   margin-bottom: 10px;
+  border: none;
+  color: white;
 }
 
 .hidden#lineup-container {
