@@ -246,6 +246,11 @@
   padding-bottom: 10px;
 }
 
+.lineupContainer .player-ytd-points .points-span {
+  font-weight: 700;
+  color: var(--dark-color);
+}
+
 .lineupContainer .player-salary {
   grid-area: projected-points;
   grid-row: 1/3;
