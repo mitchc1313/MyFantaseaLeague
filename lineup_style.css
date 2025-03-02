@@ -855,9 +855,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 700px;
+  margin: 0 auto;
+  min-width: 358px;
 }
 
-#body_contest_lineup .append_contest textarea {
+.append_contest textarea#MESSAGE {
   width: 100%;
 }
 
