@@ -857,6 +857,10 @@
   align-items: center;
 }
 
+#lineup-tracker textarea#message {
+  width: 100%;
+}
+
 @media only screen and (max-width: 620px) {
   .lineupContainer .player-card {
     display: grid;
