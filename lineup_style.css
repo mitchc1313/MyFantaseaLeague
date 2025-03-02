@@ -890,7 +890,7 @@
 #body_contest_lineup #starters-count,
 #body_contest_lineup #max-starters {
   color: var(--primary-color);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 @media only screen and (max-width: 620px) {
