@@ -851,6 +851,12 @@
   justify-content: center;
 }
 
+#lineup-tracker.lineup-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 @media only screen and (max-width: 620px) {
   .lineupContainer .player-card {
     display: grid;
