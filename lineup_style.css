@@ -880,10 +880,17 @@
   background-color: black;
   padding-top: 10px;
   padding-bottom: 10px;
+  color: white;
 }
 
 .append_contest textarea#MESSAGE {
   width: 100%;
+}
+
+#body_contest_lineup #starters-count,
+#body_contest_lineup #max-starters {
+  color: var(--primary-color);
+  font-weight: 900;
 }
 
 @media only screen and (max-width: 620px) {
