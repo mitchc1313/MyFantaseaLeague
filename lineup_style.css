@@ -857,7 +857,7 @@
   align-items: center;
 }
 
-.append_contest textarea#MESSAGE {
+#body_contest_lineup .append_contest textarea {
   width: 100%;
 }
 
