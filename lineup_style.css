@@ -857,7 +857,7 @@
   align-items: center;
 }
 
-#lineup-tracker textarea#MESSAGE {
+.append_contest textarea#MESSAGE {
   width: 100%;
 }
 
