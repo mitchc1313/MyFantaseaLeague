@@ -3,7 +3,8 @@
 }
 
 #body_lineup form table.report,
-#body_contest_lineup form table.report {
+#body_contest_lineup form table.report,
+#body_contest_lineup .requirements-table {
   visibility: hidden;
 }
 
@@ -782,6 +783,13 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--dark-color);
+}
+
+#body_contest_lineup #salary-remaining,
+#body_contest_lineup #avg-salary-remaining {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-color);
 }
 
 #body_contest_lineup #salary-remaining::before,
