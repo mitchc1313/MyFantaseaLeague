@@ -784,6 +784,13 @@
   color: var(--dark-color);
 }
 
+#body_contest_lineup #salary-remaining::before,
+#body_contest_lineup #avg-salary-remaining::before {
+  font-size: 13px;
+  font-weight: 400;
+  color: white;
+}
+
 #salary-remaining.negative-salary,
 #avg-salary-remaining.warning-salary {
   color: var(--red-color-warning);
@@ -838,6 +845,10 @@
   display: none;
 }
 
+#body_contest_lineup .reportnavigation {
+  padding: 15px;
+}
+
 #body_lineup div input[type=submit] {
   margin: 15px 2px;
   padding: 10px;
@@ -856,8 +867,11 @@
   flex-direction: column;
   align-items: center;
   max-width: 700px;
-  margin: 0 auto;
+  margin: 10px auto;
   min-width: 358px;
+  background-color: black;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .append_contest textarea#MESSAGE {
