@@ -33,6 +33,12 @@
   min-width: 358px;
 }
 
+.lineupContainer .add-button-container {
+  max-width: 700px;
+  min-width: 358px;
+  height: 40px;
+}
+
 .lineupContainer .player-card {
   display: grid;
   grid-template-columns: 55px 62px auto 1fr 1fr 126px;
