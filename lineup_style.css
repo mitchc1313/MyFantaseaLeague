@@ -2,7 +2,8 @@
   --red-color-warning: #91071e;
 }
 
-#body_lineup form table.report {
+#body_lineup form table.report,
+#body_contest_lineup form table.report {
   visibility: hidden;
 }
 
