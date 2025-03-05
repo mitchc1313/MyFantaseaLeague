@@ -1,0 +1,1171 @@
+<script>
+    let lu_formTable = null;
+    let lu_lineup_valid = true;
+    const lu_cellClassNames = [];
+    let lu_isIDP = false;
+
+    // Initialize object to store extracted data
+    let lu_lineup_ar = {
+        "requiredPosCount": {}, // Store positions as keys with min/max
+        "partial_allowed": "YES",
+        "start_bye_players": "No",
+        "minStarters": "0",
+        "maxStarters": "0"
+    };
+
+    // Define the normalizePosition function
+    function normalizePosition(position) {
+        if (!position) return "";
+        const pos = position.toUpperCase();
+        // Treat any variant containing "DEF" as "DEF"
+        if (pos.includes("DEF")) return "DEF";
+        return pos;
+    }
+
+    function removeWarnIfNoneCheckedFromSubmit() {
+        const submitBtn = document.querySelector('input[type="submit"][name="SUBMIT"]');
+        if (submitBtn) {
+            submitBtn.removeAttribute('onclick');
+            console.log("Removed warnIfNoneChecked from submit button.");
+        }
+    }
+
+    async function fetchSettingsHTML() {
+        try {
+            const response = await fetch(`${baseURLDynamic}/${year}/options?L=${league_id}&O=26&PRINTER=1`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/html'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const htmlText = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+
+            // Find all tables in the document
+            const tables = doc.querySelectorAll('table');
+
+            tables.forEach(table => {
+                const thElements = table.querySelectorAll('th');
+
+                for (const th of thElements) {
+                    const thText = th.textContent.trim();
+
+                    // Extract "Starting Lineup Setup" Table
+                    if (thText.includes("Starting Lineup Setup")) {
+                        const rows = table.querySelectorAll('tr');
+
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td');
+                            if (cells.length >= 2) {
+                                let label = cells[0].textContent.trim();
+                                let value = cells[1].textContent.trim();
+
+                                value = value.replace(/[oO]/g, "0");
+
+                                // Extract Starting Positions
+                                if (label.startsWith("Number of Starting")) {
+                                    let position = label.replace("Number of Starting ", "").replace(/s:$/, "");
+                                    // Normalize the key so defenses always become "DEF"
+                                    position = normalizePosition(position);
+                                    let min = 0, max = 0;
+                                    if (value.includes("-")) {
+                                        [min, max] = value.split("-").map(num => parseInt(num, 10));
+                                    } else {
+                                        min = max = parseInt(value, 10);
+                                    }
+                                    lu_lineup_ar["requiredPosCount"][position] = { min, max };
+                                }
+
+                                // Extract Start Bye Week Players - array will contains "No" or "Yes"
+                                if (label === "Should owners be allowed to submit players on bye as starters?") {
+                                    lu_lineup_ar["start_bye_players"] = value;
+                                }
+
+                                // Extract Partial Lineups Allowed - array will contains "NO" or "YES"
+                                if (label === "Are Partial Lineups Allowed?") {
+                                    lu_lineup_ar["partial_allowed"] = value;
+                                }
+
+                                // Extract IDP Count
+                                if (label.startsWith("Total Number of Starting Individual Defensive")) {
+                                    lu_lineup_ar["idp_count"] = value;
+                                    lu_isIDP = true;
+                                }
+                            }
+                        });
+                    }
+
+                    // Extract "General Scoring Setup" Table
+                    if (thText.includes("General Scoring Setup")) {
+                        const rows = table.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td');
+                            if (cells.length >= 2) {
+                                let label = cells[0].textContent.trim();
+                                let value = cells[1].textContent.trim();
+                                if (label.startsWith("Ties Are") && value.startsWith("Decided by")) {
+                                    // Extract the number from "Decided by X ..."
+                                    let match = value.match(/Decided by (\d+)/);
+                                    if (!lu_lineup_ar["tieBreaker"]) {
+                                        lu_lineup_ar["tieBreaker"] = {}; // Ensure tieBreaker is an object
+                                    }
+                                    if (match) {
+                                        let count = parseInt(match[1], 10); // Convert the extracted number to an integer
+                                        lu_lineup_ar["tieBreaker"]["count"] = count; // Store count inside tieBreaker object
+
+                                        // Determine if the value contains "non-starting" or "roster"
+                                        if (value.includes("non-starting")) {
+                                            lu_lineup_ar["tieBreaker"]["type"] = "non-starter";
+                                        } else if (value.includes("roster")) {
+                                            lu_lineup_ar["tieBreaker"]["type"] = "roster";
+                                        }
+
+                                        // Extract the position after "players at"
+                                        let positionMatch = value.match(/players at (.+)/);
+                                        if (positionMatch) {
+                                            let positionText = positionMatch[1].trim();
+
+                                            // If the position is "Any Position", store "all" instead
+                                            lu_lineup_ar["tieBreaker"]["position"] = positionText === "Any Position" ? "all" : positionText;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // Extract "Formations Setup" Table
+                    if (thText.includes("Formations Setup")) {
+                        lu_lineup_ar["formations"] = {};
+                        const rows = table.querySelectorAll('tr');
+
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td');
+                            if (cells.length >= 2) {
+                                let formationName = cells[0].textContent.trim(); // Get formation name
+                                let formationValues = cells[1].innerHTML.trim(); // Get positions (with <br> tags)
+
+                                // Split position lines and process them
+                                let positionCounts = {};
+                                formationValues.split("<br>").forEach(line => {
+                                    let match = line.match(/(\w+): (\d+)/); // Extract position and count
+                                    if (match) {
+                                        let position = match[1].trim();
+                                        let count = parseInt(match[2], 10);
+                                        positionCounts[position] = {
+                                            "count": count
+                                        };
+                                    }
+                                });
+
+                                // Store the extracted formation inside "formations"
+                                lu_lineup_ar["formations"][formationName] = positionCounts;
+                            }
+                        });
+                    }
+
+                }
+            });
+
+            lu_lineup_ar["minStarters"] = leagueAttributes['MinStarters'];
+            lu_lineup_ar["maxStarters"] = leagueAttributes['MaxStarters'];
+
+            // Log the final extracted data
+            //console.log(lu_lineup_ar);
+            return true; // Resolves the promise to indicate completion
+
+        } catch (error) {
+            console.error('Error fetching Settings HTML data:', error);
+        }
+    }
+
+    function processLineupTable() {
+        return new Promise(resolve => {
+            if (lu_formTable) {
+                // Extract the week number, franchise ID, and franchise name from the caption
+                let captionElement = lu_formTable.querySelector("caption");
+                if (captionElement) {
+
+                    if (!lu_lineup_ar["franchise"]) {
+                        lu_lineup_ar["franchise"] = {};
+                    }
+
+                    let captionText = captionElement.textContent.trim();
+
+                    // Extract week number (e.g., "Week 7")
+                    let weekMatch = captionText.match(/Week (\d+)/i);
+                    if (weekMatch) {
+                        if (!lu_lineup_ar["week"]) {
+                            lu_lineup_ar["lineup_week"] = {};
+                        }
+                        lu_lineup_ar["lineup_week"] = parseInt(weekMatch[1]);
+                    }
+
+                    // Find the <a> element inside caption that contains the class "franchise_XXXX"
+                    let franchiseElement = captionElement.querySelector("a[class*='franchise_']");
+                    if (franchiseElement) {
+                        // Extract franchise ID from multiple class names
+                        let classList = franchiseElement.className.split(" ");
+                        let franchiseClass = classList.find(cls => cls.startsWith("franchise_"));
+
+                        if (franchiseClass) {
+                            lu_lineup_ar["franchise"]["franchise_id"] = franchiseClass.replace("franchise_", ""); // Extract ID
+                        }
+
+                        // Determine franchise name and logo based on "withfranchiseicon" class
+                        if (captionElement.classList.contains("withfranchiseicon")) {
+                            let imgElement = franchiseElement.querySelector("img");
+                            if (imgElement) {
+                                lu_lineup_ar["franchise"]["franchise_name"] = imgElement.alt.trim(); // Use image alt text
+                                lu_lineup_ar["franchise"]["franchise_logo"] = imgElement.src.trim(); // Store image URL
+                            }
+                        } else {
+                            lu_lineup_ar["franchise"]["franchise_name"] = franchiseElement.textContent.trim(); // Use text inside <a>
+                        }
+                    }
+                }
+
+                let rows = lu_formTable.querySelectorAll("tbody tr");
+
+                rows.forEach((row, rowIndex) => {
+                    let th = row.querySelector("th"); // Select the first <th> in the row
+                    if (th) {
+                        let text = th.textContent.trim();
+
+                        // Handle header cells (th) in the first row
+                        if (rowIndex === 0) {
+                            const headerCells = row.querySelectorAll('th');
+                            headerCells.forEach((th, thIndex) => {
+                                let className = th.textContent.toLowerCase().replace(/ /g, "-");
+                                if (className === "rush" || className === "pass") {
+                                    className += "-rank";
+                                } else if (className === "opp-avgvs-pos") {
+                                    className = "pass-rank";
+                                } else if (className === "opp-rankvs-pos") {
+                                    className = "rush-rank";
+                                } else if (className.indexOf("select-a") !== -1) {
+                                    className = "select-total-starters";
+                                } else if (className.indexOf("week-") !== -1) {
+                                    className = "weekly-opp";
+                                }
+                                th.classList.add(className);
+                                lu_cellClassNames.push(className);
+                            });
+                        }
+                    }
+                    if (row.querySelector('input[type="checkbox"]')) {
+                        const cells = row.querySelectorAll("td");
+                        let playerData = {}; // Temporary object to store player data
+
+                        cells.forEach((td, tdIndex) => {
+                            // Skip the first header (index + 1 matches the header classes to the cells)
+                            if (lu_cellClassNames[tdIndex + 1]) {
+                                td.classList.add(lu_cellClassNames[tdIndex + 1]);
+                                td.classList.remove("points");
+                            }
+
+                            // Store each cell's class name as a key and its text content as the value
+                            let className = td.className.trim().replace(/\s+/g, '_'); // Replace spaces with underscores
+                            if (className) {
+                                playerData[`${className}`] = td.textContent.trim();
+                            }
+
+                            if (td.classList.contains('player')) {
+                                // Check if an anchor link exists within the td
+                                const link = td.querySelector('a');
+                                if (!link) return; // Exit if no link is found
+
+                                const url = link.getAttribute('href');
+                                let playerID_lu;
+
+                                // Extract playerID_lu from URL based on its format
+                                if (url.includes("launch_player_modal")) {
+                                    const qs = url.split(',');
+                                    playerID_lu = qs[1]?.replace(/'/g, "").replace(");", "") || '';
+                                } else {
+                                    playerID_lu = url.substring(url.indexOf("P=") + 2);
+                                }
+
+                                // Parse player name, position, and team
+                                const name = link.textContent.trim();
+                                const nameArray = name.split(" ");
+                                let position = nameArray[nameArray.length - 1] || '';
+                                const nflTeam = nameArray[nameArray.length - 2] || '';
+
+                                // Normalize defensive position
+                                if (position.toLowerCase() === "def") {
+                                    position = "DEF";
+                                }
+
+                                let first = nameArray[nameArray.length - 3] || '';
+                                let last = nameArray[nameArray.length - 4] || '';
+                                last = last.replace(/,$/, ""); // Remove trailing comma from last name
+
+                                // Find the checkbox and determine its state
+                                const checkbox = row.querySelector('input[type="checkbox"]');
+                                let status = "";
+
+                                if (checkbox.checked && checkbox.disabled) {
+                                    status = "locked_starter";
+                                } else if (checkbox.checked) {
+                                    status = "starter";
+                                } else if (!checkbox.disabled && !checkbox.checked) {
+                                    status = "bench";
+                                } else if (checkbox.disabled && !checkbox.checked) {
+                                    status = "locked_bench";
+                                }
+
+                                // Ensure "players" object exists in lu_lineup_ar
+                                if (!lu_lineup_ar["players"]) {
+                                    lu_lineup_ar["players"] = {};
+                                }
+
+                                // Ensure an array exists for the position
+                                if (!lu_lineup_ar["players"][position]) {
+                                    lu_lineup_ar["players"][position] = [];
+                                }
+
+                                // Add player details to playerData
+                                playerData = {
+                                    ...playerData, // Retain stored cell data
+                                    id: playerID_lu,
+                                    first_name: first,
+                                    last_name: last,
+                                    team: nflTeam,
+                                    position: position,
+                                    status: status
+                                };
+
+                                // Push player object into the appropriate position array
+                                lu_lineup_ar["players"][position].push(playerData);
+                            }
+                        });
+                    }
+
+                });
+            }
+            //console.log("DOM Processing Completed:", lu_lineup_ar);
+            resolve(true); // Resolves the promise to indicate completion
+        });
+    }
+
+    //  Helper function: Render placeholders
+    const renderPlaceholders = (position, count, action) => {
+        const placeholders = [];
+        for (let i = 0; i < count; i++) {
+            const placeholder = document.createElement("div");
+            placeholder.className = "player-card placeholder-card";
+            placeholder.dataset.position = position;
+            placeholder.innerHTML = `
+                <div class="player-info">
+                    <div class="player-details">
+                        <div class="player-position">${position}</div>
+                    </div>
+                </div>
+            `;
+            const addButton = document.createElement("button");
+            addButton.type = "button";
+            addButton.className = "add-position-btn";
+            addButton.textContent = "Add";
+            addButton.addEventListener("click", action);
+            placeholder.appendChild(addButton);
+            placeholders.push(placeholder);
+        }
+        return placeholders;
+    };
+
+    // Helper function to create the add-position button container
+    function createAddPositionButton(position) {
+        const container = document.createElement("div");
+        container.className = "player-card add-button-container";
+        container.dataset.position = position;
+
+        const addButton = document.createElement("button");
+        addButton.type = "button";
+        addButton.className = "add-more-btn";
+        addButton.textContent = "Add " + position;
+        addButton.addEventListener("click", () => {
+            console.log(`Add button clicked for ${position}`);
+            showBenchForPosition(position);
+        });
+
+        container.appendChild(addButton);
+        return container;
+    }
+
+    // Modified updatePlaceholders() to include the add-position button based on maximum allowed
+    function updatePlaceholders() {
+        console.log(" Running updatePlaceholders()...");
+
+        const startersContainer = document.getElementById("starters-container");
+        if (!startersContainer) {
+            console.error("startersContainer not found!");
+            return;
+        }
+
+        // Remove existing placeholders and addposition buttons.
+        document.querySelectorAll(".placeholder-card, .add-button-container").forEach(el => el.remove());
+        console.log(" Cleared old placeholders and addposition buttons.");
+
+        // Define the position order.
+        const positionOrder = ["QB", "RB", "WR", "TE", "PK", "DEF"];
+
+        // Get current player cards (exclude placeholders and addposition buttons).
+        const lineupElements = [...startersContainer.children].filter(el =>
+            el.classList.contains("player-card") &&
+            !el.classList.contains("placeholder-card") &&
+            !el.classList.contains("add-button-container")
+        );
+
+        // Calculate overall remaining roster spots.
+        const overallMax = parseInt(lu_lineup_ar["maxStarters"], 10);
+        const totalStartersSelected = lineupElements.length;
+        const overallRemaining = overallMax - totalStartersSelected;
+
+        // First, calculate how many minimum spots are still missing across all positions.
+        let totalMissingMin = 0;
+        positionOrder.forEach(pos => {
+            const normalizedPos = normalizePosition(pos);
+            const playersForPos = lineupElements.filter(el => {
+                const posText = el.querySelector(".player-position")?.textContent;
+                return normalizePosition(posText) === normalizedPos;
+            });
+            const minRequired = lu_lineup_ar["requiredPosCount"][normalizedPos]?.min || 0;
+            totalMissingMin += Math.max(0, minRequired - playersForPos.length);
+        });
+
+        let sortedElements = [];
+
+        // Process each position.
+        positionOrder.forEach(position => {
+            position = normalizePosition(position);
+
+            // Get player cards already added for this position.
+            const playersForPosition = lineupElements.filter(el => {
+                const posText = el.querySelector(".player-position")?.textContent;
+                return normalizePosition(posText) === position;
+            });
+
+            // Retrieve minimum and maximum allowed for this position.
+            const minRequired = lu_lineup_ar["requiredPosCount"][position]?.min || 0;
+            const maxAllowed = lu_lineup_ar["requiredPosCount"][position]?.max || 0;
+
+            // Determine how many placeholders are needed to meet the minimum.
+            const missingMin = Math.max(0, minRequired - playersForPosition.length);
+            let placeholders = [];
+            if (missingMin > 0) {
+                placeholders = renderPlaceholders(position, missingMin, () => {
+                    console.log(`Add button (placeholder) clicked for ${position}`);
+                    showBenchForPosition(position);
+                });
+            }
+
+            // Combine the actual players and the placeholders.
+            let groupElements = [...playersForPosition, ...placeholders];
+
+            // Only add an addposition button if:
+            // 1. The current position has already met its minimum (playersForPosition.length >= minRequired),
+            // 2. The group hasn't reached the maximum allowed for this position, and
+            // 3. There's extra flexibility overall (overallRemaining > totalMissingMin).
+            if (
+                playersForPosition.length >= minRequired &&
+                (playersForPosition.length + placeholders.length) < maxAllowed &&
+                overallRemaining > totalMissingMin
+            ) {
+                groupElements.push(createAddPositionButton(position));
+            }
+
+            // Append group elements in order.
+            sortedElements.push(...groupElements);
+        });
+
+        // Rebuild the starters container in the defined order.
+        startersContainer.innerHTML = "";
+        sortedElements.forEach(el => startersContainer.appendChild(el));
+
+        console.log(" updatePlaceholders() completed.");
+    }
+
+    // 3ï¸ Modify moveToBench() and moveToStarters() to call updatePlaceholders()
+    function moveToBench(playerCard, player) { /* Updated function with updatePlaceholders(); */ }
+    function moveToStarters(playerCard, player) { /* Updated function with updatePlaceholders(); */ }
+
+
+    function buildCustomLineupTable() {
+        if (!lu_formTable) {
+            console.error("Lineup form table not found.");
+            return;
+        }
+
+        // Create main container div that will replace the table
+        const playerContainer = document.createElement("div");
+        playerContainer.id = "lineup-container";
+
+        // Create a wrapper for the starters area that includes a clear button and a dedicated container
+        const startersWrapper = document.createElement("div");
+        startersWrapper.id = "starters-wrapper";
+
+        // Create and add the Clear Starters button outside the area updatePlaceholders() clears
+        const clearBtn = document.createElement("button");
+        clearBtn.type = "button";
+        clearBtn.textContent = "Clear Starters";
+        clearBtn.title = "Remove all selected starters";
+        clearBtn.className = "clear-btn";
+        clearBtn.id = "clear-lineup-btn";
+        clearBtn.addEventListener("click", clearStarters);
+        startersWrapper.appendChild(clearBtn);
+
+        // Create the actual starters container (which updatePlaceholders() will update)
+        const startersContainer = document.createElement("div");
+        startersContainer.id = "starters-container";
+        startersContainer.className = "lineupContainer";
+        startersWrapper.appendChild(startersContainer);
+
+        // Create bench container
+        const benchContainer = document.createElement("div");
+        benchContainer.id = "bench-container";
+        benchContainer.className = "lineupContainer";
+        benchContainer.style.display = "none"; // Hidden by default
+
+        // Create a container for the back button at the bottom of benchContainer
+        const benchBottomContainer = document.createElement("div");
+        benchBottomContainer.id = "bench-bottom-container";
+        benchContainer.appendChild(benchBottomContainer);
+
+        // Create the "Back to Starters" button and add it to the bottom container
+        const backToStartersBtn = document.createElement("button");
+        backToStartersBtn.type = "button";  // Prevent form submission
+        backToStartersBtn.textContent = "Back to Starters";
+        backToStartersBtn.title = "Return to Starters";
+        backToStartersBtn.className = "back-btn";
+        backToStartersBtn.addEventListener("click", () => {
+            benchContainer.style.display = "none";
+            startersContainer.style.display = "grid";
+            document.querySelector('#body_lineup input[type="submit"][name="SUBMIT"]').style.display = "flex";
+            // Show the clear button when returning to starters
+            document.querySelector("#starters-wrapper .clear-btn").style.display = "block";
+        });
+        benchBottomContainer.appendChild(backToStartersBtn);
+
+        // Append wrappers to the main container
+        playerContainer.appendChild(startersWrapper);
+        playerContainer.appendChild(benchContainer);
+
+        //  Loop through all positions and determine missing starters
+        Object.keys(lu_lineup_ar["requiredPosCount"]).forEach(position => {
+            const minRequired = lu_lineup_ar["requiredPosCount"][position]?.min || 0;
+            const currentStarters = lu_lineup_ar["players"]?.[position]?.length || 0;
+            const missingStarters = Math.max(0, minRequired - currentStarters);
+
+            console.log(`Position: ${position} | Min Required: ${minRequired} | Current Starters: ${currentStarters} | Missing: ${missingStarters}`);
+
+            // Add placeholder player cards if missing starters
+            if (missingStarters > 0) {
+                const placeholders = renderPlaceholders(position, missingStarters, () => {
+                    console.log(`Add button clicked for position: ${position}`);
+                    // Future: Implement logic to add a real player here
+                });
+                placeholders.forEach(ph => startersContainer.appendChild(ph));
+            }
+        });
+
+        //  Loop through actual players and classify them as starters or bench
+        Object.values(lu_lineup_ar["players"] || {}).flat().forEach(player => {
+            const playerCard = document.createElement("div");
+            playerCard.className = "player-card player-container";
+            playerCard.dataset.playerId = player.id;
+
+            //  Determine projected points
+            const projectedPoints = player["proj-pts"] || "0";
+
+            //  Determine player image URL
+            const imageUrl = player.position.toUpperCase() === "DEF"
+                ? `https://www.mflscripts.com/playerImages_96x96/mfl_${player.team}.svg`
+                : `https://www.mflscripts.com/playerImages_80x107/mfl_${player.id}.png`;
+
+            // Determine the correct defense rank based on position.
+            let defenseRank = "";
+            if (player.position !== "DEF" && player.position !== "PK") {
+                if (player.position === "RB") {
+                    defenseRank = player.opp_rushDefenseRank;
+                } else if (["QB", "WR", "TE"].includes(player.position)) {
+                    defenseRank = player.opp_passDefenseRank;
+                }
+            }
+
+            // Create the player card HTML and add the data-rank attribute if applicable.
+            playerCard.innerHTML = `
+            <div class="player-image-container">
+            <div class="background-layer-1"></div>
+            <div class="background-layer-2"></div>
+            <div class="overlay-top"></div>
+            <img src="${imageUrl}" alt="${player.first_name} ${player.last_name}" />
+            </div>
+            <div class="first-name">${player.first_name}</div>
+            <div class="last-name">
+            <a href="${baseURLDynamic}/${year}/player?L=${league_id}&P=${player.id}" target="_blank">
+            ${player.last_name}
+            </a>
+            ${player.inj ? `<span class="injury-status">[${player.inj}]</span>` : ""}
+            </div>
+            <div class="player-position">${player.position}</div>
+            <div class="player-team-jersey">
+            <img src="https://www.mflscripts.com/playerImages_96x96/mfl_${player.team}.svg" alt="${player.team}" class="team-logo">
+            <span class="team-name">${player.team}</span>
+            ${player.position !== "DEF" ? `<span class="dot">⋅</span>` : ""}
+            <span class="player-jersey">${player.jersey_number ? `#${player.jersey_number}` : ""}</span>
+            </div>
+            <div class="player-opponent">
+            <span>Week ${lu_lineup_ar["lineup_week"]}:</span> ${player.opp_team}
+            </div>
+            <div class="player-opponent-rank" ${defenseRank && defenseRank !== "N/A"
+                    ? `data-rank="${defenseRank}"`
+                    : ""
+                }>
+            ${player.position !== "DEF" && player.position !== "PK" ? `<span>OPRK:</span> ${defenseRank !== "N/A" ? defenseRank : ""}` : ""}
+            </div>
+            <div class="player-projected-points">${projectedPoints}</div>
+            <div class="player-ytd-points">
+            <span>YTD Points:</span> ${player['ytd-pts'] ? player['ytd-pts'] : "0"}
+            </div>
+
+            `;
+
+
+            //  Add Bench Button for Starters
+            if (player.status === "starter" || player.status === "locked_starter") {
+                const benchButton = document.createElement("button");
+                benchButton.type = "button";
+                benchButton.className = "bench-btn";
+                benchButton.textContent = "Bench";
+
+                if (player.status === "locked_starter") {
+                    benchButton.disabled = true;
+                    benchButton.textContent = "Locked";
+                } else {
+                    benchButton.addEventListener("click", () => moveToBench(playerCard, player));
+                }
+
+                playerCard.appendChild(benchButton);
+                startersContainer.appendChild(playerCard);
+            }
+
+            //  Add Add Button for Bench Players
+            if (player.status === "bench" || player.status === "locked_bench") {
+                const addButton = document.createElement("button");
+                addButton.type = "button";
+                addButton.className = "add-btn";
+                addButton.textContent = "Add";
+                addButton.addEventListener("click", () => moveToStarters(playerCard, player));
+
+                playerCard.appendChild(addButton);
+                benchContainer.appendChild(playerCard);
+            }
+        });
+
+        //  Append both containers to the player container
+        playerContainer.appendChild(startersContainer);
+        playerContainer.appendChild(benchContainer);
+
+        //  Replace the table with the new div-based lineup
+        lu_formTable.replaceWith(playerContainer);
+        console.log("Player lineup replaced with div elements successfully.");
+
+        //  Set up lineup, then...
+        updatePlaceholders(); // Run once when the lineup is initially built
+    }
+
+    function showBenchForPosition(position) {
+        console.log(`Showing bench for position: ${position}`);
+        const startersContainer = document.getElementById("starters-container");
+        const benchContainer = document.getElementById("bench-container");
+        if (!benchContainer) {
+            console.error("Bench container not found!");
+            return;
+        }
+        // Hide the clear button since we're leaving the starters view
+        document.querySelector("#starters-wrapper .clear-btn").style.display = "none";
+
+        // Hide starters and show bench
+        startersContainer.style.display = "none";
+        benchContainer.style.display = "grid";
+
+        document.querySelector('#body_lineup input[type="submit"][name="SUBMIT"]').style.display = "none";
+
+
+        // Loop through all players in the bench and filter by position
+        document.querySelectorAll("#bench-container .player-card").forEach(playerCard => {
+            const playerPosition = playerCard.querySelector(".player-position")?.textContent;
+
+            if (playerPosition === position) {
+                playerCard.style.display = "grid";
+
+                // Attach an event listener to the Add button
+                let addButton = playerCard.querySelector(".add-btn");
+                if (addButton) {
+                    // Ensure event listener is only attached once
+                    addButton.replaceWith(addButton.cloneNode(true));
+                    addButton = playerCard.querySelector(".add-btn");
+
+                    addButton.addEventListener("click", () => {
+                        console.log(` ${playerCard.querySelector(".first-name")?.textContent} selected!`);
+                        moveToStarters(playerCard);
+                    });
+                }
+            } else {
+                playerCard.style.display = "none";
+            }
+        });
+
+        console.log(` Bench updated for position: ${position}`);
+    }
+
+    function syncHiddenCheckboxes() {
+        console.log(" Syncing hidden checkboxes with current starters...");
+
+        // Loop through each player card in the starters container.
+        document.querySelectorAll("#starters-container .player-card.player-container").forEach(playerCard => {
+            const playerId = playerCard.dataset.playerId;
+            let position = playerCard.querySelector(".player-position")?.textContent;
+
+            if (playerId && position) {
+                // Normalize the position for submission.
+                // For defense, use "Def" (capital D, lowercase ef)
+                if (position.toUpperCase() === "DEF") {
+                    position = "Def";
+                } else {
+                    position = position.toUpperCase();
+                }
+
+                // Use a hardcoded 0001 for each position.
+                const inputName = `${position}0001`;
+
+                // Remove any existing hidden input with that name.
+                const existingInput = playerCard.querySelector(`input[type="hidden"][name="${inputName}"]`);
+                if (existingInput) {
+                    existingInput.remove();
+                    console.log(`Removed existing hidden input for ${inputName}`);
+                }
+
+                // Create and append the new hidden input.
+                const hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = inputName;
+                hiddenInput.value = playerId;
+                playerCard.appendChild(hiddenInput);
+                console.log(` Added hidden input to player card: ${inputName}=${playerId}`);
+            }
+        });
+
+        console.log(" Hidden checkboxes synced successfully.");
+    }
+
+
+
+    //  Function to Move Player to Bench
+    function moveToBench(playerCard) {
+        const playerName = playerCard.querySelector(".first-name")?.textContent || "Unknown";
+        const position = playerCard.querySelector(".player-position")?.textContent;
+
+        console.log(` Moving ${playerName} to bench...`);
+
+        const startersContainer = document.getElementById("starters-container");
+        const benchContainer = document.getElementById("bench-container");
+
+        if (!startersContainer || !benchContainer) {
+            console.error("Containers not found!");
+            return;
+        }
+
+        // Ensure player is actually in the starters container
+        if (!startersContainer.contains(playerCard)) {
+            console.warn(`${playerName} is not in starters, skipping move.`);
+            return;
+        }
+
+        console.log(` Moving ${playerName} to the bench.`);
+
+        //  Remove player from starters container
+        startersContainer.removeChild(playerCard);
+
+        //  Update player status in lu_lineup_ar
+        if (lu_lineup_ar["players"][position]) {
+            lu_lineup_ar["players"][position] = lu_lineup_ar["players"][position].map(p => {
+                if (p.id === playerCard.dataset.playerId) {
+                    return { ...p, status: "bench" };
+                }
+                return p;
+            });
+        }
+
+        // Remove any lingering copies of this player's card from startersContainer
+        document.querySelectorAll(`#starters-container .player-card[data-player-id="${playerCard.dataset.playerId}"]`).forEach(card => {
+            card.remove();
+        });
+
+        //  Create a fresh playerCard without old event listeners
+        let newPlayerCard = playerCard.cloneNode(true);
+        newPlayerCard.querySelector(".bench-btn")?.remove();
+
+        // Remove any hidden inputs from the cloned card so it doesn't submit as a starter
+        newPlayerCard.querySelectorAll("input[type='hidden']").forEach(input => input.remove());
+
+        //  Create "Add" button
+        let addButton = document.createElement("button");
+        addButton.type = "button";
+        addButton.className = "add-btn";
+        addButton.textContent = "Add";
+        addButton.addEventListener("click", () => moveToStarters(newPlayerCard));
+        newPlayerCard.appendChild(addButton);
+
+        // Instead of appending to the end, insert new bench cards above the back button container
+        const benchBottom = document.getElementById("bench-bottom-container");
+        if (benchBottom) {
+            benchContainer.insertBefore(newPlayerCard, benchBottom);
+        } else {
+            benchContainer.appendChild(newPlayerCard);
+        }
+        newPlayerCard.style.display = "grid"; // Ensure visibility
+
+        console.log(`${playerName} moved to bench.`);
+
+        // Refresh placeholders and sync hidden checkboxes as needed
+        updatePlaceholders();
+        syncHiddenCheckboxes();
+
+    }
+
+    function moveToStarters(playerCard) {
+        const playerName = playerCard.querySelector(".first-name")?.textContent || "Unknown";
+        const position = playerCard.querySelector(".player-position")?.textContent;
+
+        console.log(` Attempting to move ${playerName} to starters...`);
+
+        const startersContainer = document.getElementById("starters-container");
+        const benchContainer = document.getElementById("bench-container");
+
+        if (!startersContainer || !benchContainer) {
+            console.error("Containers not found!");
+            return;
+        }
+
+        // Ensure player is actually in the bench container
+        if (!benchContainer.contains(playerCard)) {
+            console.warn(`${playerName} is not in bench, skipping move.`);
+            return;
+        }
+
+        console.log(` Player ${playerName} is in the bench, proceeding to move...`);
+
+        //  Remove player from the bench
+        benchContainer.removeChild(playerCard);
+
+        //  Update player status in lu_lineup_ar
+        if (lu_lineup_ar["players"][position]) {
+            lu_lineup_ar["players"][position] = lu_lineup_ar["players"][position].map(p => {
+                if (p.id === playerCard.dataset.playerId) {
+                    return { ...p, status: "starter" };
+                }
+                return p;
+            });
+        }
+
+        //  Create a fresh playerCard without old event listeners
+        let newPlayerCard = playerCard.cloneNode(true);
+        newPlayerCard.querySelector(".add-btn")?.remove();
+
+        //  Create "Bench" button
+        let benchButton = document.createElement("button");
+        benchButton.type = "button";
+        benchButton.className = "bench-btn";
+        benchButton.textContent = "Bench";
+        benchButton.addEventListener("click", () => moveToBench(newPlayerCard));
+        newPlayerCard.appendChild(benchButton);
+
+        //  Insert player in correct order instead of appending to bottom
+        let inserted = false;
+        let startersList = [...startersContainer.children];
+
+        for (let i = 0; i < startersList.length; i++) {
+            if (startersList[i].dataset.position === position) {
+                startersContainer.insertBefore(newPlayerCard, startersList[i]);
+                inserted = true;
+                break;
+            }
+        }
+
+        if (!inserted) {
+            startersContainer.appendChild(newPlayerCard);
+        }
+
+        newPlayerCard.style.display = "grid"; // Ensure visibility
+
+        console.log(` ${playerName} successfully moved to starters.`);
+
+        // Hide bench and show starters again
+        benchContainer.style.display = "none";
+        startersContainer.style.display = "grid";
+
+        document.querySelector("#starters-wrapper .clear-btn").style.display = "block";
+        document.querySelector('#body_lineup input[type="submit"][name="SUBMIT"]').style.display = "flex";
+
+
+
+        // Update placeholders
+        updatePlaceholders();
+        console.log(` Moving ${playerCard.querySelector(".first-name")?.textContent} to starters...`);
+        syncHiddenCheckboxes();
+
+    }
+
+    // Function to clear all starters (move them to bench)
+    function clearStarters() {
+        const startersContainer = document.getElementById("starters-container");
+        if (!startersContainer) return;
+
+        // Select all player cards that are actual players (exclude placeholders and add-button containers)
+        const playerCards = [...startersContainer.querySelectorAll(".player-card")].filter(card =>
+            !card.classList.contains("placeholder-card") &&
+            !card.classList.contains("add-button-container")
+        );
+
+        playerCards.forEach(card => {
+            moveToBench(card);
+        });
+    }
+
+
+    // Fetch data immediately
+    const fetchSettingsFunction = fetchSettingsHTML();
+
+    let playerDetailsFetched = false;
+    async function fetchPlayerDetails() {
+        if (playerDetailsFetched) {
+            console.log("Player details already fetched.");
+            return;
+        }
+        playerDetailsFetched = true;
+        try {
+            let playerIds = [];
+            if (lu_lineup_ar["players"]) {
+                Object.values(lu_lineup_ar["players"]).forEach(positionArray => {
+                    positionArray.forEach(player => {
+                        if (player.id) {
+                            playerIds.push(player.id);
+                        }
+                    });
+                });
+            }
+
+            if (playerIds.length === 0) {
+                console.log("No player IDs found.");
+                return;
+            }
+
+            let playerIdString = playerIds.join(",");
+            let apiUrl = `${baseURLDynamic}/${year}/export?TYPE=players&L=${league_id}&DETAILS=1&PLAYERS=${playerIdString}&JSON=1`;
+
+            console.log(`Fetching Player Details: ${apiUrl}`);
+
+            let response = await fetch(apiUrl);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            let data = await response.json();
+            if (!data.players || !data.players.player) {
+                console.log("No player data found.");
+                return;
+            }
+
+            let playerDetails = data.players.player;
+
+            playerDetails.forEach(player => {
+                let playerId = player.id;
+                let jerseyNumber = player.jersey || "";
+
+                Object.values(lu_lineup_ar["players"]).forEach(positionArray => {
+                    positionArray.forEach(p => {
+                        if (p.id === playerId) {
+                            p.jersey_number = jerseyNumber;
+                        }
+                    });
+                });
+            });
+
+            console.log("Updated lineup with jersey numbers:", lu_lineup_ar);
+
+        } catch (error) {
+            console.error("Error fetching player details:", error);
+        }
+    }
+
+    let nflScheduleFetched = false;
+    async function fetchNFLScheduleAndUpdateDefenseRanks() {
+        if (nflScheduleFetched) {
+            console.log("NFL schedule already fetched.");
+            return;
+        }
+        nflScheduleFetched = true;
+        try {
+            if (!lu_lineup_ar["lineup_week"]) {
+                console.log("No lineup week found.");
+                return;
+            }
+
+            let week = lu_lineup_ar["lineup_week"];
+
+            let apiUrl = `https://api.myfantasyleague.com/${year}/export?TYPE=nflSchedule&W=${week}&JSON=1`;
+
+            console.log(`Fetching NFL Schedule: ${apiUrl}`);
+
+            let response = await fetch(apiUrl);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            let data = await response.json();
+            if (!data.nflSchedule || !data.nflSchedule.matchup) {
+                console.log("No NFL schedule data found.");
+                return;
+            }
+
+            let matchups = data.nflSchedule.matchup;
+            let opponentDefenseRanks = {};
+
+            matchups.forEach(matchup => {
+                let teams = matchup.team;
+                if (teams.length === 2) {
+                    let home = teams[0];
+                    let away = teams[1];
+
+                    opponentDefenseRanks[home.id] = {
+                        opponent: away.id,
+                        passDefenseRank: away.passDefenseRank,
+                        rushDefenseRank: away.rushDefenseRank
+                    };
+                    opponentDefenseRanks[away.id] = {
+                        opponent: home.id,
+                        passDefenseRank: home.passDefenseRank,
+                        rushDefenseRank: home.rushDefenseRank
+                    };
+                }
+            });
+
+            if (lu_lineup_ar["players"]) {
+                Object.values(lu_lineup_ar["players"]).forEach(positionArray => {
+                    positionArray.forEach(player => {
+                        let team = player.team;
+                        if (opponentDefenseRanks[team]) {
+                            player.opp_team = opponentDefenseRanks[team].opponent;
+                            player.opp_passDefenseRank = opponentDefenseRanks[team].passDefenseRank;
+                            player.opp_rushDefenseRank = opponentDefenseRanks[team].rushDefenseRank;
+                        }
+                    });
+                });
+            }
+
+            console.log("Updated lineup with opponent defense ranks:", lu_lineup_ar);
+
+        } catch (error) {
+            console.error("Error fetching NFL schedule data:", error);
+        }
+    }
+
+
+    function prepareLineupSubmission() {
+        console.log(" Preparing lineup submission...");
+
+        // Find the original form element that wraps the lineup table
+        const formElement = lu_formTable.closest('form');
+        if (!formElement) {
+            console.error("Form element not found!");
+            return;
+        }
+
+        // Clear existing hidden inputs to avoid duplicates
+        formElement.querySelectorAll('input[type="hidden"]').forEach(input => input.remove());
+
+        // Core lineup data to match submission format
+        const coreData = {
+            FRANCHISE: lu_lineup_ar["franchise"]["franchise_id"],
+            LEAGUE_ID: league_id,
+            WEEK: lu_lineup_ar["lineup_week"],
+            FORM: "1",
+            lineup_expires: "1740198739", // Ensure this is dynamically set if needed
+            INITPROJSRC: "mfl",
+            PROJSRC: "mfl",
+            SUBMIT: "Submit Lineup"
+        };
+
+        // Add core data as hidden inputs to the form
+        Object.keys(coreData).forEach(key => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = coreData[key];
+            formElement.appendChild(input);
+            console.log(` Added core input: ${key}=${coreData[key]}`);
+        });
+
+        // Add player selections to the form as hidden inputs
+        document.querySelectorAll("#starters-container .player-card.player-container").forEach(playerCard => {
+            const playerId = playerCard.dataset.playerId;
+            const position = playerCard.querySelector(".player-position")?.textContent;
+
+            if (playerId && position) {
+                const inputName = `${position}0001`; // Format input name correctly for the franchise ID
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = inputName;
+                input.value = playerId;
+                formElement.appendChild(input);
+                console.log(` Added player input: ${inputName}=${playerId}`);
+            }
+        });
+
+        console.log(" Lineup submission prepared. Submitting form...");
+
+        // Submit the form
+        formElement.submit();
+    }
+
+
+
+    // Wait for the DOM to be ready before processing the table
+    document.addEventListener("DOMContentLoaded", async function () {
+        //  Locate the Lineup Form Table
+        lu_formTable = document.querySelector("#body_lineup form table.report");
+
+        if (!lu_formTable) {
+            console.log("Custom Lineup Script Not Running - Lineup Form Not Found");
+            return; // Exit if the table is missing
+        }
+
+        // Fetch Lineup & Settings Data
+        await Promise.all([
+            fetchSettingsHTML(),
+            processLineupTable()
+        ]);
+
+        // Fetch Additional Data
+        await fetchPlayerDetails();
+        await fetchNFLScheduleAndUpdateDefenseRanks();
+
+        // Build the Custom Lineup UI
+        buildCustomLineupTable();
+
+        // Synchronize Hidden Checkboxes for Form Submission
+        syncHiddenCheckboxes();
+
+        // Update Placeholders in the UI
+        updatePlaceholders();
+
+        // remove the warning if no checkboxes are checked
+        removeWarnIfNoneCheckedFromSubmit();
+
+        console.log(" Initial Setup Completed");
+    });
+</script>
