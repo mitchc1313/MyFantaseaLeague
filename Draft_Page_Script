@@ -4,10 +4,10 @@
             document.body.classList.remove("view-roster", "view-pool", "view-queue");
             document.body.classList.add(`view-${view}`);
 
-            document.querySelectorAll(".mobile-nav-btn").forEach(btn => {
+            document.querySelectorAll(".mobile-nav-draft-btn").forEach(btn => {
                 btn.classList.remove("active");
             });
-            const activeBtn = document.querySelector(`.mobile-nav-btn[data-view="${view}"]`);
+            const activeBtn = document.querySelector(`.mobile-nav-draft-btn[data-view="${view}"]`);
             if (activeBtn) activeBtn.classList.add("active");
 
             // Optional animation effect
@@ -21,21 +21,21 @@
 
         function injectMobileViewButtons() {
             if (window.innerWidth > 900) return;
-            if (document.querySelector(".mobile-nav")) return;
+            if (document.querySelector(".mobile-nav-draft")) return;
 
             const nav = document.createElement("div");
-            nav.className = "mobile-nav";
+            nav.className = "mobile-nav-draft";
 
             nav.innerHTML = `
-        <button class="mobile-nav-btn active" data-view="roster" onclick="setMobileView('roster')">
+        <button class="mobile-nav-draft-btn active" data-view="roster" onclick="setMobileView('roster')">
             <i class="fas fa-clipboard-list"></i>
             <div class="label">Roster</div>
         </button>
-        <button class="mobile-nav-btn" data-view="pool" onclick="setMobileView('pool')">
+        <button class="mobile-nav-draft-btn" data-view="pool" onclick="setMobileView('pool')">
             <i class="fas fa-football-ball"></i>
             <div class="label">Player Pool</div>
         </button>
-        <button class="mobile-nav-btn" data-view="queue" onclick="setMobileView('queue')">
+        <button class="mobile-nav-draft-btn" data-view="queue" onclick="setMobileView('queue')">
             <i class="fas fa-layer-group"></i>
             <div class="label">Queue</div>
         </button>
@@ -58,7 +58,7 @@
         let mobileNavInjected = false;
 
         function handleResizeForMobileNav() {
-            const existingNav = document.querySelector(".mobile-nav");
+            const existingNav = document.querySelector(".mobile-nav-draft");
 
             if (window.innerWidth <= 900 && !existingNav) {
                 injectMobileViewButtons();
