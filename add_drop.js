@@ -5,7 +5,8 @@ const allowedPageIds = [
 	'body_csetup_cantcut',
 	'body_options_178',
 	'body_load_rosters',
-	'body_options_256'
+	'body_options_256',
+	'body_options_129'
   ];
 
   if (allowedPageIds.includes(document.body.id)) {
