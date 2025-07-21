@@ -3,6 +3,7 @@ const allowedPageIds = [
 	'body_options_257',
 	'body_csetup_cantadd',
 	'body_csetup_cantcut',
+	'body_csetup_loadrost',
 	'body_options_178',
 	'body_load_rosters',
 	'body_options_256'
