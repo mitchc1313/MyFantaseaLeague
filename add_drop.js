@@ -696,13 +696,13 @@ if (thisProgram === "add_drop") {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 						} else {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 						}
 
@@ -1549,13 +1549,13 @@ if (thisProgram === "options_257") {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 						} else {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Drop" : "Remove"}</button>`;
 						}
 
@@ -2140,7 +2140,7 @@ if (thisProgram === "csetup_cantadd") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "â€”"}</div>
+  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "&mdash;"}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 
@@ -2779,7 +2779,7 @@ if (thisProgram === "csetup_cantcut") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "â€”"}</div>
+  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "&mdash;"}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 
@@ -3444,13 +3444,13 @@ if (thisProgram === "options_178") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 					} else {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Remove"}</button>`;
 					}
 
@@ -4113,7 +4113,7 @@ if (thisProgram === "csetup_loadrost") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "â€”"}</div>
+  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "&mdash;"}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 					fragment.appendChild(row);
@@ -4726,13 +4726,13 @@ if (thisProgram === "options_129") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 					} else {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Remove"}</button>`;
 					}
 
@@ -5653,9 +5653,9 @@ if (thisProgram === "options_52" || thisProgram === "new_predraft") {
 
 					let infoRank = ``
 					if (sortMyRank) {
-						infoRank = `${!isNaN(parseFloat(p.myrank)) ? p.myrank : "â€”"}`;
+						infoRank = `${!isNaN(parseFloat(p.myrank)) ? p.myrank : "&mdash;"}`;
 					} else {
-						infoRank = `${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "â€”"}`;
+						infoRank = `${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "&mdash;"}`;
 					}
 
 					const row = document.createElement("div");
@@ -6536,13 +6536,13 @@ if (thisProgram === "contest_lineup") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 					} else {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 
@@ -7331,13 +7331,13 @@ if (thisProgram === "options_256") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 					} else {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 					fragment.appendChild(row);
@@ -7791,7 +7791,7 @@ if (thisProgram === "options_43") {
 						span.textContent = `${franchiseName} Auction Status`;
 						caption.appendChild(span);
 
-						// Insert caption at the top (some tables already have one â€” optional logic if needed)
+						// Insert caption at the top (some tables already have one &mdash; optional logic if needed)
 						const existingCaption = parentTable.querySelector("caption");
 						if (existingCaption) {
 							existingCaption.replaceWith(caption); // or remove it first if you want to avoid duplicates
@@ -8158,13 +8158,13 @@ if (thisProgram === "options_43") {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 						} else {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 						}
 
