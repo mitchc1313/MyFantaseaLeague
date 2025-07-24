@@ -1043,39 +1043,54 @@ if (thisProgram === "add_drop") {
 				window.addEventListener("resize", handleSubmitButtonChange);
 
 				document.addEventListener("DOMContentLoaded", () => {
-					const checkbox = document.getElementById("FORCE_WAIVER");
-					const iconWrapper = document.getElementById("customCheckbox");
-					const icon = iconWrapper?.querySelector("i");
+	const checkbox = document.getElementById("FORCE_WAIVER");
+	const iconWrapper = document.getElementById("customCheckbox");
+	const icon = iconWrapper?.querySelector("i");
 
-					// Exit early if required elements are missing
-					if (!checkbox || !iconWrapper || !icon) {
-						return;
-					}
+	console.log("Checkbox:", checkbox);
+	console.log("Icon Wrapper:", iconWrapper);
+	console.log("Icon:", icon);
 
-					function updateCheckboxVisual() {
-						if (checkbox.checked) {
-							iconWrapper.classList.add("checked");
-							icon.classList.remove("fa-square");
-							icon.classList.add("fa-check-square");
-						} else {
-							iconWrapper.classList.remove("checked");
-							icon.classList.remove("fa-check-square");
-							icon.classList.add("fa-square");
-						}
-					}
+	// Exit early if required elements are missing
+	if (!checkbox || !iconWrapper || !icon) {
+		console.warn("Missing required element(s):", {
+			checkbox,
+			iconWrapper,
+			icon
+		});
+		return;
+	}
 
-					// Toggle checkbox when icon is clicked
-					iconWrapper.addEventListener("click", () => {
-						checkbox.checked = !checkbox.checked;
-						checkbox.dispatchEvent(new Event("change"));
-					});
+	function updateCheckboxVisual() {
+		console.log("updateCheckboxVisual called. Checked:", checkbox.checked);
+		if (checkbox.checked) {
+			iconWrapper.classList.add("checked");
+			icon.classList.remove("fa-square");
+			icon.classList.add("fa-check-square");
+		} else {
+			iconWrapper.classList.remove("checked");
+			icon.classList.remove("fa-check-square");
+			icon.classList.add("fa-square");
+		}
+	}
 
-					// Update icon when checkbox state changes
-					checkbox.addEventListener("change", updateCheckboxVisual);
+	// Toggle checkbox when icon is clicked
+	iconWrapper.addEventListener("click", () => {
+		console.log("Icon wrapper clicked. Toggling checkbox.");
+		checkbox.checked = !checkbox.checked;
+		checkbox.dispatchEvent(new Event("change"));
+	});
 
-					// Initialize icon state
-					updateCheckboxVisual();
-				});
+	// Update icon when checkbox state changes
+	checkbox.addEventListener("change", () => {
+		console.log("Checkbox change event triggered.");
+		updateCheckboxVisual();
+	});
+
+	// Initialize icon state
+	updateCheckboxVisual();
+});
+
 
 
 				const waiverRequestTable = addDropContainer.querySelector("#waiver_request_list");
