@@ -935,7 +935,7 @@ if (thisProgram === "add_drop") {
 						}
 						const pos = row.querySelector(".player-pos")?.textContent || "";
 						const team = row.querySelector(".player-info small")?.textContent?.split("&bull;")[0]?.trim() || "";
-						summaryEl.textContent = nameText;
+						summaryEl.textContent = `${pos} ${nameText}`;
 					}
 					// ðŸ”½ ADD THIS AT THE VERY END
 					const WaiverInputRow = document.getElementById("force_waiver_claim_p");
