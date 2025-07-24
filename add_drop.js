@@ -1,6 +1,3 @@
-
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // GLOBAL USE ITEMS
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -665,15 +662,15 @@ if (thisProgram === "add_drop") {
 
 						if (type === "drop") {
 							if (p.sal) {
-								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 							} else {
-								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${p.roster ? ` â€¢ Ros: ${p.roster}` : ''}</small>`;
+								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${p.roster ? ` &bull; Ros: ${p.roster}` : ''}</small>`;
 							}
 						} else {
 							if (p.sal) {
-								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 							} else {
-								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}</small>`;
+								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}</small>`;
 							}
 						}
 
@@ -686,13 +683,13 @@ if (thisProgram === "add_drop") {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 						} else {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 						}
 
@@ -924,8 +921,8 @@ if (thisProgram === "add_drop") {
 							nameText = cloned.textContent.replace(/\(R\)/g, "").trim(); // remove (R) and trim
 						}
 						const pos = row.querySelector(".player-pos")?.textContent || "";
-						const team = row.querySelector(".player-info small")?.textContent?.split("â€¢")[0]?.trim() || "";
-						summaryEl.textContent = `${pos} ${nameText} (${team})`;
+						const team = row.querySelector(".player-info small")?.textContent?.split("&bull;")[0]?.trim() || "";
+						summaryEl.textContent = `${pos} ${nameText}`;
 					}
 					// ðŸ”½ ADD THIS AT THE VERY END
 					const WaiverInputRow = document.getElementById("force_waiver_claim_p");
@@ -1514,15 +1511,15 @@ if (thisProgram === "options_257") {
 
 					if (type === "drop") {
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.roster ? ` â€¢ Ros: ${p.roster}` : ''}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.roster ? ` &bull; Ros: ${p.roster}` : ''}</small>`;
 						}
 					} else {
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.roster ? ` â€¢ Ros: ${p.roster}` : ''}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.roster ? ` &bull; Ros: ${p.roster}` : ''}</small>`;
 						}
 					}
 
@@ -1539,13 +1536,13 @@ if (thisProgram === "options_257") {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 						} else {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Drop" : "Remove"}</button>`;
 						}
 
@@ -2109,7 +2106,7 @@ if (thisProgram === "csetup_cantadd") {
 					if (type === "drop") {
 						infoLine = `<small>${p.nfl_team ?? 'FA'}</small>`;
 					} else {
-						infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}</small>`;
+						infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small>`;
 					}
 
 					const row = document.createElement("div");
@@ -2130,7 +2127,7 @@ if (thisProgram === "csetup_cantadd") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "â€”"}</div>
+  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "&mdash;"}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 
@@ -2748,7 +2745,7 @@ if (thisProgram === "csetup_cantcut") {
 					if (type === "drop") {
 						infoLine = `<small>${p.nfl_team ?? 'FA'}</small>`;
 					} else {
-						infoLine = `<small>${p.nfl_team ?? 'FA'}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}</small>`;
+						infoLine = `<small>${p.nfl_team ?? 'FA'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small>`;
 					}
 
 					const row = document.createElement("div");
@@ -2769,7 +2766,7 @@ if (thisProgram === "csetup_cantcut") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "â€”"}</div>
+  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "&mdash;"}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 
@@ -3416,9 +3413,9 @@ if (thisProgram === "options_178") {
 					let infoLine = "";
 
 					if (p.sal) {
-						infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.fsrank)) ? ` â€¢ Rank: ${parseFloat(p.fsrank)}` : ' â€¢ Rank: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+						infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.fsrank)) ? ` &bull; Rank: ${parseFloat(p.fsrank)}` : ' &bull; Rank: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 					} else {
-						infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.fsrank)) ? ` â€¢ Rank: ${parseFloat(p.fsrank)}` : ' â€¢ Rank: N/A'}</small>`;
+						infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.fsrank)) ? ` &bull; Rank: ${parseFloat(p.fsrank)}` : ' &bull; Rank: N/A'}</small>`;
 					}
 
 					const row = document.createElement("div");
@@ -3434,13 +3431,13 @@ if (thisProgram === "options_178") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 					} else {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Remove"}</button>`;
 					}
 
@@ -4082,7 +4079,7 @@ if (thisProgram === "csetup_loadrost") {
 					if (type === "drop") {
 						infoLine = `<small>${p.nfl_team ?? 'FA'}</small>`;
 					} else {
-						infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}</small>`;
+						infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small>`;
 					}
 
 					const row = document.createElement("div");
@@ -4103,7 +4100,7 @@ if (thisProgram === "csetup_loadrost") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "â€”"}</div>
+  <div class="player-myrank" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "&mdash;"}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 					fragment.appendChild(row);
@@ -4689,16 +4686,16 @@ if (thisProgram === "options_129") {
 
 					if (type === "drop") {
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small><input type="hidden" name="PLAYERS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">â†“</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">â†“ 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 â†“</button></div>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small><input type="hidden" name="PLAYERS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">â†“</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">â†“ 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 â†“</button></div>`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}</small><input type="hidden" name="PLAYERS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">â†“</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">â†“ 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 â†“</button></div>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small><input type="hidden" name="PLAYERS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">â†“</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">â†“ 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 â†“</button></div>`;
 						}
 					} else {
 
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small>`;
 						}
 					}
 
@@ -4716,13 +4713,13 @@ if (thisProgram === "options_129") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 					} else {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Remove"}</button>`;
 					}
 
@@ -5618,14 +5615,14 @@ if (thisProgram === "options_52" || thisProgram === "new_predraft") {
 
 					if (type === "drop") {
 						if (p.sal) {
-							infoLine += `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+							infoLine += `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 							if (franchiseOnClock) {
 								infoLine += `<input type="hidden" name="PLAYER_PICK" value="${p.id}">`;
 							} else {
 								infoLine += `<input type="hidden" name="PICKS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">â†“</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">â†“ 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 â†“</button></div>`;
 							}
 						} else {
-							infoLine += `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}</small>`;
+							infoLine += `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small>`;
 							if (franchiseOnClock) {
 								infoLine += `<input type="hidden" name="PLAYER_PICK" value="${p.id}">`;
 							} else {
@@ -5634,17 +5631,17 @@ if (thisProgram === "options_52" || thisProgram === "new_predraft") {
 						}
 					} else {
 						if (p.sal) {
-							infoLine += `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+							infoLine += `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 						} else {
-							infoLine += `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}</small>`;
+							infoLine += `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small>`;
 						}
 					}
 
 					let infoRank = ``
 					if (sortMyRank) {
-						infoRank = `${!isNaN(parseFloat(p.myrank)) ? p.myrank : "â€”"}`;
+						infoRank = `${!isNaN(parseFloat(p.myrank)) ? p.myrank : "&mdash;"}`;
 					} else {
-						infoRank = `${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "â€”"}`;
+						infoRank = `${!isNaN(parseFloat(p.fsrank)) ? p.fsrank : "&mdash;"}`;
 					}
 
 					const row = document.createElement("div");
@@ -6499,15 +6496,15 @@ if (thisProgram === "contest_lineup") {
 
 					if (type === "drop") {
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}</small>`;
 						}
 					} else {
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}</small>`;
 						}
 					}
 
@@ -6525,13 +6522,13 @@ if (thisProgram === "contest_lineup") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 					} else {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.pwpts)) ? parseFloat(p.pwpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 
@@ -7294,15 +7291,15 @@ if (thisProgram === "options_256") {
 
 					if (type === "drop") {
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small><input type="hidden" name="ROSTER" value="${p.id}">`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small><input type="hidden" name="ROSTER" value="${p.id}">`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}</small><input type="hidden" name="ROSTER" value="${p.id}">`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small><input type="hidden" name="ROSTER" value="${p.id}">`;
 						}
 					} else {
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.adp)) ? ` â€¢ ADP: ${parseFloat(p.adp)}` : ' â€¢ ADP: N/A'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small>`;
 						}
 					}
 
@@ -7320,13 +7317,13 @@ if (thisProgram === "options_256") {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 					} else {
 						row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 					}
 					fragment.appendChild(row);
@@ -7780,7 +7777,7 @@ if (thisProgram === "options_43") {
 						span.textContent = `${franchiseName} Auction Status`;
 						caption.appendChild(span);
 
-						// Insert caption at the top (some tables already have one â€” optional logic if needed)
+						// Insert caption at the top (some tables already have one &mdash; optional logic if needed)
 						const existingCaption = parentTable.querySelector("caption");
 						if (existingCaption) {
 							existingCaption.replaceWith(caption); // or remove it first if you want to avoid duplicates
@@ -8133,9 +8130,9 @@ if (thisProgram === "options_43") {
 						let infoLine = "";
 
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` â€¢ Sal: $${parseFloat(p.sort_sal)}` : ' â€¢ Sal: $0'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` â€¢ Bye: ${p.bye_week}` : ' â€¢ Bye: N/A'}${p.opp ? ` â€¢ Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.fsrank)) ? ` â€¢ Rank: ${parseFloat(p.fsrank)}` : ' â€¢ Rank: N/A'}</small>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.fsrank)) ? ` &bull; Rank: ${parseFloat(p.fsrank)}` : ' &bull; Rank: N/A'}</small>`;
 						}
 
 						const row = document.createElement("div");
@@ -8147,13 +8144,13 @@ if (thisProgram === "options_43") {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Locked" : "Locked"}</button>`;
 						} else {
 							row.innerHTML = `<div class="player-pos ${p.pos?.toUpperCase() || ''}" style=" text-align:center; font-weight:bold;">${p.pos}</div>
   <div class="player-img-wrapper" style="flex-shrink:0;position:relative"><div class="player-img-wrapper-clippler"><img src="${imageUrl}" alt="${fullName}" onerror="this.onerror=null;this.src='${fallbackImage}';"></div>${p.inj ? `<div class="player-inj" style="position:absolute">${p.inj}</div>` : ""}</div>
   <div class="player-info"><strong>${fullName}${statusSpan}</strong><br>${infoLine} </div>
-  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : 'â€”'}</div>
+  <div class="player-wproj" style="text-align:right; font-weight:900;">${!isNaN(parseFloat(p.projpts)) ? parseFloat(p.projpts) : '&mdash;'}</div>
   <button type="button" class="select-btn">${type === "add" ? "Add" : "Drop"}</button>`;
 						}
 
@@ -8347,7 +8344,7 @@ if (thisProgram === "options_43") {
 							nameText = cloned.textContent.replace(/\(R\)/g, "").trim(); // remove (R) and trim
 						}
 						const pos = row.querySelector(".player-pos")?.textContent || "";
-						const team = row.querySelector(".player-info small")?.textContent?.split("â€¢")[0]?.trim() || "";
+						const team = row.querySelector(".player-info small")?.textContent?.split("&bull;")[0]?.trim() || "";
 						summaryEl.textContent = `${pos} ${nameText} (${team})`;
 					}
 
