@@ -661,18 +661,19 @@ if (thisProgram === "add_drop") {
 						let infoLine = "";
 
 						if (type === "drop") {
-							if (p.sal) {
-								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
+							  if (p.sal) {
+							    infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
+							  } else {
+							    infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}</small>`;
+							  }
 							} else {
-								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${p.roster ? ` &bull; Ros: ${p.roster}` : ''}</small>`;
+							  if (p.sal) {
+							    infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
+							  } else {
+							    infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}</small>`;
+							  }
 							}
-						} else {
-							if (p.sal) {
-								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small>`;
-							} else {
-								infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${p.opp ? ` &bull; Opp: ${p.opp}` : ''}</small>`;
-							}
-						}
+
 
 						const row = document.createElement("div");
 						if (hasLock) row.className = `add-drop-player-row disabled-locked ${index % 2 === 0 ? "oddtablerow" : "eventablerow"}`;
