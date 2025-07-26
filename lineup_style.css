@@ -54,7 +54,7 @@
 .lineupContainer .placeholder-card.player-card {
   display: grid;
   grid-template-columns: 55px 62px auto 1fr 1fr 126px;
-  grid-template-rows: auto;
+  grid-template-rows: 80px;
   grid-template-areas: "position . . .  ";
   gap: 10px;
   border: 1px solid #ddd;
