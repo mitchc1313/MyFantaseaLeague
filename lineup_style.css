@@ -899,6 +899,11 @@
     grid-template-rows: 25px 20px 20px;
     grid-template-areas: "position image first-name projected-points" "position image last-name bench" ". image opponent .";
   }
+
+  .lineupContainer .placeholder-card.player-card {
+    height: 67px;
+  }
+  
   .lineupContainer .player-ytd-points {
     display: none;
   }
