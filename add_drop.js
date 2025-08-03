@@ -4687,9 +4687,9 @@ if (thisProgram === "options_129") {
 
 					if (type === "drop") {
 						if (p.sal) {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small><input type="hidden" name="PLAYERS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">â†“</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">â†“ 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 â†“</button></div>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}${!isNaN(parseFloat(p.sort_sal)) ? ` &bull; Sal: $${parseFloat(p.sort_sal)}` : ' &bull; Sal: $0'}</small><input type="hidden" name="PLAYERS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">&darr;</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">&darr; 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 &darr;</button></div>`;
 						} else {
-							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small><input type="hidden" name="PLAYERS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">â†“</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">â†“ 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 â†“</button></div>`;
+							infoLine = `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small><input type="hidden" name="PLAYERS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">&darr;</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">&darr; 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 &darr;</button></div>`;
 						}
 					} else {
 
@@ -5009,7 +5009,7 @@ if (thisProgram === "options_129") {
 					promptDiv.className = "move-20-prompt oddtablerow";
 					promptDiv.style.cssText = `padding:.25rem;display:flex;align-items:center;gap:.25rem;margin:.25rem 0`;
 
-					promptDiv.innerHTML = `<strong style="white-space:nowrap;font-size:1rem;font-weight:40">Move Player:</strong><select id="move-20-select" style="width:100%!important;padding:0!important;height:2rem;"><option value="">Direction</option><option value="up">â†‘ Up 20</option><option value="down">â†“ Down 20</option></select><button style="padding:.1875rem;height:2rem;" type="button" id="confirm-move-20">Confirm</button><button type="button" id="cancel-move-20" style="padding:.1875rem;height:2rem;">Cancel</button>`;
+					promptDiv.innerHTML = `<strong style="white-space:nowrap;font-size:1rem;font-weight:40">Move Player:</strong><select id="move-20-select" style="width:100%!important;padding:0!important;height:2rem;"><option value="">Direction</option><option value="up">â†‘ Up 20</option><option value="down">&darr; Down 20</option></select><button style="padding:.1875rem;height:2rem;" type="button" id="confirm-move-20">Confirm</button><button type="button" id="cancel-move-20" style="padding:.1875rem;height:2rem;">Cancel</button>`;
 
 					// Insert the prompt after the entire .add-drop-player-row
 					row.insertAdjacentElement("afterend", promptDiv);
@@ -5620,14 +5620,14 @@ if (thisProgram === "options_52" || thisProgram === "new_predraft") {
 							if (franchiseOnClock) {
 								infoLine += `<input type="hidden" name="PLAYER_PICK" value="${p.id}">`;
 							} else {
-								infoLine += `<input type="hidden" name="PICKS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">â†“</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">â†“ 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 â†“</button></div>`;
+								infoLine += `<input type="hidden" name="PICKS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">&darr;</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">&darr; 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 &darr;</button></div>`;
 							}
 						} else {
 							infoLine += `<small>${p.nfl_team ?? 'FA'}${p.bye_week ? ` &bull; Bye: ${p.bye_week}` : ' &bull; Bye: N/A'}${!isNaN(parseFloat(p.adp)) ? ` &bull; ADP: ${parseFloat(p.adp)}` : ' &bull; ADP: N/A'}</small>`;
 							if (franchiseOnClock) {
 								infoLine += `<input type="hidden" name="PLAYER_PICK" value="${p.id}">`;
 							} else {
-								infoLine += `<input type="hidden" name="PICKS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">â†“</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">â†“ 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 â†“</button></div>`;
+								infoLine += `<input type="hidden" name="PICKS" value="${p.id}"><div class="moveBtns"><button type="button" class="move-up-btn" title="Move Player Up 1 Spot">â†‘</button><button type="button" class="move-up-btn-twenty" title="Move Player Up 20 Spots">â†‘ 20</button><button type="button" class="move-down-btn" title="Move Player Down 1 Spot">&darr;</button><button type="button" class="move-down-btn-twenty" title="Move Player Down 20 Spots">&darr; 20</button><button type="button" class="move-Up-down-btn-twenty" title="Move Player 20 Spots">â†‘ 20 &darr;</button></div>`;
 							}
 						}
 					} else {
@@ -5980,7 +5980,7 @@ if (thisProgram === "options_52" || thisProgram === "new_predraft") {
 					promptDiv.className = "move-20-prompt oddtablerow";
 					promptDiv.style.cssText = `padding:.25rem;display:flex;align-items:center;gap:.25rem;margin:.25rem 0`;
 
-					promptDiv.innerHTML = `<strong style="white-space:nowrap;font-size:1rem;font-weight:40">Move Player:</strong><select id="move-20-select" style="width:100%!important;padding:0!important;height:2rem;"><option value="">Direction</option><option value="up">â†‘ Up 20</option><option value="down">â†“ Down 20</option></select><button style="padding:.1875rem;height:2rem;" type="button" id="confirm-move-20">Confirm</button><button type="button" id="cancel-move-20" style="padding:.1875rem;height:2rem;">Cancel</button>`;
+					promptDiv.innerHTML = `<strong style="white-space:nowrap;font-size:1rem;font-weight:40">Move Player:</strong><select id="move-20-select" style="width:100%!important;padding:0!important;height:2rem;"><option value="">Direction</option><option value="up">â†‘ Up 20</option><option value="down">&darr; Down 20</option></select><button style="padding:.1875rem;height:2rem;" type="button" id="confirm-move-20">Confirm</button><button type="button" id="cancel-move-20" style="padding:.1875rem;height:2rem;">Cancel</button>`;
 
 					// Insert the prompt after the entire .add-drop-player-row
 					row.insertAdjacentElement("afterend", promptDiv);
