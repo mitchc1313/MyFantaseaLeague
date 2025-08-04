@@ -356,29 +356,57 @@
     }
 
     //  Helper function: Render placeholders
-    const renderPlaceholders = (position, count, action) => {
-        const placeholders = [];
-        for (let i = 0; i < count; i++) {
-            const placeholder = document.createElement("div");
-            placeholder.className = "player-card placeholder-card";
-            placeholder.dataset.position = position;
-            placeholder.innerHTML = `
-                <div class="player-info">
-                    <div class="player-details">
-                        <div class="player-position">${position}</div>
-                    </div>
-                </div>
-            `;
-            const addButton = document.createElement("button");
-            addButton.type = "button";
-            addButton.className = "add-position-btn";
-            addButton.textContent = "Add";
-            addButton.addEventListener("click", action);
-            placeholder.appendChild(addButton);
-            placeholders.push(placeholder);
-        }
-        return placeholders;
+   const renderPlaceholders = (position, count, action) => {
+    const placeholders = [];
+
+    // Optional: human-readable mapping if needed
+    const positionNames = {
+        QB: "Quarterback",
+        RB: "Running Back",
+        WR: "Wide Receiver",
+        TE: "Tight End",
+        FLEX: "Flex",
+        DEF: "Defense",
+        K: "Kicker",
+        BN: "Bench"
+        // Add others as needed
     };
+
+    for (let i = 0; i < count; i++) {
+        const placeholder = document.createElement("div");
+        placeholder.className = "player-card placeholder-card";
+        placeholder.dataset.position = position;
+
+        // Create the "Select [Position]" message
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "placeholder-message";
+        messageDiv.textContent = `Select ${positionNames[position] || position}`;
+
+        placeholder.innerHTML = `
+            <div class="player-info">
+                <div class="player-details">
+                    <div class="player-position">${position}</div>
+                </div>
+            </div>
+        `;
+
+        // Insert message div above the info section
+        placeholder.insertBefore(messageDiv, placeholder.firstChild);
+
+        // Add button
+        const addButton = document.createElement("button");
+        addButton.type = "button";
+        addButton.className = "add-position-btn";
+        addButton.textContent = "Add";
+        addButton.addEventListener("click", action);
+
+        placeholder.appendChild(addButton);
+        placeholders.push(placeholder);
+    }
+
+    return placeholders;
+};
+
 
     // Helper function to create the add-position button container
     function createAddPositionButton(position) {
