@@ -983,7 +983,8 @@
   }
   .lineupContainer .bench-btn,
   .lineupContainer .add-btn {
-    grid-row: 2/4;
+    grid-row: 1/4;
+    grid-column: 5;
     padding: 0;
   }
   .lineupContainer .player-card.bye-week .bench-btn,
