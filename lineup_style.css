@@ -120,7 +120,7 @@
 }
 
 .lineupContainer .add-position-btn .fa-plus,
-.lineupContainer .add-position-btn .fa-minus {
+.lineupContainer .bench-btn .fa-minus {
   padding: 0;
   font-size: 16px;
 }
