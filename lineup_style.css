@@ -36,7 +36,7 @@
 
 .lineupContainer .player-card {
   display: grid;
-  grid-template-columns: 55px 62px auto 1fr 1fr 126px;
+  grid-template-columns: 55px 62px auto 1fr 1fr 80px;
   /* Adjust flexible and fixed sizes */
   grid-template-rows: repeat(4, 20px);
   grid-template-areas: "position image first-name . . ." "position image last-name . . projected-points" ". image team jersey . bench" ". image opponent opponent-rank ytdpoints .";
@@ -88,11 +88,14 @@
 
 .lineupContainer .player-ytd-points {
   grid-area: ytdpoints;
+  grid-row: 4;
+  grid-column: 5;
   font-size: 12px;
   color: var(--dark-color);
   font-weight: 700;
-  text-align: left;
+  text-align: right;
   margin-bottom: 5px;
+  padding-bottom: 22px;
 }
 
 .lineupContainer .player-ytd-points span {
@@ -259,14 +262,15 @@
 .lineupContainer .player-projected-points {
   grid-area: projected-points;
   grid-row: 2/4;
+  grid-column: 5;
   font-size: 18px;
   font-weight: 900;
   color: var(--dark-color);
-  text-align: center;
+  text-align: right;
   position: relative;
   display: inline-block;
   margin-right: 0px;
-  padding-bottom: 10px;
+  padding-bottom: 0px;
 }
 
 .lineupContainer .player-ytd-points .points-span {
@@ -317,13 +321,14 @@
   /* Allows precise placement */
   bottom: 88%;
   /* Moves it directly below the parent */
-  left: 0;
+  left: -12px;
   /* Aligns it with the parent's left edge */
   width: 100%;
   /* Match the parent's width */
   z-index: 1;
   /* Pushes it below the parent visually */
   padding-bottom: 0px;
+  text-align: right;
 }
 
 .lineupContainer .player-projected-points::after,
@@ -334,7 +339,7 @@
 .lineupContainer .bench-btn,
 .lineupContainer .add-btn {
   grid-area: bench;
-  grid-row: 3/5;
+  grid-row: 1/5;
   padding: 0px;
   background-color: var(--dark-color);
   color: white;
@@ -343,10 +348,14 @@
   cursor: pointer;
   font-size: 12px;
   text-align: center;
-  width: 75px;
-  height: 27px;
+  width: 30px;
+  height: 30px;
   margin: auto;
   margin-right: 26px;
+}
+
+.lineupContainer .fa-plus {
+  padding: 0;
 }
 
 .lineupContainer .player-card.contest-league .bench-btn,
