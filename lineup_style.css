@@ -119,7 +119,8 @@
   margin-right: 26px;
 }
 
-.lineupContainer .add-position-btn .fa-plus {
+.lineupContainer .add-position-btn .fa-plus,
+.lineupContainer .add-position-btn .fa-minus {
   padding: 0;
   font-size: 16px;
 }
@@ -975,9 +976,10 @@
   .lineupContainer .player-projected-points {
     text-align: right;
     margin-right: 0px;
-    grid-row: 2/3;
+    grid-row: 2/4;
     grid-column: 4;
     padding-top: 0px;
+    padding-bottom: 7px;
   }
   .lineupContainer .bench-btn,
   .lineupContainer .add-btn {
