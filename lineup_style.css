@@ -926,14 +926,16 @@
 @media only screen and (max-width: 620px) {
   .lineupContainer .player-card {
     display: grid;
-    grid-template-columns: 55px 50px auto 1fr;
+    grid-template-columns: 55px 50px auto 1fr 80px;
     grid-template-rows: 25px 20px 20px;
     grid-template-areas: "position image first-name projected-points" "position image last-name bench" ". image opponent .";
   }
 
+  
   .lineupContainer .placeholder-card.player-card {
     height: 67px;
   }
+  
   
   .lineupContainer .player-ytd-points {
     display: none;
@@ -968,13 +970,13 @@
     display: none;
   }
   .lineupContainer .player-projected-points::before {
-    left: -16px;
-    display: none;
+    left: -14px;
   }
   .lineupContainer .player-projected-points {
     text-align: right;
-    margin-right: 30px;
-    grid-row: 1/3;
+    margin-right: 0px;
+    grid-row: 2/3;
+    grid-column: 4;
     padding-top: 0px;
   }
   .lineupContainer .bench-btn,
