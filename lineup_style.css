@@ -53,7 +53,7 @@
 
 .lineupContainer .placeholder-card.player-card {
   display: grid;
-  grid-template-columns: 55px 62px auto 126px;
+  grid-template-columns: 19px 62px auto 80px;
   grid-template-rows: 1fr;
   grid-template-areas: "position . . .  ";
   gap: 10px;
@@ -74,6 +74,7 @@
   grid-column: 3;
   color: #999;
   margin: auto;
+  font-size: 12px;
 }
 
 .lineupContainer .placeholder-card.player-card .player-info {
@@ -101,7 +102,7 @@
 .lineupContainer .add-position-btn {
   grid-area: add;
   grid-row: 1;
-  padding: 5px 10px;
+  padding: 0;
   background-color: var(--dark-color);
   color: white;
   border: none;
@@ -109,9 +110,15 @@
   cursor: pointer;
   font-size: 12px;
   text-align: center;
-  width: 75px;
+  width: 30px;
+  height: 30px;
   margin: auto;
   margin-right: 26px;
+}
+
+.lineupContainer .add-position-btn .fa-plus {
+  padding: 0;
+  font-size: 16px;
 }
 
 .lineupContainer .player-image-container {
