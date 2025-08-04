@@ -53,8 +53,8 @@
 
 .lineupContainer .placeholder-card.player-card {
   display: grid;
-  grid-template-columns: 55px 62px auto 1fr 1fr 126px;
-  grid-template-rows: auto;
+  grid-template-columns: 55px 62px auto 126px;
+  grid-template-rows: 1fr;
   grid-template-areas: "position . . .  ";
   gap: 10px;
   border: 1px solid #ddd;
@@ -68,6 +68,21 @@
   height: 82px;
   grid-gap: 0;
   margin: 0 auto;
+}
+
+.lineupContainer .placeholder-card.player-card .placeholder-message {
+  grid-column: 3;
+  color: #999;
+  margin: auto;
+}
+
+.lineupContainer .placeholder-card.player-card .player-info {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.lineupContainer .placeholder-card.player-card .add-position-btn {
+  grid-column: 4;
 }
 
 .lineupContainer .player-ytd-points {
@@ -960,7 +975,6 @@
     margin-top: 0;
   }
   .lineupContainer .placeholder-card.player-card {
-    grid-template-columns: 55px 1fr;
     grid-template-areas: "position add";
   }
   .lineupContainer .team-icon {
