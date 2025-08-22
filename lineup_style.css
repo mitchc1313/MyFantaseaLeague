@@ -125,6 +125,10 @@
   font-size: 16px;
 }
 
+.clear-btn .fa-solid.fa-trash {
+  padding-right: 5px;
+}
+
 .lineupContainer .player-image-container {
   grid-area: image;
   position: relative;
@@ -783,9 +787,9 @@
 
 #clear-lineup-btn {
   font-size: 14px;
-  width: 107px;
+  width: 125px;
   border-radius: 6px;
-  height: 25px;
+  height: 32px;
   background-color: #c9a426;
   padding: 0;
   margin-bottom: 10px;
