@@ -2458,6 +2458,31 @@ if ($('#body_ajax_ls').length) {
         } // end update_class_by_class
 
 
+
+
+
+        function getProjection(fid) {
+            // Try to read the number out of the pace-box snippet we already render
+            var key = 'fid_' + fid;
+            var s = (window.ls_pace_tracker && ls_pace_tracker[key] && typeof ls_pace_tracker[key].S === 'string')
+                ? ls_pace_tracker[key].S : '';
+
+            // First try: inner text like ...>114.6</span>
+            var m = s.match(/>(-?\d+(?:\.\d+)?)[^<]*</);
+            if (m) return parseFloat(m[1]);
+
+            // Fallback: title="Original Projection: 114.6"
+            var t = s.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+            if (t) return parseFloat(t[1]);
+
+            // Optional fallback if you keep a numeric projection on ls_fran_totals[fid].proj
+            if (ls_fran_totals[fid] && typeof ls_fran_totals[fid].proj === 'number') {
+                return ls_fran_totals[fid].proj;
+            }
+            return 0;
+        }
+
+
         ////////////////////////////////////////////////////////////////////
         //           REWRITE MFL FUNCTION - build_other_games             //
         ////////////////////////////////////////////////////////////////////
@@ -2476,20 +2501,25 @@ if ($('#body_ajax_ls').length) {
                 game_ord.sort(function (a, b) {
                     var afid = ls_games[a];
                     var bfid = ls_games[b];
-                    var apts = ls_fran_totals[afid] == undefined ? 0 : ls_fran_totals[afid].total;
-                    var bpts = ls_fran_totals[bfid] == undefined ? 0 : ls_fran_totals[bfid].total;
-                    if (afid === ls_target_franchise) { //KEEP MY FRANCHISE ON TOP
-                        return -1;
-                    } else if (bfid === ls_target_franchise) { //MOVE MY FRANCHISE TO TOP
-                        return 1;
-                    } else if (apts < bpts) {
-                        return 1;
-                    } else if (apts > bpts) {
-                        return -1;
-                    } else {
-                        return 0;
+
+                    var apts = (ls_fran_totals[afid] ? ls_fran_totals[afid].total : 0) || 0;
+                    var bpts = (ls_fran_totals[bfid] ? ls_fran_totals[bfid].total : 0) || 0;
+
+                    if (apts !== bpts) {
+                        return bpts - apts;             // higher live points first
                     }
+
+                    // tie-breaker: higher projected points first
+                    var aproj = getProjection(afid);
+                    var bproj = getProjection(bfid);
+                    if (aproj !== bproj) {
+                        return bproj - aproj;
+                    }
+
+                    // final stable fallback: by franchise id so sort is deterministic
+                    return ('' + afid).localeCompare('' + bfid);
                 });
+
             }
             html = "<tr><td>\n";
             if ($("#hide_projections_cb").is(':checked')) var _style = ' style="display:none"';
