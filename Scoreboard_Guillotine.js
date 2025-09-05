@@ -2464,15 +2464,15 @@ if ($('#body_ajax_ls').length) {
         function extractProjectionFromMarkup(markup) {
             if (typeof markup !== 'string') return 0;
 
-            // 1) title="Original Projection: 114.6"
-            let m = markup.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+            // 1) Prefer the visible number inside tags (current projection / pace)
+            let m = markup.match(/>(-?\d+(?:\.\d+)?)[^<]*</);
             if (m) return parseFloat(m[1]);
 
-            // 2) Inner text between tags ...>114.6</span>
-            m = markup.match(/>(-?\d+(?:\.\d+)?)[^<]*</);
+            // 2) Fall back to title="Original Projection: 114.6"
+            m = markup.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
             if (m) return parseFloat(m[1]);
 
-            // 3) Numbers anywhere, last one wins (defensive)
+            // 3) Defensive: any numbers, last one wins
             const nums = markup.match(/-?\d+(?:\.\d+)?/g);
             if (nums && nums.length) return parseFloat(nums[nums.length - 1]);
 
@@ -2481,15 +2481,29 @@ if ($('#body_ajax_ls').length) {
 
         function getProjection(fid) {
             const key = 'fid_' + fid;
+
+            // A) Try the cached snippet first (fast path)
             const S = (window.ls_pace_tracker && ls_pace_tracker[key] && ls_pace_tracker[key].S) ? ls_pace_tracker[key].S : '';
             let p = extractProjectionFromMarkup(S);
 
-            // Optional: numeric fallback if you keep a projection on ls_fran_totals[fid].proj
-            if ((!isFinite(p) || p === 0) && ls_fran_totals[fid] && typeof ls_fran_totals[fid].proj === 'number') {
-                p = ls_fran_totals[fid].proj;
+            // B) If still falsy, try the live DOM (works on re-renders)
+            if (!p && typeof $ === 'function') {
+                const txt = $('#ls_pace_box_' + fid).text && $('#ls_pace_box_' + fid).text();
+                if (txt) {
+                    const m = String(txt).match(/-?\d+(?:\.\d+)?/);
+                    if (m) p = parseFloat(m[0]);
+                }
             }
+
+            // C) Numeric fallbacks that some MFL custom code exposes
+            if (!p && ls_fran_totals && ls_fran_totals[fid]) {
+                const cand = ls_fran_totals[fid].proj ?? ls_fran_totals[fid].projection ?? ls_fran_totals[fid].prj;
+                if (typeof cand === 'number' && isFinite(cand)) p = cand;
+            }
+
             return isFinite(p) ? p : 0;
         }
+
 
 
 
@@ -2507,36 +2521,29 @@ if ($('#body_ajax_ls').length) {
                     if (ls_games[i].split(",")[1] === home && ls_games[i].split(",")[0] === away) current_matchup = i;
             }
             if (ls_vert_og) {
-
-                // Build a projection map so we don't parse repeatedly inside the comparator
                 var projMap = {};
                 for (var k = 0; k < game_ord.length; k++) {
-                    var fid_k = ls_games[game_ord[k]];     // in vertical mode, ls_games[x] is a single fid like "0005"
-                    projMap[fid_k] = getProjection(fid_k); // number (0 if unknown)
+                    var fid_k = ls_games[game_ord[k]]; // e.g., "0005"
+                    projMap[fid_k] = getProjection(fid_k) || 0;
                 }
-                
+
                 game_ord.sort(function (a, b) {
                     var afid = ls_games[a];
                     var bfid = ls_games[b];
 
-                    var apts = parseFloat((ls_fran_totals[afid] && ls_fran_totals[afid].total) ?? 0) || 0;
-                    var bpts = parseFloat((ls_fran_totals[bfid] && ls_fran_totals[bfid].total) ?? 0) || 0;
+                    var apts = parseFloat((ls_fran_totals[afid] && ls_fran_totals[afid].total) || 0) || 0;
+                    var bpts = parseFloat((ls_fran_totals[bfid] && ls_fran_totals[bfid].total) || 0) || 0;
 
-                    if (apts !== bpts) {
-                        return bpts - apts; // higher live points first
-                    }
+                    if (apts !== bpts) return bpts - apts;          // higher live points first
 
-                    // Tie-breaker: higher projected points first
-                    var aproj = projMap[afid] ?? 0;
-                    var bproj = projMap[bfid] ?? 0;
-                    if (aproj !== bproj) {
-                        return bproj - aproj;
-                    }
+                    var aproj = projMap[afid] || 0;
+                    var bproj = projMap[bfid] || 0;
+                    if (aproj !== bproj) return bproj - aproj;      // tie: higher projection first
 
-                    // Final deterministic fallback: by franchise id
-                    return ('' + afid).localeCompare('' + bfid);
+                    return ('' + afid).localeCompare('' + bfid);    // deterministic fallback
                 });
             }
+
             html = "<tr><td>\n";
             if ($("#hide_projections_cb").is(':checked')) var _style = ' style="display:none"';
             else var _style = '';
