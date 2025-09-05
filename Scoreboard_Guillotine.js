@@ -2515,7 +2515,6 @@ if ($('#body_ajax_ls').length) {
                         if (game[j] === 'AVG') matchup_class = ' ls_other_game_avg';
                     }
                 }
-                html = html + '<div id="og_' + i + '" class="ls_other_game' + matchup_class + current_matchup_class + '" onclick="' + link + '" onmouseenter="set_border(this,1);" onmouseleave="set_border(this,0);" style="display:inline-block;" title="View Match Up"><table border="0" cellspacing="0" cellpadding="0">\n';
                 // ...snip...
                 html = html + '<div id="og_' + i + '" class="ls_other_game' + matchup_class + current_matchup_class + '" onclick="' + link + '" onmouseenter="set_border(this,1);" onmouseleave="set_border(this,0);" style="display:inline-block;" title="View Match Up"><table border="0" cellspacing="0" cellpadding="0">\n';
 
