@@ -2486,28 +2486,27 @@ if ($('#body_ajax_ls').length) {
             const key = 'fid_' + fid;
             let p = 0, source = 'none';
 
-            // A) Cached snippet first
-            const S = safeGet(window, `ls_pace_tracker.${key}.S`, '');
-            if (S) {
-                p = extractProjectionFromMarkup(S);
-                if (p) source = 'pace_tracker.S';
-            }
-
-            // B) Live DOM as fallback
-            if (!p && typeof $ === 'function') {
+            // A) data-proj on the DOM cell (works even if hidden)
+            if (typeof $ === 'function') {
                 const $box = $('#ls_pace_box_' + fid);
                 if ($box && $box.length) {
-                    const txt = $box.text();
-                    const m = String(txt).match(/-?\d+(?:\.\d+)?/);
-                    if (m) {
-                        p = parseFloat(m[0]);
-                        if (p) source = 'dom_text';
+                    const dp = parseFloat($box.attr('data-proj'));
+                    if (Number.isFinite(dp) && dp !== 0) {
+                        p = dp; source = 'dom_data_proj';
                     }
                 }
             }
 
-            // C) Numeric fallbacks many themes expose
-            // Try several likely keys on ls_fran_totals[fid]
+            // B) pace_tracker markup (in case DOM not built yet)
+            if (!p) {
+                const S = safeGet(window, `ls_pace_tracker.${key}.S`, '');
+                if (S) {
+                    const v = extractProjectionFromMarkup(S);
+                    if (Number.isFinite(v) && v !== 0) { p = v; source = 'pace_tracker.S'; }
+                }
+            }
+
+            // C) last-resort numeric fields
             if (!p && window.ls_fran_totals && ls_fran_totals[fid]) {
                 const cand =
                     ls_fran_totals[fid].proj ??
@@ -2516,20 +2515,14 @@ if ($('#body_ajax_ls').length) {
                     ls_fran_totals[fid].projected ??
                     ls_fran_totals[fid].pace ??
                     ls_fran_totals[fid].orig_proj;
-
-                if (Number.isFinite(cand)) {
-                    p = cand;
-                    if (p) source = 'fran_totals_numeric';
-                }
+                if (Number.isFinite(cand)) { p = cand; source = 'fran_totals_numeric'; }
             }
 
-            if (window.LS_RANK_DEBUG) {
-                console.log('[getProjection]', fid, { p, source, hasS: !!S });
-            }
-
+            if (window.LS_RANK_DEBUG) console.log('[getProjection]', fid, { p, source });
 
             return Number.isFinite(p) ? p : 0;
         }
+
 
 
         function num(x, dflt = 0) {
@@ -2664,11 +2657,24 @@ if ($('#body_ajax_ls').length) {
 
                         html = html + '<td class="ls_og_cell">' + ls_get_icon_abbrev(fidkey) + '</td>';
 
-                        html = html + '<td id="ls_pace_box_' + game[j] + '" class="ls_pace_box_' + game[j] + ' ls_projections ls_pace_box"' + _style + '>';
-                        if (ls_includeProjections) {
-                            if (ls_pace_tracker.hasOwnProperty(fidkey)) html = html + ls_pace_tracker[fidkey].S;
+                        // pull the markup S if present
+                        var S_markup = safeGet(window, `ls_pace_tracker.${fidkey}.S`, '') || '';
+                        // derive a numeric projection from S (0 if missing)
+                        var P_num = extractProjectionFromMarkup(S_markup) || 0;
+
+                        // put P_num into data-proj so we can read it later even if hidden
+                        html = html
+                            + '<td id="ls_pace_box_' + game[j] + '"'
+                            + ' class="ls_projections ls_pace_box ls_pace_box_' + game[j] + '"'
+                            + ' data-proj="' + P_num + '"' + _style + '>';
+
+                        // optional: only render S markup visibly if ls_includeProjections
+                        if (ls_includeProjections && S_markup) {
+                            html = html + S_markup;
                         }
+
                         html = html + '</td>';
+
 
                         html = html + '<td align="right" style="border:none;"><div class="ogffpts_' + game[j] + '">';
                         html = html + format_points(ls_fran_totals[game[j]].total);
