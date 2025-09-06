@@ -2660,14 +2660,6 @@ if ($('#body_ajax_ls').length) {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
-            // Second pass: after the HTML is in the DOM, projections exist -> rebuild once
-            if (ls_vert_og && !window.__OG_SECOND_PASS__) {
-                window.__OG_SECOND_PASS__ = true;
-                setTimeout(function () {
-                    window.__OG_SECOND_PASS__ = false;
-                    build_other_games(home, away);
-                }, 0);
-            }
 
 
             if (ls_hide_bye_teams) {
