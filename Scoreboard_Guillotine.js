@@ -2461,18 +2461,21 @@ if ($('#body_ajax_ls').length) {
 
 
 
+        // toggle in the console: window.LS_RANK_DEBUG = true;
+        window.LS_RANK_DEBUG = window.LS_RANK_DEBUG ?? false;
+
         function extractProjectionFromMarkup(markup) {
             if (typeof markup !== 'string') return 0;
 
-            // 1) Prefer the visible number inside tags (current projection / pace)
+            // visible number inside tags ...>114.6</span>
             let m = markup.match(/>(-?\d+(?:\.\d+)?)[^<]*</);
             if (m) return parseFloat(m[1]);
 
-            // 2) Fall back to title="Original Projection: 114.6"
+            // title="Original Projection: 114.6"
             m = markup.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
             if (m) return parseFloat(m[1]);
 
-            // 3) Defensive: any numbers, last one wins
+            // defensive: last number
             const nums = markup.match(/-?\d+(?:\.\d+)?/g);
             if (nums && nums.length) return parseFloat(nums[nums.length - 1]);
 
@@ -2481,28 +2484,61 @@ if ($('#body_ajax_ls').length) {
 
         function getProjection(fid) {
             const key = 'fid_' + fid;
+            let p = 0, source = 'none';
 
-            // A) Try the cached snippet first (fast path)
-            const S = (window.ls_pace_tracker && ls_pace_tracker[key] && ls_pace_tracker[key].S) ? ls_pace_tracker[key].S : '';
-            let p = extractProjectionFromMarkup(S);
+            // A) Cached snippet first
+            const S = safeGet(window, `ls_pace_tracker.${key}.S`, '');
+            if (S) {
+                p = extractProjectionFromMarkup(S);
+                if (p) source = 'pace_tracker.S';
+            }
 
-            // B) If still falsy, try the live DOM (works on re-renders)
+            // B) Live DOM as fallback
             if (!p && typeof $ === 'function') {
-                const txt = $('#ls_pace_box_' + fid).text && $('#ls_pace_box_' + fid).text();
-                if (txt) {
+                const $box = $('#ls_pace_box_' + fid);
+                if ($box && $box.length) {
+                    const txt = $box.text();
                     const m = String(txt).match(/-?\d+(?:\.\d+)?/);
-                    if (m) p = parseFloat(m[0]);
+                    if (m) {
+                        p = parseFloat(m[0]);
+                        if (p) source = 'dom_text';
+                    }
                 }
             }
 
-            // C) Numeric fallbacks that some MFL custom code exposes
-            if (!p && ls_fran_totals && ls_fran_totals[fid]) {
-                const cand = ls_fran_totals[fid].proj ?? ls_fran_totals[fid].projection ?? ls_fran_totals[fid].prj;
-                if (typeof cand === 'number' && isFinite(cand)) p = cand;
+            // C) Numeric fallbacks many themes expose
+            // Try several likely keys on ls_fran_totals[fid]
+            if (!p && window.ls_fran_totals && ls_fran_totals[fid]) {
+                const cand =
+                    ls_fran_totals[fid].proj ??
+                    ls_fran_totals[fid].projection ??
+                    ls_fran_totals[fid].proj_total ??
+                    ls_fran_totals[fid].projected ??
+                    ls_fran_totals[fid].pace ??
+                    ls_fran_totals[fid].orig_proj;
+
+                if (Number.isFinite(cand)) {
+                    p = cand;
+                    if (p) source = 'fran_totals_numeric';
+                }
             }
 
-            return isFinite(p) ? p : 0;
+            if (window.LS_RANK_DEBUG) {
+                console.debug('[getProjection]', fid, { p, source, hasS: !!S });
+            }
+
+            return Number.isFinite(p) ? p : 0;
         }
+
+
+        function num(x, dflt = 0) {
+            const n = parseFloat(x);
+            return Number.isFinite(n) ? n : dflt;
+        }
+        function safeGet(obj, path, dflt = undefined) {
+            return path.split('.').reduce((a, k) => (a && a[k] !== undefined ? a[k] : undefined), obj) ?? dflt;
+        }
+
 
 
 
@@ -2521,26 +2557,45 @@ if ($('#body_ajax_ls').length) {
                     if (ls_games[i].split(",")[1] === home && ls_games[i].split(",")[0] === away) current_matchup = i;
             }
             if (ls_vert_og) {
+                // Build maps once
                 var projMap = {};
+                var ptsMap = {};
+
                 for (var k = 0; k < game_ord.length; k++) {
-                    var fid_k = ls_games[game_ord[k]]; // e.g., "0005"
+                    var fid_k = ls_games[game_ord[k]];   // e.g., "0005"
+                    ptsMap[fid_k] = num(safeGet(ls_fran_totals, `${fid_k}.total`, 0));
                     projMap[fid_k] = getProjection(fid_k) || 0;
+                }
+
+                if (window.LS_RANK_DEBUG) {
+                    // Nice overview before sort
+                    var snapshot = game_ord.map(function (idx) {
+                        var fid = ls_games[idx];
+                        return { fid, points: ptsMap[fid], proj: projMap[fid] };
+                    });
+                    console.table(snapshot);
                 }
 
                 game_ord.sort(function (a, b) {
                     var afid = ls_games[a];
                     var bfid = ls_games[b];
 
-                    var apts = parseFloat((ls_fran_totals[afid] && ls_fran_totals[afid].total) || 0) || 0;
-                    var bpts = parseFloat((ls_fran_totals[bfid] && ls_fran_totals[bfid].total) || 0) || 0;
+                    var apts = ptsMap[afid];
+                    var bpts = ptsMap[bfid];
 
-                    if (apts !== bpts) return bpts - apts;          // higher live points first
+                    if (apts !== bpts) return bpts - apts; // higher live points first
 
                     var aproj = projMap[afid] || 0;
                     var bproj = projMap[bfid] || 0;
-                    if (aproj !== bproj) return bproj - aproj;      // tie: higher projection first
 
-                    return ('' + afid).localeCompare('' + bfid);    // deterministic fallback
+                    if (window.LS_RANK_DEBUG) {
+                        // Only log when comparing a tie on points
+                        console.debug('[tie on points]', { afid, apts, aproj, bfid, bpts, bproj });
+                    }
+
+                    if (aproj !== bproj) return bproj - aproj; // higher projection first
+
+                    return ('' + afid).localeCompare('' + bfid); // deterministic fallback
                 });
             }
 
