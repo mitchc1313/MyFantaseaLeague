@@ -2461,84 +2461,54 @@ if ($('#body_ajax_ls').length) {
 
 
 
-        // toggle in the console: window.LS_RANK_DEBUG = true;
-        window.LS_RANK_DEBUG = true;
+        // Read projection from the rendered DOM (preferred)
+        function getProjectionFromDOM(fid) {
+            const box = document.getElementById('ls_pace_box_' + fid);
+            if (!box) return NaN;
 
-        function extractProjectionFromMarkup(markup) {
-            if (typeof markup !== 'string') return 0;
+            // Any of these classes can hold the number
+            const span = box.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
+            if (span) {
+                // Prefer the visible number, e.g. ...>110.8</span>
+                const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
+                if (mTxt) return parseFloat(mTxt[0]);
 
-            // visible number inside tags ...>114.6</span>
-            let m = markup.match(/>(-?\d+(?:\.\d+)?)[^<]*</);
-            if (m) return parseFloat(m[1]);
+                // Fallback to title="Original Projection: 118.1"
+                const title = span.getAttribute('title') || '';
+                const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+                if (mTitle) return parseFloat(mTitle[1]);
+            }
 
-            // title="Original Projection: 114.6"
-            m = markup.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
-            if (m) return parseFloat(m[1]);
+            // Ultra-defensive: any number somewhere inside the cell
+            const any = (box.textContent || '').match(/-?\d+(?:\.\d+)?/);
+            if (any) return parseFloat(any[0]);
 
-            // defensive: last number
-            const nums = markup.match(/-?\d+(?:\.\d+)?/g);
-            if (nums && nums.length) return parseFloat(nums[nums.length - 1]);
-
-            return 0;
+            return NaN;
         }
 
         function getProjection(fid) {
-            const box = document.getElementById('ls_pace_box_' + fid);
-            if (!box) {
-                if (window.LS_RANK_DEBUG) console.debug('[getProjection] no box', fid);
-                return 0;
+            const key = 'fid_' + fid;
+
+            // A) Try the LIVE DOM first (works after the first render)
+            let p = getProjectionFromDOM(fid);
+
+            // B) If DOM isn't there yet on first pass, use cached snippet S
+            if (!isFinite(p)) {
+                const S = (window.ls_pace_tracker && ls_pace_tracker[key] && ls_pace_tracker[key].S) ? ls_pace_tracker[key].S : '';
+                p = extractProjectionFromMarkup(S);
             }
 
-            // A) data-proj attribute (works even if hidden)
-            const dp = parseFloat(box.getAttribute('data-proj'));
-            if (Number.isFinite(dp) && dp !== 0) {
-                if (window.LS_RANK_DEBUG) console.debug('[getProjection] via data-proj', fid, dp);
-                return dp;
+            // C) Numeric fallbacks some themes expose
+            if ((!isFinite(p) || p === 0) && window.ls_fran_totals && ls_fran_totals[fid]) {
+                const cand =
+                    ls_fran_totals[fid].proj ??
+                    ls_fran_totals[fid].projection ??
+                    ls_fran_totals[fid].prj;
+                if (typeof cand === 'number' && isFinite(cand)) p = cand;
             }
 
-            // B) visible text inside span (e.g., 110.8)
-            const span = box.querySelector(
-                'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
-            );
-            if (span) {
-                const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
-                if (mTxt) {
-                    const v = parseFloat(mTxt[0]);
-                    if (Number.isFinite(v) && v !== 0) {
-                        if (window.LS_RANK_DEBUG) console.debug('[getProjection] via span text', fid, v);
-                        return v;
-                    }
-                }
-                // C) fallback to title="Original Projection: 118.1"
-                const title = span.getAttribute('title') || '';
-                const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
-                if (mTitle) {
-                    const v = parseFloat(mTitle[1]);
-                    if (Number.isFinite(v) && v !== 0) {
-                        if (window.LS_RANK_DEBUG) console.debug('[getProjection] via span title', fid, v);
-                        return v;
-                    }
-                }
-            }
-
-            if (window.LS_RANK_DEBUG) {
-                console.debug('[getProjection] 0 value', fid, { outer: box.outerHTML });
-            }
-            return 0;
+            return isFinite(p) ? p : 0;
         }
-
-
-
-
-
-        function num(x, dflt = 0) {
-            const n = parseFloat(x);
-            return Number.isFinite(n) ? n : dflt;
-        }
-        function safeGet(obj, path, dflt = undefined) {
-            return path.split('.').reduce((a, k) => (a && a[k] !== undefined ? a[k] : undefined), obj) ?? dflt;
-        }
-
 
 
 
@@ -2547,7 +2517,6 @@ if ($('#body_ajax_ls').length) {
         //           REWRITE MFL FUNCTION - build_other_games             //
         ////////////////////////////////////////////////////////////////////
         function build_other_games(home, away) {
-            console.log('[build_other_games] called', { home, away, ls_vert_og });
             //NOTE: FOR ALL PLAY LEAGUES home & away ARE UNDEFINED
             var html;
             var game_ord = [];
@@ -2558,56 +2527,28 @@ if ($('#body_ajax_ls').length) {
                     if (ls_games[i].split(",")[1] === home && ls_games[i].split(",")[0] === away) current_matchup = i;
             }
             if (ls_vert_og) {
-                console.log('[rank] vertical mode enabled, building maps...');
-
                 var projMap = {};
-                var ptsMap = {};
-
                 for (var k = 0; k < game_ord.length; k++) {
-                    var fid_k = ls_games[game_ord[k]];
-                    ptsMap[fid_k] = num(safeGet(ls_fran_totals, `${fid_k}.total`, 0));
+                    var fid_k = ls_games[game_ord[k]]; // e.g., "0005"
                     projMap[fid_k] = getProjection(fid_k) || 0;
                 }
 
-                if (window.LS_RANK_DEBUG) {
-                    console.log('[rank] snapshot before sort:');
-                    console.table(game_ord.map(function (idx) {
-                        var fid = ls_games[idx];
-                        return { fid, points: ptsMap[fid], proj: projMap[fid] };
-                    }));
-                }
+                game_ord.sort(function (a, b) {
+                    var afid = ls_games[a];
+                    var bfid = ls_games[b];
 
-                try {
-                    game_ord.sort(function (a, b) {
-                        var afid = ls_games[a];
-                        var bfid = ls_games[b];
+                    var apts = parseFloat((ls_fran_totals[afid] && ls_fran_totals[afid].total) || 0) || 0;
+                    var bpts = parseFloat((ls_fran_totals[bfid] && ls_fran_totals[bfid].total) || 0) || 0;
 
-                        var apts = ptsMap[afid] || 0;
-                        var bpts = ptsMap[bfid] || 0;
-                        if (apts !== bpts) return bpts - apts;     // higher live points first
+                    if (apts !== bpts) return bpts - apts;          // higher live points first
 
-                        var aproj = projMap[afid] || 0;
-                        var bproj = projMap[bfid] || 0;
-                        if (aproj !== bproj) return bproj - aproj; // tie-break on projection
+                    var aproj = projMap[afid] || 0;
+                    var bproj = projMap[bfid] || 0;
+                    if (aproj !== bproj) return bproj - aproj;      // tie: higher projection first
 
-                        return ('' + afid).localeCompare('' + bfid); // deterministic fallback
-                    });
-
-                } catch (e) {
-                    console.error('[rank] sort failed', e);
-                }
-
-                // ⬇️ move this INSIDE the block so ptsMap/projMap are in scope
-                if (window.LS_RANK_DEBUG) {
-                    console.log('[rank] order after sort:');
-                    console.table(game_ord.map(function (idx) {
-                        var fid = ls_games[idx];
-                        return { fid, points: ptsMap[fid], proj: projMap[fid] };
-                    }));
-                }
-            } // end if (ls_vert_og)
-
-
+                    return ('' + afid).localeCompare('' + bfid);    // deterministic fallback
+                });
+            }
 
             html = "<tr><td>\n";
             if ($("#hide_projections_cb").is(':checked')) var _style = ' style="display:none"';
@@ -2675,43 +2616,11 @@ if ($('#body_ajax_ls').length) {
 
                         html = html + '<td class="ls_og_cell">' + ls_get_icon_abbrev(fidkey) + '</td>';
 
-                        // pull the markup S if present
-                        var S_markup = safeGet(window, `ls_pace_tracker.${fidkey}.S`, '') || '';
-                        // derive a numeric projection from S (0 if missing)
-                        var P_num = extractProjectionFromMarkup(S_markup) || 0;
-
-                        // if we didn't get a number, try numeric fallbacks
-                        if (!P_num && window.ls_fran_totals && ls_fran_totals[game[j]]) {
-                            const cand =
-                                ls_fran_totals[game[j]].proj ??
-                                ls_fran_totals[game[j]].projection ??
-                                ls_fran_totals[game[j]].proj_total ??
-                                ls_fran_totals[game[j]].projected ??
-                                ls_fran_totals[game[j]].pace ??
-                                ls_fran_totals[game[j]].orig_proj;
-                            if (Number.isFinite(cand)) P_num = cand;
+                        html = html + '<td id="ls_pace_box_' + game[j] + '" class="ls_pace_box_' + game[j] + ' ls_projections ls_pace_box"' + _style + '>';
+                        if (ls_includeProjections) {
+                            if (ls_pace_tracker.hasOwnProperty(fidkey)) html = html + ls_pace_tracker[fidkey].S;
                         }
-
-                        // build inner HTML:
-                        //  - if S_markup exists, use it
-                        //  - else synthesize a span so the DOM always contains a number
-                        var innerProjHTML = '';
-                        if (S_markup) {
-                            innerProjHTML = S_markup;
-                        } else if (P_num) {
-                            innerProjHTML =
-                                '<span class="ls_at_projected" title="Original Projection: ' + P_num + '">' + P_num + '</span>';
-                        }
-
-                        // always render a span (hidden or visible) so ranking can read it.
-                        // respect the checkbox by hiding visually via style, not by omitting content
-                        var tdStyle = _style; // your existing style='display:none' when checkbox is on
-                        html = html
-                            + '<td id="ls_pace_box_' + game[j] + '"'
-                            + ' class="ls_projections ls_pace_box ls_pace_box_' + game[j] + '"'
-                            + ' data-proj="' + (Number.isFinite(P_num) ? P_num : 0) + '"' + tdStyle + '>'
-                            + innerProjHTML
-                            + '</td>';
+                        html = html + '</td>';
 
                         html = html + '<td align="right" style="border:none;"><div class="ogffpts_' + game[j] + '">';
                         html = html + format_points(ls_fran_totals[game[j]].total);
@@ -2727,42 +2636,15 @@ if ($('#body_ajax_ls').length) {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
-
-            // Normalize: if any pace box still lacks data-proj, derive it from DOM now
-            $('#other_games td[id^="ls_pace_box_"]').each(function () {
-                const $td = $(this);
-                const cur = parseFloat($td.attr('data-proj'));
-                if (Number.isFinite(cur) && cur !== 0) return;
-
-                const span = this.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
-                let v = 0;
-                if (span) {
-                    const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
-                    if (mTxt) v = parseFloat(mTxt[0]);
-                    if (!v) {
-                        const title = span.getAttribute('title') || '';
-                        const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
-                        if (mTitle) v = parseFloat(mTitle[1]);
-                    }
-                }
-                if (Number.isFinite(v) && v !== 0) {
-                    $td.attr('data-proj', String(v));
-                    if (window.LS_RANK_DEBUG) console.debug('[normalize data-proj]', this.id, v);
-                }
-            });
-
-
-            // Second pass: now that #ls_pace_box_* elements exist, projections can be read from the DOM
+            // Second pass: after the HTML is in the DOM, projections exist -> rebuild once
             if (ls_vert_og && !window.__OG_SECOND_PASS__) {
                 window.__OG_SECOND_PASS__ = true;
                 setTimeout(function () {
-                    if (window.LS_RANK_DEBUG) {
-                        console.log('[second pass] rebuilding with DOM projections available');
-                    }
                     window.__OG_SECOND_PASS__ = false;
                     build_other_games(home, away);
                 }, 0);
             }
+
             if (ls_hide_bye_teams) {
                 $("[id^=og_].ls_other_game_bye").each(function () {
                     $(this).hide();
