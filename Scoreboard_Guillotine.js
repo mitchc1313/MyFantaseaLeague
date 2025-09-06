@@ -2483,28 +2483,50 @@ if ($('#body_ajax_ls').length) {
         }
 
         function getProjection(fid) {
-            // e.g., fid = "0015" → #ls_pace_box_0015
             const box = document.getElementById('ls_pace_box_' + fid);
-            if (!box) return 0;
+            if (!box) {
+                if (window.LS_RANK_DEBUG) console.debug('[getProjection] no box', fid);
+                return 0;
+            }
 
-            // any of these can hold the number: below/at/above
+            // A) data-proj attribute (works even if hidden)
+            const dp = parseFloat(box.getAttribute('data-proj'));
+            if (Number.isFinite(dp) && dp !== 0) {
+                if (window.LS_RANK_DEBUG) console.debug('[getProjection] via data-proj', fid, dp);
+                return dp;
+            }
+
+            // B) visible text inside span (e.g., 110.8)
             const span = box.querySelector(
                 'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
             );
-            if (!span) return 0;
+            if (span) {
+                const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
+                if (mTxt) {
+                    const v = parseFloat(mTxt[0]);
+                    if (Number.isFinite(v) && v !== 0) {
+                        if (window.LS_RANK_DEBUG) console.debug('[getProjection] via span text', fid, v);
+                        return v;
+                    }
+                }
+                // C) fallback to title="Original Projection: 118.1"
+                const title = span.getAttribute('title') || '';
+                const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+                if (mTitle) {
+                    const v = parseFloat(mTitle[1]);
+                    if (Number.isFinite(v) && v !== 0) {
+                        if (window.LS_RANK_DEBUG) console.debug('[getProjection] via span title', fid, v);
+                        return v;
+                    }
+                }
+            }
 
-            // 1) prefer the visible number in the span (e.g., 110.8)
-            const txt = (span.textContent || '').trim();
-            const mTxt = txt.match(/-?\d+(?:\.\d+)?/);
-            if (mTxt) return parseFloat(mTxt[0]);
-
-            // 2) fallback to title="Original Projection: 118.1"
-            const title = span.getAttribute('title') || '';
-            const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
-            if (mTitle) return parseFloat(mTitle[1]);
-
+            if (window.LS_RANK_DEBUG) {
+                console.debug('[getProjection] 0 value', fid, { outer: box.outerHTML });
+            }
             return 0;
         }
+
 
 
 
@@ -2557,8 +2579,20 @@ if ($('#body_ajax_ls').length) {
 
                 try {
                     game_ord.sort(function (a, b) {
-                        // ... your comparator (unchanged) ...
+                        var afid = ls_games[a];
+                        var bfid = ls_games[b];
+
+                        var apts = ptsMap[afid] || 0;
+                        var bpts = ptsMap[bfid] || 0;
+                        if (apts !== bpts) return bpts - apts;     // higher live points first
+
+                        var aproj = projMap[afid] || 0;
+                        var bproj = projMap[bfid] || 0;
+                        if (aproj !== bproj) return bproj - aproj; // tie-break on projection
+
+                        return ('' + afid).localeCompare('' + bfid); // deterministic fallback
                     });
+
                 } catch (e) {
                     console.error('[rank] sort failed', e);
                 }
@@ -2674,6 +2708,30 @@ if ($('#body_ajax_ls').length) {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
+
+            // Normalize: if any pace box still lacks data-proj, derive it from DOM now
+            $('#other_games td[id^="ls_pace_box_"]').each(function () {
+                const $td = $(this);
+                const cur = parseFloat($td.attr('data-proj'));
+                if (Number.isFinite(cur) && cur !== 0) return;
+
+                const span = this.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
+                let v = 0;
+                if (span) {
+                    const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
+                    if (mTxt) v = parseFloat(mTxt[0]);
+                    if (!v) {
+                        const title = span.getAttribute('title') || '';
+                        const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+                        if (mTitle) v = parseFloat(mTitle[1]);
+                    }
+                }
+                if (Number.isFinite(v) && v !== 0) {
+                    $td.attr('data-proj', String(v));
+                    if (window.LS_RANK_DEBUG) console.debug('[normalize data-proj]', this.id, v);
+                }
+            });
+
 
             // Second pass: now that #ls_pace_box_* elements exist, projections can be read from the DOM
             if (ls_vert_og && !window.__OG_SECOND_PASS__) {
