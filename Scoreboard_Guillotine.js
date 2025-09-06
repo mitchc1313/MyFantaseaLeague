@@ -2680,19 +2680,38 @@ if ($('#body_ajax_ls').length) {
                         // derive a numeric projection from S (0 if missing)
                         var P_num = extractProjectionFromMarkup(S_markup) || 0;
 
-                        // put P_num into data-proj so we can read it later even if hidden
+                        // if we didn't get a number, try numeric fallbacks
+                        if (!P_num && window.ls_fran_totals && ls_fran_totals[game[j]]) {
+                            const cand =
+                                ls_fran_totals[game[j]].proj ??
+                                ls_fran_totals[game[j]].projection ??
+                                ls_fran_totals[game[j]].proj_total ??
+                                ls_fran_totals[game[j]].projected ??
+                                ls_fran_totals[game[j]].pace ??
+                                ls_fran_totals[game[j]].orig_proj;
+                            if (Number.isFinite(cand)) P_num = cand;
+                        }
+
+                        // build inner HTML:
+                        //  - if S_markup exists, use it
+                        //  - else synthesize a span so the DOM always contains a number
+                        var innerProjHTML = '';
+                        if (S_markup) {
+                            innerProjHTML = S_markup;
+                        } else if (P_num) {
+                            innerProjHTML =
+                                '<span class="ls_at_projected" title="Original Projection: ' + P_num + '">' + P_num + '</span>';
+                        }
+
+                        // always render a span (hidden or visible) so ranking can read it.
+                        // respect the checkbox by hiding visually via style, not by omitting content
+                        var tdStyle = _style; // your existing style='display:none' when checkbox is on
                         html = html
                             + '<td id="ls_pace_box_' + game[j] + '"'
                             + ' class="ls_projections ls_pace_box ls_pace_box_' + game[j] + '"'
-                            + ' data-proj="' + P_num + '"' + _style + '>';
-
-                        // optional: only render S markup visibly if ls_includeProjections
-                        if (ls_includeProjections && S_markup) {
-                            html = html + S_markup;
-                        }
-
-                        html = html + '</td>';
-
+                            + ' data-proj="' + (Number.isFinite(P_num) ? P_num : 0) + '"' + tdStyle + '>'
+                            + innerProjHTML
+                            + '</td>';
 
                         html = html + '<td align="right" style="border:none;"><div class="ogffpts_' + game[j] + '">';
                         html = html + format_points(ls_fran_totals[game[j]].total);
