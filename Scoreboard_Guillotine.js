@@ -2562,8 +2562,18 @@ if ($('#body_ajax_ls').length) {
             if (ls_vert_og) {
                 var projMap = {};
                 for (var k = 0; k < game_ord.length; k++) {
-                    var fid_k = ls_games[game_ord[k]]; // e.g., "0005"
-                    projMap[fid_k] = getProjectionFromS(fid_k) || 0; // ← no DOM dependency
+                    var fid_k = ls_games[game_ord[k]]; // e.g. "0005"
+                    // prefill from S (no DOM dependency)
+                    projMap[fid_k] = getProjectionFromS(fid_k) || 0;
+                }
+
+                // optional debug table
+                if (window.LS_RANK_DEBUG) {
+                    console.table(game_ord.map(function (idx) {
+                        var fid = ls_games[idx];
+                        var pts = (ls_fran_totals[fid] && ls_fran_totals[fid].total) || 0;
+                        return { fid, points: +pts, proj_from_S: +projMap[fid] };
+                    }));
                 }
 
                 game_ord.sort(function (a, b) {
@@ -2573,15 +2583,33 @@ if ($('#body_ajax_ls').length) {
                     var apts = parseFloat((ls_fran_totals[afid] && ls_fran_totals[afid].total) || 0) || 0;
                     var bpts = parseFloat((ls_fran_totals[bfid] && ls_fran_totals[bfid].total) || 0) || 0;
 
-                    if (apts !== bpts) return bpts - apts;  // higher live points first
+                    if (apts !== bpts) return bpts - apts; // higher live points first
 
+                    // tie on points → use projections
                     var aproj = projMap[afid] || 0;
                     var bproj = projMap[bfid] || 0;
-                    if (aproj !== bproj) return bproj - aproj; // tie → higher projection first
 
-                    return ('' + afid).localeCompare('' + bfid); // deterministic fallback
+                    // If either projection is missing/zero, try DOM (now that HTML is rendered)
+                    if (!aproj) {
+                        var dA = getProjectionFromDOM(afid);
+                        if (isFinite(dA) && dA !== 0) { aproj = dA; projMap[afid] = dA; }
+                    }
+                    if (!bproj) {
+                        var dB = getProjectionFromDOM(bfid);
+                        if (isFinite(dB) && dB !== 0) { bproj = dB; projMap[bfid] = dB; }
+                    }
+
+                    if (window.LS_RANK_DEBUG) {
+                        console.debug('[tie]', { afid, bfid, apts, aproj, bproj });
+                    }
+
+                    if (aproj !== bproj) return bproj - aproj; // higher projection first
+
+                    // deterministic fallback
+                    return ('' + afid).localeCompare('' + bfid);
                 });
             }
+
 
             html = "<tr><td>\n";
             if ($("#hide_projections_cb").is(':checked')) var _style = ' style="display:none"';
