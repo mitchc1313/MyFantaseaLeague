@@ -2461,24 +2461,39 @@ if ($('#body_ajax_ls').length) {
 
 
 
-        // Parse out a projection number from raw markup text
+        // Parse projection out of the S markup string
         function extractProjectionFromMarkup(markup) {
             if (typeof markup !== 'string') return 0;
 
-            // 1) Visible number inside tags ...>114.6</span>
+            // 1) prefer the visible number ...>114.6</span>
             let m = markup.match(/>(-?\d+(?:\.\d+)?)[^<]*</);
             if (m) return parseFloat(m[1]);
 
-            // 2) title="Original Projection: 114.6"
+            // 2) fallback: title="Original Projection: 114.6"
             m = markup.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
             if (m) return parseFloat(m[1]);
 
-            // 3) Defensive: any number, last one wins
+            // 3) last numeric found (defensive)
             const nums = markup.match(/-?\d+(?:\.\d+)?/g);
             if (nums && nums.length) return parseFloat(nums[nums.length - 1]);
 
             return 0;
         }
+
+        // Read projection for a fid **without touching the DOM**
+        function getProjectionFromS(fid) {
+            const key = 'fid_' + fid;
+            const S = (window.ls_pace_tracker && ls_pace_tracker[key] && ls_pace_tracker[key].S) ? ls_pace_tracker[key].S : '';
+            let p = extractProjectionFromMarkup(S);
+
+            // numeric fallbacks some themes expose
+            if ((!isFinite(p) || p === 0) && window.ls_fran_totals && ls_fran_totals[fid]) {
+                const cand = ls_fran_totals[fid].proj ?? ls_fran_totals[fid].projection ?? ls_fran_totals[fid].prj;
+                if (typeof cand === 'number' && isFinite(cand)) p = cand;
+            }
+            return isFinite(p) ? p : 0;
+        }
+
 
         // Read projection directly from the rendered DOM (preferred)
         function getProjectionFromDOM(fid) {
@@ -2548,7 +2563,7 @@ if ($('#body_ajax_ls').length) {
                 var projMap = {};
                 for (var k = 0; k < game_ord.length; k++) {
                     var fid_k = ls_games[game_ord[k]]; // e.g., "0005"
-                    projMap[fid_k] = getProjection(fid_k) || 0;
+                    projMap[fid_k] = getProjectionFromS(fid_k) || 0; // ← no DOM dependency
                 }
 
                 game_ord.sort(function (a, b) {
@@ -2558,13 +2573,13 @@ if ($('#body_ajax_ls').length) {
                     var apts = parseFloat((ls_fran_totals[afid] && ls_fran_totals[afid].total) || 0) || 0;
                     var bpts = parseFloat((ls_fran_totals[bfid] && ls_fran_totals[bfid].total) || 0) || 0;
 
-                    if (apts !== bpts) return bpts - apts;          // higher live points first
+                    if (apts !== bpts) return bpts - apts;  // higher live points first
 
                     var aproj = projMap[afid] || 0;
                     var bproj = projMap[bfid] || 0;
-                    if (aproj !== bproj) return bproj - aproj;      // tie: higher projection first
+                    if (aproj !== bproj) return bproj - aproj; // tie → higher projection first
 
-                    return ('' + afid).localeCompare('' + bfid);    // deterministic fallback
+                    return ('' + afid).localeCompare('' + bfid); // deterministic fallback
                 });
             }
 
@@ -2634,16 +2649,22 @@ if ($('#body_ajax_ls').length) {
 
                         html = html + '<td class="ls_og_cell">' + ls_get_icon_abbrev(fidkey) + '</td>';
 
-                        // ALWAYS pull S markup if present
-                        var S_markup = (window.ls_pace_tracker && ls_pace_tracker[fidkey] && ls_pace_tracker[fidkey].S) ? ls_pace_tracker[fidkey].S : '';
+                        // ALWAYS pull S markup if present (for parsing), but only render it if allowed
+                        var S_markup =
+                            (window.ls_pace_tracker && ls_pace_tracker[fidkey] && ls_pace_tracker[fidkey].S)
+                                ? ls_pace_tracker[fidkey].S
+                                : '';
 
                         html = html
                             + '<td id="ls_pace_box_' + game[j] + '"'
                             + ' class="ls_pace_box_' + game[j] + ' ls_projections ls_pace_box"'
                             + _style + '>';
-                        // Always inject S if we have it (visibility still controlled by _style)
-                        if (S_markup) html = html + S_markup;
+
+                        if (ls_includeProjections && S_markup) {
+                            html = html + S_markup;  // render only when enabled
+                        }
                         html = html + '</td>';
+
 
                         html = html + '<td align="right" style="border:none;"><div class="ogffpts_' + game[j] + '">';
                         html = html + format_points(ls_fran_totals[game[j]].total);
