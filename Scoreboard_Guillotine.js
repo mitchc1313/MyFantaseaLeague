@@ -2634,10 +2634,15 @@ if ($('#body_ajax_ls').length) {
 
                         html = html + '<td class="ls_og_cell">' + ls_get_icon_abbrev(fidkey) + '</td>';
 
-                        html = html + '<td id="ls_pace_box_' + game[j] + '" class="ls_pace_box_' + game[j] + ' ls_projections ls_pace_box"' + _style + '>';
-                        if (ls_includeProjections) {
-                            if (ls_pace_tracker.hasOwnProperty(fidkey)) html = html + ls_pace_tracker[fidkey].S;
-                        }
+                        // ALWAYS pull S markup if present
+                        var S_markup = (window.ls_pace_tracker && ls_pace_tracker[fidkey] && ls_pace_tracker[fidkey].S) ? ls_pace_tracker[fidkey].S : '';
+
+                        html = html
+                            + '<td id="ls_pace_box_' + game[j] + '"'
+                            + ' class="ls_pace_box_' + game[j] + ' ls_projections ls_pace_box"'
+                            + _style + '>';
+                        // Always inject S if we have it (visibility still controlled by _style)
+                        if (S_markup) html = html + S_markup;
                         html = html + '</td>';
 
                         html = html + '<td align="right" style="border:none;"><div class="ogffpts_' + game[j] + '">';
@@ -2645,6 +2650,7 @@ if ($('#body_ajax_ls').length) {
                         html = html + '</div></td><td style="border:none;"><div class="oggstat_' + game[j] + '">';
                         html = html + ls_fran_totals[game[j]].fin;
                         html = html + '</div></td></tr>\n';
+
                     }
                 }
                 html = html + "</table></div>\n";
@@ -2662,6 +2668,7 @@ if ($('#body_ajax_ls').length) {
                     build_other_games(home, away);
                 }, 0);
             }
+
 
             if (ls_hide_bye_teams) {
                 $("[id^=og_].ls_other_game_bye").each(function () {
