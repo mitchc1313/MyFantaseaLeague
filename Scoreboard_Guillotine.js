@@ -2461,7 +2461,26 @@ if ($('#body_ajax_ls').length) {
 
 
 
-        // Read projection from the rendered DOM (preferred)
+        // Parse out a projection number from raw markup text
+        function extractProjectionFromMarkup(markup) {
+            if (typeof markup !== 'string') return 0;
+
+            // 1) Visible number inside tags ...>114.6</span>
+            let m = markup.match(/>(-?\d+(?:\.\d+)?)[^<]*</);
+            if (m) return parseFloat(m[1]);
+
+            // 2) title="Original Projection: 114.6"
+            m = markup.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+            if (m) return parseFloat(m[1]);
+
+            // 3) Defensive: any number, last one wins
+            const nums = markup.match(/-?\d+(?:\.\d+)?/g);
+            if (nums && nums.length) return parseFloat(nums[nums.length - 1]);
+
+            return 0;
+        }
+
+        // Read projection directly from the rendered DOM (preferred)
         function getProjectionFromDOM(fid) {
             const box = document.getElementById('ls_pace_box_' + fid);
             if (!box) return NaN;
@@ -2469,7 +2488,7 @@ if ($('#body_ajax_ls').length) {
             // Any of these classes can hold the number
             const span = box.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
             if (span) {
-                // Prefer the visible number, e.g. ...>110.8</span>
+                // Prefer the visible number, e.g., ...>110.8</span>
                 const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
                 if (mTxt) return parseFloat(mTxt[0]);
 
@@ -2492,18 +2511,17 @@ if ($('#body_ajax_ls').length) {
             // A) Try the LIVE DOM first (works after the first render)
             let p = getProjectionFromDOM(fid);
 
-            // B) If DOM isn't there yet on first pass, use cached snippet S
+            // B) If DOM isn’t ready yet on first pass, use cached snippet S
             if (!isFinite(p)) {
-                const S = (window.ls_pace_tracker && ls_pace_tracker[key] && ls_pace_tracker[key].S) ? ls_pace_tracker[key].S : '';
+                const S = (window.ls_pace_tracker && ls_pace_tracker[key] && ls_pace_tracker[key].S)
+                    ? ls_pace_tracker[key].S
+                    : '';
                 p = extractProjectionFromMarkup(S);
             }
 
-            // C) Numeric fallbacks some themes expose
+            // C) Numeric fallbacks that some MFL custom code exposes
             if ((!isFinite(p) || p === 0) && window.ls_fran_totals && ls_fran_totals[fid]) {
-                const cand =
-                    ls_fran_totals[fid].proj ??
-                    ls_fran_totals[fid].projection ??
-                    ls_fran_totals[fid].prj;
+                const cand = ls_fran_totals[fid].proj ?? ls_fran_totals[fid].projection ?? ls_fran_totals[fid].prj;
                 if (typeof cand === 'number' && isFinite(cand)) p = cand;
             }
 
