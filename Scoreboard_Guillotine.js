@@ -2462,7 +2462,7 @@ if ($('#body_ajax_ls').length) {
 
 
         // toggle in the console: window.LS_RANK_DEBUG = true;
-        window.LS_RANK_DEBUG = window.LS_RANK_DEBUG ?? false;
+        window.LS_RANK_DEBUG = true;
 
         function extractProjectionFromMarkup(markup) {
             if (typeof markup !== 'string') return 0;
@@ -2524,8 +2524,9 @@ if ($('#body_ajax_ls').length) {
             }
 
             if (window.LS_RANK_DEBUG) {
-                console.debug('[getProjection]', fid, { p, source, hasS: !!S });
+                console.log('[getProjection]', fid, { p, source, hasS: !!S });
             }
+
 
             return Number.isFinite(p) ? p : 0;
         }
@@ -2547,6 +2548,7 @@ if ($('#body_ajax_ls').length) {
         //           REWRITE MFL FUNCTION - build_other_games             //
         ////////////////////////////////////////////////////////////////////
         function build_other_games(home, away) {
+            console.log('[build_other_games] called', { home, away, ls_vert_og });
             //NOTE: FOR ALL PLAY LEAGUES home & away ARE UNDEFINED
             var html;
             var game_ord = [];
@@ -2557,47 +2559,44 @@ if ($('#body_ajax_ls').length) {
                     if (ls_games[i].split(",")[1] === home && ls_games[i].split(",")[0] === away) current_matchup = i;
             }
             if (ls_vert_og) {
-                // Build maps once
+                console.log('[rank] vertical mode enabled, building maps...');
+
                 var projMap = {};
                 var ptsMap = {};
 
                 for (var k = 0; k < game_ord.length; k++) {
-                    var fid_k = ls_games[game_ord[k]];   // e.g., "0005"
+                    var fid_k = ls_games[game_ord[k]];
                     ptsMap[fid_k] = num(safeGet(ls_fran_totals, `${fid_k}.total`, 0));
                     projMap[fid_k] = getProjection(fid_k) || 0;
                 }
 
                 if (window.LS_RANK_DEBUG) {
-                    // Nice overview before sort
-                    var snapshot = game_ord.map(function (idx) {
+                    console.log('[rank] snapshot before sort:');
+                    console.table(game_ord.map(function (idx) {
                         var fid = ls_games[idx];
                         return { fid, points: ptsMap[fid], proj: projMap[fid] };
-                    });
-                    console.table(snapshot);
+                    }));
                 }
 
-                game_ord.sort(function (a, b) {
-                    var afid = ls_games[a];
-                    var bfid = ls_games[b];
+                try {
+                    game_ord.sort(function (a, b) {
+                        // ... your comparator (unchanged) ...
+                    });
+                } catch (e) {
+                    console.error('[rank] sort failed', e);
+                }
 
-                    var apts = ptsMap[afid];
-                    var bpts = ptsMap[bfid];
+                // ⬇️ move this INSIDE the block so ptsMap/projMap are in scope
+                if (window.LS_RANK_DEBUG) {
+                    console.log('[rank] order after sort:');
+                    console.table(game_ord.map(function (idx) {
+                        var fid = ls_games[idx];
+                        return { fid, points: ptsMap[fid], proj: projMap[fid] };
+                    }));
+                }
+            } // end if (ls_vert_og)
 
-                    if (apts !== bpts) return bpts - apts; // higher live points first
 
-                    var aproj = projMap[afid] || 0;
-                    var bproj = projMap[bfid] || 0;
-
-                    if (window.LS_RANK_DEBUG) {
-                        // Only log when comparing a tie on points
-                        console.debug('[tie on points]', { afid, apts, aproj, bfid, bpts, bproj });
-                    }
-
-                    if (aproj !== bproj) return bproj - aproj; // higher projection first
-
-                    return ('' + afid).localeCompare('' + bfid); // deterministic fallback
-                });
-            }
 
             html = "<tr><td>\n";
             if ($("#hide_projections_cb").is(':checked')) var _style = ' style="display:none"';
@@ -2685,6 +2684,18 @@ if ($('#body_ajax_ls').length) {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
+
+            // Second pass: now that #ls_pace_box_* elements exist, projections can be read from the DOM
+            if (ls_vert_og && !window.__OG_SECOND_PASS__) {
+                window.__OG_SECOND_PASS__ = true;
+                setTimeout(function () {
+                    if (window.LS_RANK_DEBUG) {
+                        console.log('[second pass] rebuilding with DOM projections available');
+                    }
+                    window.__OG_SECOND_PASS__ = false;
+                    build_other_games(home, away);
+                }, 0);
+            }
             if (ls_hide_bye_teams) {
                 $("[id^=og_].ls_other_game_bye").each(function () {
                     $(this).hide();
