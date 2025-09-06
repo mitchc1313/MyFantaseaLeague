@@ -2483,45 +2483,29 @@ if ($('#body_ajax_ls').length) {
         }
 
         function getProjection(fid) {
-            const key = 'fid_' + fid;
-            let p = 0, source = 'none';
+            // e.g., fid = "0015" → #ls_pace_box_0015
+            const box = document.getElementById('ls_pace_box_' + fid);
+            if (!box) return 0;
 
-            // A) data-proj on the DOM cell (works even if hidden)
-            if (typeof $ === 'function') {
-                const $box = $('#ls_pace_box_' + fid);
-                if ($box && $box.length) {
-                    const dp = parseFloat($box.attr('data-proj'));
-                    if (Number.isFinite(dp) && dp !== 0) {
-                        p = dp; source = 'dom_data_proj';
-                    }
-                }
-            }
+            // any of these can hold the number: below/at/above
+            const span = box.querySelector(
+                'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
+            );
+            if (!span) return 0;
 
-            // B) pace_tracker markup (in case DOM not built yet)
-            if (!p) {
-                const S = safeGet(window, `ls_pace_tracker.${key}.S`, '');
-                if (S) {
-                    const v = extractProjectionFromMarkup(S);
-                    if (Number.isFinite(v) && v !== 0) { p = v; source = 'pace_tracker.S'; }
-                }
-            }
+            // 1) prefer the visible number in the span (e.g., 110.8)
+            const txt = (span.textContent || '').trim();
+            const mTxt = txt.match(/-?\d+(?:\.\d+)?/);
+            if (mTxt) return parseFloat(mTxt[0]);
 
-            // C) last-resort numeric fields
-            if (!p && window.ls_fran_totals && ls_fran_totals[fid]) {
-                const cand =
-                    ls_fran_totals[fid].proj ??
-                    ls_fran_totals[fid].projection ??
-                    ls_fran_totals[fid].proj_total ??
-                    ls_fran_totals[fid].projected ??
-                    ls_fran_totals[fid].pace ??
-                    ls_fran_totals[fid].orig_proj;
-                if (Number.isFinite(cand)) { p = cand; source = 'fran_totals_numeric'; }
-            }
+            // 2) fallback to title="Original Projection: 118.1"
+            const title = span.getAttribute('title') || '';
+            const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+            if (mTitle) return parseFloat(mTitle[1]);
 
-            if (window.LS_RANK_DEBUG) console.log('[getProjection]', fid, { p, source });
-
-            return Number.isFinite(p) ? p : 0;
+            return 0;
         }
+
 
 
 
