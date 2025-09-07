@@ -2716,21 +2716,23 @@ if (typeof window !== 'undefined') {
             load_elem("other_games", html);
 // After HTML is in the DOM, reorder using DOM numbers (no second render)
 if (ls_vert_og) {
-    (function domReorderByPointsThenProjection() {
+    (function domReorderByPointsThenProjection(pass = 1) {
       const containerTd = document.querySelector('#other_games td');
   
-      // Always log entry so we know this code path runs
-      console.log('[dom-sort] entered; ls_vert_og =', ls_vert_og, 'containerTd?', !!containerTd);
+      console.log('[dom-sort] entered; pass =', pass, 'containerTd?', !!containerTd);
       if (!containerTd) return;
   
       function readProjFromCell(cell) {
         if (!cell) return 0;
+        // These spans hold the live projection
         const span = cell.querySelector(
           'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
         );
         if (span) {
-          const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
+          const txt = (span.textContent || '');
+          const mTxt = txt.match(/-?\d+(?:\.\d+)?/);
           if (mTxt) return parseFloat(mTxt[0]);
+  
           const title = span.getAttribute('title') || '';
           const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
           if (mTitle) return parseFloat(mTitle[1]);
@@ -2743,60 +2745,68 @@ if (ls_vert_og) {
       console.log('[dom-sort] found cards =', cards.length);
   
       const keyed = cards.map(card => {
+        // Try the explicit class, then the id prefix
         const paceCell = card.querySelector('td.ls_pace_box') ||
                          card.querySelector('td[id^="ls_pace_box_"]');
         const fid = paceCell ? (paceCell.id || '').replace('ls_pace_box_', '') : '';
+  
         const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
-        const pts = ptsDiv ? parseFloat((ptsDiv.textContent || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
+        const points = ptsDiv ? parseFloat((ptsDiv.textContent || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
+  
         const proj = readProjFromCell(paceCell);
-        return { card, fid, points: pts, proj, paceCell };
+        return { card, fid, points, proj, paceCell };
       });
   
-      // Snapshot BEFORE sort: show what we’re actually using
-      console.log('[dom-sort] snapshot before sort:');
-      console.table(keyed.map(k => ({ fid: k.fid, points: k.points, proj: k.proj })));
+      // If projections aren't populated yet, retry shortly (projections often arrive async)
+      const haveAnyProj = keyed.some(k => k.proj > 0);
+      if (!haveAnyProj && pass < 10) {
+        console.log('[dom-sort] no projections yet; retrying shortly (pass', pass + 1, ')');
+        setTimeout(() => domReorderByPointsThenProjection(pass + 1), 150);
+        return;
+      }
   
-      // Extra diagnostics: any entries with proj === 0 when a span exists?
+      // Extra diagnostics for proj=0: show whether a span exists and the cell HTML
       keyed.forEach(k => {
         if (k.proj === 0 && k.paceCell) {
-          const span = k.paceCell.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
-          if (span) {
-            console.warn('[dom-sort] proj=0 despite span present', {
-              fid: k.fid,
-              spanText: span.textContent,
-              spanTitle: span.getAttribute('title'),
-              paceHTML: k.paceCell.outerHTML
+          const span = k.paceCell.querySelector(
+            'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
+          );
+          if (!span) {
+            console.warn('[dom-sort] proj=0 and no span found for fid', k.fid, { paceHTML: k.paceCell.outerHTML });
+          } else {
+            console.warn('[dom-sort] proj=0 despite span present for fid', k.fid, {
+              spanText: span.textContent, spanTitle: span.getAttribute('title'), paceHTML: k.paceCell.outerHTML
             });
           }
         }
       });
   
-      // Sort: points desc, then projection desc, then fid
+      console.log('[dom-sort] snapshot before sort:');
+      console.table(keyed.map(k => ({ fid: k.fid, points: k.points, proj: k.proj })));
+  
+      // Sort: points desc, then projection desc, then fid for determinism
       keyed.sort((A, B) => {
         if (A.points !== B.points) return B.points - A.points;
   
-        // Tie diagnostics
-        console.debug('[dom-sort tie] compare',
-          { fidA: A.fid, pts: A.points, projA: A.proj },
-          { fidB: B.fid, pts: B.points, projB: B.proj }
-        );
+        // per-tie diagnostics
+        console.debug('[dom-sort tie] compare', { fidA: A.fid, pts: A.points, projA: A.proj }, { fidB: B.fid, pts: B.points, projB: B.proj });
   
         if (A.proj !== B.proj) return B.proj - A.proj;
         return ('' + A.fid).localeCompare('' + B.fid);
       });
   
-      // Re-append in the new order and renumber the rank cells
+      // Re-append in the new order and renumber ranks
       keyed.forEach((k, i) => {
         const rankCell = k.card.querySelector('.ls_rank');
         if (rankCell) rankCell.textContent = (i + 1);
         containerTd.appendChild(k.card);
       });
   
-      // Snapshot AFTER sort
       console.log('[dom-sort] order after sort:');
       console.table(keyed.map((k, i) => ({ rank: i + 1, fid: k.fid, points: k.points, proj: k.proj })));
     })();
   }
+  
   
   
   
