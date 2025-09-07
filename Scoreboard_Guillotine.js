@@ -2719,9 +2719,8 @@ if (ls_vert_og) {
     (function domReorderByPointsThenProjection() {
       const containerTd = document.querySelector('#other_games td');
   
-      // Always log entry once so we know this code path runs
+      // Always log entry so we know this code path runs
       console.log('[dom-sort] entered; ls_vert_og =', ls_vert_og, 'containerTd?', !!containerTd);
-  
       if (!containerTd) return;
   
       function readProjFromCell(cell) {
@@ -2750,33 +2749,52 @@ if (ls_vert_og) {
         const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
         const pts = ptsDiv ? parseFloat((ptsDiv.textContent || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
         const proj = readProjFromCell(paceCell);
-        return { card, fid, points: pts, proj };
+        return { card, fid, points: pts, proj, paceCell };
       });
   
-      if (window.LS_RANK_DEBUG) {
-        console.log('[dom-sort] snapshot before sort:');
-        console.table(keyed.map(k => ({ fid: k.fid, points: k.points, proj: k.proj })));
-      }
+      // Snapshot BEFORE sort: show what we’re actually using
+      console.log('[dom-sort] snapshot before sort:');
+      console.table(keyed.map(k => ({ fid: k.fid, points: k.points, proj: k.proj })));
   
+      // Extra diagnostics: any entries with proj === 0 when a span exists?
+      keyed.forEach(k => {
+        if (k.proj === 0 && k.paceCell) {
+          const span = k.paceCell.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
+          if (span) {
+            console.warn('[dom-sort] proj=0 despite span present', {
+              fid: k.fid,
+              spanText: span.textContent,
+              spanTitle: span.getAttribute('title'),
+              paceHTML: k.paceCell.outerHTML
+            });
+          }
+        }
+      });
+  
+      // Sort: points desc, then projection desc, then fid
       keyed.sort((A, B) => {
         if (A.points !== B.points) return B.points - A.points;
-        if (window.LS_RANK_DEBUG) {
-          console.debug('[dom-sort tie] comparing', { fidA: A.fid, projA: A.proj, fidB: B.fid, projB: B.proj });
-        }
+  
+        // Tie diagnostics
+        console.debug('[dom-sort tie] compare',
+          { fidA: A.fid, pts: A.points, projA: A.proj },
+          { fidB: B.fid, pts: B.points, projB: B.proj }
+        );
+  
         if (A.proj !== B.proj) return B.proj - A.proj;
         return ('' + A.fid).localeCompare('' + B.fid);
       });
   
+      // Re-append in the new order and renumber the rank cells
       keyed.forEach((k, i) => {
         const rankCell = k.card.querySelector('.ls_rank');
         if (rankCell) rankCell.textContent = (i + 1);
         containerTd.appendChild(k.card);
       });
   
-      if (window.LS_RANK_DEBUG) {
-        console.log('[dom-sort] order after sort:');
-        console.table(keyed.map((k, i) => ({ rank: i + 1, fid: k.fid, points: k.points, proj: k.proj })));
-      }
+      // Snapshot AFTER sort
+      console.log('[dom-sort] order after sort:');
+      console.table(keyed.map((k, i) => ({ rank: i + 1, fid: k.fid, points: k.points, proj: k.proj })));
     })();
   }
   
