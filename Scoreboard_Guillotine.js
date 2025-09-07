@@ -2714,7 +2714,7 @@ if (typeof window !== 'undefined') {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
-// After HTML is in the DOM, reorder using DOM numbers (no second render)
+/// After HTML is in the DOM, reorder using DOM numbers (no second render)
 if (ls_vert_og) {
     (function domReorderByPointsThenProjection(pass = 1) {
       const containerTd = document.querySelector('#other_games td');
@@ -2747,7 +2747,7 @@ if (ls_vert_og) {
         return { card, fid, points, proj };
       });
   
-      // If projections aren't populated yet, retry shortly
+      // If projections aren't populated yet, retry shortly (avoid flicker/race)
       const haveAnyProj = keyed.some(k => k.proj > 0);
       if (!haveAnyProj && pass < 10) {
         setTimeout(() => domReorderByPointsThenProjection(pass + 1), 150);
@@ -2779,7 +2779,7 @@ if (ls_vert_og) {
         containerTd.appendChild(k.card);
       });
   
-      // After reordering, mirror projections into team name cells
+      // After reordering, mirror projections into team name cells (and wrap logo+name)
       decorateProjectedScoreIntoTeamCell();
     })();
   }
@@ -2815,6 +2815,23 @@ if (ls_vert_og) {
       const teamCell = card.querySelector('td.ls_og_cell');
       if (!teamCell) return;
   
+      // Wrap logo + name in a single row so flex-column doesn't stack them
+      if (!teamCell.querySelector('.ls_team_row')) {
+        const logo = teamCell.querySelector('img.ls_og_icon');
+        const name = teamCell.querySelector('span.ls_og_icon_full_name, span.ls_og_full_name');
+  
+        if (logo || name) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'ls_team_row';
+  
+          if (logo) wrapper.appendChild(logo);
+          if (name) wrapper.appendChild(name);
+  
+          teamCell.insertBefore(wrapper, teamCell.firstChild);
+        }
+      }
+  
+      // Create/update the projection line below the team row
       let line = teamCell.querySelector('.ls_proj_line');
       if (!line) {
         line = document.createElement('div');
