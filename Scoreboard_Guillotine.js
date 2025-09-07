@@ -2735,19 +2735,12 @@ if (ls_vert_og) {
       // Collect each card with its live points and projection
       const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
       const keyed = cards.map(card => {
-        const paceCell = card.querySelector('td.ls_pace_box');
-        // If the theme doesn’t put 'ls_pace_box' on the cell, fallback to id^=ls_pace_box_
-        const pace = paceCell || card.querySelector('td[id^="ls_pace_box_"]');
-        // fid from id="ls_pace_box_00XX"
-        const fid = pace ? (pace.id || '').replace('ls_pace_box_', '') : '';
-  
-        // live points: div.ogffpts_00XX contains the number as text
+        const paceCell = card.querySelector('td.ls_pace_box') ||
+                         card.querySelector('td[id^="ls_pace_box_"]');
+        const fid = paceCell ? (paceCell.id || '').replace('ls_pace_box_', '') : '';
         const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
         const pts = ptsDiv ? parseFloat((ptsDiv.textContent || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
-  
-        // projection from the pace cell’s span/text/title
-        const proj = readProjFromCell(pace);
-  
+        const proj = readProjFromCell(paceCell);
         return { card, fid, points: pts, proj };
       });
   
@@ -2757,11 +2750,20 @@ if (ls_vert_og) {
       }
   
       // Sort: points desc, then projection desc, then fid for determinism
-      keyed.sort((A, B) =>
-        (B.points - A.points) ||
-        (B.proj - A.proj) ||
-        ('' + A.fid).localeCompare('' + B.fid)
-      );
+      keyed.sort((A, B) => {
+        if (A.points !== B.points) return B.points - A.points;
+  
+        // DEBUG: we hit a tie on live points
+        if (window.LS_RANK_DEBUG) {
+          console.debug('[dom-sort tie]', {
+            fidA: A.fid, projA: A.proj,
+            fidB: B.fid, projB: B.proj
+          });
+        }
+  
+        if (A.proj !== B.proj) return B.proj - A.proj;
+        return ('' + A.fid).localeCompare('' + B.fid);
+      });
   
       // Re-append in the new order and renumber the rank cells
       keyed.forEach((k, i) => {
@@ -2776,6 +2778,7 @@ if (ls_vert_og) {
       }
     })();
   }
+  
   
 
             if (ls_hide_bye_teams) {
