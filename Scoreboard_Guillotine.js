@@ -2761,34 +2761,71 @@ if (ls_vert_og) {
         ('' + A.fid).localeCompare('' + B.fid)
       );
   
-      // Find the lowest projection across the league
-      const minProj = Math.min(...keyed.map(k => k.proj || Infinity));
+      // Find the lowest valid projection
+      const projVals = keyed.map(k => k.proj).filter(v => Number.isFinite(v) && v > 0);
+      const minProj = projVals.length ? Math.min(...projVals) : Infinity;
+      const EPS = 1e-6;
   
       // Re-append in order, renumber, and apply classes
       keyed.forEach((k, i) => {
         const rankCell = k.card.querySelector('.ls_rank');
         if (rankCell) rankCell.textContent = (i + 1);
   
-        // Reset any old classes
         k.card.classList.remove('chopped', 'dangerous');
   
-        // Add chopped class to last place
-        if (i === keyed.length - 1) {
-          k.card.classList.add('chopped');
-        }
-  
-        // Add dangerous class to whoever has the lowest projection
-        if (k.proj === minProj) {
-          k.card.classList.add('dangerous');
-        }
+        if (i === keyed.length - 1) k.card.classList.add('chopped');
+        if (Math.abs(k.proj - minProj) < EPS) k.card.classList.add('dangerous');
   
         containerTd.appendChild(k.card);
       });
+  
+      // After reordering, mirror projections into team name cells
+      decorateProjectedScoreIntoTeamCell();
     })();
   }
   
+  // === Helper to mirror projected score into .ls_og_cell under team name ===
+  function decorateProjectedScoreIntoTeamCell() {
+    const containerTd = document.querySelector('#other_games td');
+    if (!containerTd) return;
   
+    function readProjFromCell(cell) {
+      if (!cell) return 0;
+      const span = cell.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
+      if (span) {
+        const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
+        if (mTxt) return parseFloat(mTxt[0]);
+        const title = span.getAttribute('title') || '';
+        const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+        if (mTitle) return parseFloat(mTitle[1]);
+      }
+      const any = (cell.textContent || '').match(/-?\d+(?:\.\d+)?/);
+      return any ? parseFloat(any[0]) : 0;
+    }
   
+    const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
+    cards.forEach(card => {
+      const paceCell = card.querySelector('td.ls_pace_box') ||
+                       card.querySelector('td[id^="ls_pace_box_"]');
+      if (!paceCell) return;
+  
+      const proj = readProjFromCell(paceCell);
+      if (!Number.isFinite(proj) || proj <= 0) return;
+  
+      const teamCell = card.querySelector('td.ls_og_cell');
+      if (!teamCell) return;
+  
+      let line = teamCell.querySelector('.ls_proj_line');
+      if (!line) {
+        line = document.createElement('div');
+        line.className = 'ls_proj_line';
+        teamCell.appendChild(line);
+      }
+      line.textContent = proj.toFixed(1);
+    });
+  }
+  
+
   
   
   
