@@ -2459,7 +2459,12 @@ if ($('#body_ajax_ls').length) {
 
 
 
-
+// Debug flag: read from localStorage so it can be set before script runs
+if (typeof window !== 'undefined') {
+    window.LS_RANK_DEBUG = (localStorage.getItem('LS_RANK_DEBUG') === '1');
+    console.log('[init] LS_RANK_DEBUG =', window.LS_RANK_DEBUG);
+  }
+  
 
         // Parse projection out of the S markup string
         function extractProjectionFromMarkup(markup) {
@@ -2713,9 +2718,12 @@ if ($('#body_ajax_ls').length) {
 if (ls_vert_og) {
     (function domReorderByPointsThenProjection() {
       const containerTd = document.querySelector('#other_games td');
+  
+      // Always log entry once so we know this code path runs
+      console.log('[dom-sort] entered; ls_vert_og =', ls_vert_og, 'containerTd?', !!containerTd);
+  
       if (!containerTd) return;
   
-      // Helper: read projection from a pace cell
       function readProjFromCell(cell) {
         if (!cell) return 0;
         const span = cell.querySelector(
@@ -2732,8 +2740,9 @@ if (ls_vert_og) {
         return any ? parseFloat(any[0]) : 0;
       }
   
-      // Collect each card with its live points and projection
       const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
+      console.log('[dom-sort] found cards =', cards.length);
+  
       const keyed = cards.map(card => {
         const paceCell = card.querySelector('td.ls_pace_box') ||
                          card.querySelector('td[id^="ls_pace_box_"]');
@@ -2749,23 +2758,15 @@ if (ls_vert_og) {
         console.table(keyed.map(k => ({ fid: k.fid, points: k.points, proj: k.proj })));
       }
   
-      // Sort: points desc, then projection desc, then fid for determinism
       keyed.sort((A, B) => {
         if (A.points !== B.points) return B.points - A.points;
-  
-        // DEBUG: we hit a tie on live points
         if (window.LS_RANK_DEBUG) {
-          console.debug('[dom-sort tie]', {
-            fidA: A.fid, projA: A.proj,
-            fidB: B.fid, projB: B.proj
-          });
+          console.debug('[dom-sort tie] comparing', { fidA: A.fid, projA: A.proj, fidB: B.fid, projB: B.proj });
         }
-  
         if (A.proj !== B.proj) return B.proj - A.proj;
         return ('' + A.fid).localeCompare('' + B.fid);
       });
   
-      // Re-append in the new order and renumber the rank cells
       keyed.forEach((k, i) => {
         const rankCell = k.card.querySelector('.ls_rank');
         if (rankCell) rankCell.textContent = (i + 1);
@@ -2778,6 +2779,7 @@ if (ls_vert_og) {
       }
     })();
   }
+  
   
   
 
