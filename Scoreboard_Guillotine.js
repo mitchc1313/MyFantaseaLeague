@@ -2716,57 +2716,69 @@ if (typeof window !== 'undefined') {
             load_elem("other_games", html);
 // After HTML is in the DOM, reorder using DOM numbers (no second render)
 if (ls_vert_og) {
-    (function domReorderByPointsThenProjection(pass = 1) {
-      const containerTd = document.querySelector('#other_games td');
-      if (!containerTd) return;
-  
-      function readProjFromCell(cell) {
-        if (!cell) return 0;
-        const span = cell.querySelector(
-          'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
-        );
-        if (span) {
-          const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
-          if (mTxt) return parseFloat(mTxt[0]);
-          const title = span.getAttribute('title') || '';
-          const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
-          if (mTitle) return parseFloat(mTitle[1]);
+    function domReorderByPointsThenProjection(pass = 1) {
+        const containerTd = document.querySelector('#other_games td');
+        if (!containerTd) return;
+      
+        function readProjFromCell(cell) {
+          if (!cell) return 0;
+          const span = cell.querySelector(
+            'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
+          );
+          if (span) {
+            const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
+            if (mTxt) return parseFloat(mTxt[0]);
+            const title = span.getAttribute('title') || '';
+            const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+            if (mTitle) return parseFloat(mTitle[1]);
+          }
+          const any = (cell.textContent || '').match(/-?\d+(?:\.\d+)?/);
+          return any ? parseFloat(any[0]) : 0;
         }
-        const any = (cell.textContent || '').match(/-?\d+(?:\.\d+)?/);
-        return any ? parseFloat(any[0]) : 0;
+      
+        const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
+        const keyed = cards.map(card => {
+          const paceCell = card.querySelector('td.ls_pace_box') ||
+                           card.querySelector('td[id^="ls_pace_box_"]');
+          const fid = paceCell ? (paceCell.id || '').replace('ls_pace_box_', '') : '';
+          const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
+          const points = ptsDiv ? parseFloat((ptsDiv.textContent || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
+          const proj = readProjFromCell(paceCell);
+          return { card, fid, points, proj };
+        });
+      
+        // Sort by live points, then projections, then fid
+        keyed.sort((A, B) =>
+          (B.points - A.points) ||
+          (B.proj - A.proj) ||
+          ('' + A.fid).localeCompare('' + B.fid)
+        );
+      
+        // Determine the lowest projected score in the league
+        const minProj = Math.min(...keyed.map(k => k.proj || Infinity));
+      
+        // Re-append in order, renumber, and apply classes
+        keyed.forEach((k, i) => {
+          const rankCell = k.card.querySelector('.ls_rank');
+          if (rankCell) rankCell.textContent = (i + 1);
+      
+          // Reset classes before applying
+          k.card.classList.remove('chopped', 'dangerous');
+      
+          // Add chopped class to last place
+          if (i === keyed.length - 1) {
+            k.card.classList.add('chopped');
+          }
+      
+          // Add dangerous class if this team has the lowest projection
+          if (k.proj === minProj) {
+            k.card.classList.add('dangerous');
+          }
+      
+          containerTd.appendChild(k.card);
+        });
       }
-  
-      const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
-      const keyed = cards.map(card => {
-        const paceCell = card.querySelector('td.ls_pace_box') ||
-                         card.querySelector('td[id^="ls_pace_box_"]');
-        const fid = paceCell ? (paceCell.id || '').replace('ls_pace_box_', '') : '';
-        const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
-        const points = ptsDiv ? parseFloat((ptsDiv.textContent || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
-        const proj = readProjFromCell(paceCell);
-        return { card, fid, points, proj };
-      });
-  
-      // If projections aren't populated yet, retry shortly
-      const haveAnyProj = keyed.some(k => k.proj > 0);
-      if (!haveAnyProj && pass < 10) {
-        setTimeout(() => domReorderByPointsThenProjection(pass + 1), 150);
-        return;
-      }
-  
-      keyed.sort((A, B) =>
-        (B.points - A.points) ||
-        (B.proj - A.proj) ||
-        ('' + A.fid).localeCompare('' + B.fid)
-      );
-  
-      keyed.forEach((k, i) => {
-        const rankCell = k.card.querySelector('.ls_rank');
-        if (rankCell) rankCell.textContent = (i + 1);
-        containerTd.appendChild(k.card);
-      });
-    })();
-  }
+      
   
   
   
