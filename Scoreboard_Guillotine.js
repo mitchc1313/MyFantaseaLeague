@@ -2709,7 +2709,74 @@ if ($('#body_ajax_ls').length) {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
-
+// After HTML is in the DOM, reorder using DOM numbers (no second render)
+if (ls_vert_og) {
+    (function domReorderByPointsThenProjection() {
+      const containerTd = document.querySelector('#other_games td');
+      if (!containerTd) return;
+  
+      // Helper: read projection from a pace cell
+      function readProjFromCell(cell) {
+        if (!cell) return 0;
+        const span = cell.querySelector(
+          'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
+        );
+        if (span) {
+          const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
+          if (mTxt) return parseFloat(mTxt[0]);
+          const title = span.getAttribute('title') || '';
+          const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+          if (mTitle) return parseFloat(mTitle[1]);
+        }
+        const any = (cell.textContent || '').match(/-?\d+(?:\.\d+)?/);
+        return any ? parseFloat(any[0]) : 0;
+      }
+  
+      // Collect each card with its live points and projection
+      const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
+      const keyed = cards.map(card => {
+        const paceCell = card.querySelector('td.ls_pace_box');
+        // If the theme doesn’t put 'ls_pace_box' on the cell, fallback to id^=ls_pace_box_
+        const pace = paceCell || card.querySelector('td[id^="ls_pace_box_"]');
+        // fid from id="ls_pace_box_00XX"
+        const fid = pace ? (pace.id || '').replace('ls_pace_box_', '') : '';
+  
+        // live points: div.ogffpts_00XX contains the number as text
+        const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
+        const pts = ptsDiv ? parseFloat((ptsDiv.textContent || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
+  
+        // projection from the pace cell’s span/text/title
+        const proj = readProjFromCell(pace);
+  
+        return { card, fid, points: pts, proj };
+      });
+  
+      if (window.LS_RANK_DEBUG) {
+        console.log('[dom-sort] snapshot before sort:');
+        console.table(keyed.map(k => ({ fid: k.fid, points: k.points, proj: k.proj })));
+      }
+  
+      // Sort: points desc, then projection desc, then fid for determinism
+      keyed.sort((A, B) =>
+        (B.points - A.points) ||
+        (B.proj - A.proj) ||
+        ('' + A.fid).localeCompare('' + B.fid)
+      );
+  
+      // Re-append in the new order and renumber the rank cells
+      keyed.forEach((k, i) => {
+        const rankCell = k.card.querySelector('.ls_rank');
+        if (rankCell) rankCell.textContent = (i + 1);
+        containerTd.appendChild(k.card);
+      });
+  
+      if (window.LS_RANK_DEBUG) {
+        console.log('[dom-sort] order after sort:');
+        console.table(keyed.map((k, i) => ({ rank: i + 1, fid: k.fid, points: k.points, proj: k.proj })));
+      }
+    })();
+  }
+  
 
             if (ls_hide_bye_teams) {
                 $("[id^=og_].ls_other_game_bye").each(function () {
