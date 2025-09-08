@@ -2842,6 +2842,24 @@ if ($('#body_ajax_ls').length) {
                 });
             }
 
+            // === Tag games as final if (F) marker exists ===
+            (function markFinalGames() {
+                const containerTd = document.querySelector('#other_games td');
+                if (!containerTd) return;
+
+                const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
+                cards.forEach(card => {
+                    // look for a td with class ls_allplay_final OR containing (F)
+                    const finalCell = card.querySelector('td.ls_allplay_final, td:has(div:contains("(F)"))');
+                    if (finalCell) {
+                        card.classList.add('game_final');
+                    } else {
+                        card.classList.remove('game_final');
+                    }
+                });
+            })();
+
+
 
 
 
