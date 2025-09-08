@@ -2714,6 +2714,11 @@ if ($('#body_ajax_ls').length) {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
+           
+            // ✅ make sure projection line is created immediately
+            if (ls_vert_og) {
+                setTimeout(decorateProjectedScoreIntoTeamCell, 0);
+            }
             // After HTML is in the DOM, reorder using DOM numbers (no second render)
             if (ls_vert_og) {
                 (function domReorderByPointsThenProjection(pass = 1) {
@@ -2852,7 +2857,10 @@ if ($('#body_ajax_ls').length) {
 
                         containerTd.appendChild(k.card);
                     });
+
+                    // ✅ ensure non-final cards get their mirrored line
                     decorateProjectedScoreIntoTeamCell();
+
                 })();
             }
 
