@@ -2688,11 +2688,10 @@ if ($('#body_ajax_ls').length) {
                             + ' class="ls_pace_box_' + game[j] + ' ls_projections ls_pace_box"'
                             + _style + '>';
 
-                        if (S_markup) {
-                            html = html + S_markup;  // always inject; _style/CSS can hide it
+                        if (ls_includeProjections && S_markup) {
+                            html = html + S_markup;  // render only when enabled
                         }
                         html = html + '</td>';
-
 
 
                         html = html + '<td align="right" style="border:none;"><div class="ogffpts_' + game[j] + '">';
@@ -2711,8 +2710,7 @@ if ($('#body_ajax_ls').length) {
             html = html + '</tr>\n';
             load_elem("other_games", html);
 
-
-
+            
 
             if (ls_hide_bye_teams) {
                 $("[id^=og_].ls_other_game_bye").each(function () {
