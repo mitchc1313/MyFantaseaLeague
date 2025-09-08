@@ -2459,12 +2459,7 @@ if ($('#body_ajax_ls').length) {
 
 
 
-// Debug flag: read from localStorage so it can be set before script runs
-if (typeof window !== 'undefined') {
-    window.LS_RANK_DEBUG = (localStorage.getItem('LS_RANK_DEBUG') === '1');
-    console.log('[init] LS_RANK_DEBUG =', window.LS_RANK_DEBUG);
-  }
-  
+
 
         // Parse projection out of the S markup string
         function extractProjectionFromMarkup(markup) {
@@ -2714,138 +2709,33 @@ if (typeof window !== 'undefined') {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
-/// After HTML is in the DOM, reorder using DOM numbers (no second render)
-if (ls_vert_og) {
-    (function domReorderByPointsThenProjection(pass = 1) {
-      const containerTd = document.querySelector('#other_games td');
-      if (!containerTd) return;
-  
-      function readProjFromCell(cell) {
-        if (!cell) return 0;
-        const span = cell.querySelector(
-          'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
-        );
-        if (span) {
-          const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
-          if (mTxt) return parseFloat(mTxt[0]);
-          const title = span.getAttribute('title') || '';
-          const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
-          if (mTitle) return parseFloat(mTitle[1]);
-        }
-        const any = (cell.textContent || '').match(/-?\d+(?:\.\d+)?/);
-        return any ? parseFloat(any[0]) : 0;
-      }
-  
-      const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
-      const keyed = cards.map(card => {
-        const paceCell = card.querySelector('td.ls_pace_box') ||
-                         card.querySelector('td[id^="ls_pace_box_"]');
-        const fid = paceCell ? (paceCell.id || '').replace('ls_pace_box_', '') : '';
-        const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
-        const points = ptsDiv ? parseFloat((ptsDiv.textContent || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
-        const proj = readProjFromCell(paceCell);
-        return { card, fid, points, proj };
-      });
-  
-      // If projections aren't populated yet, retry shortly (avoid flicker/race)
-      const haveAnyProj = keyed.some(k => k.proj > 0);
-      if (!haveAnyProj && pass < 10) {
-        setTimeout(() => domReorderByPointsThenProjection(pass + 1), 150);
-        return;
-      }
-  
-      // Sort by points → projection → fid
-      keyed.sort((A, B) =>
-        (B.points - A.points) ||
-        (B.proj - A.proj) ||
-        ('' + A.fid).localeCompare('' + B.fid)
-      );
-  
-      // Find the lowest valid projection
-      const projVals = keyed.map(k => k.proj).filter(v => Number.isFinite(v) && v > 0);
-      const minProj = projVals.length ? Math.min(...projVals) : Infinity;
-      const EPS = 1e-6;
-  
-      // Re-append in order, renumber, and apply classes
-      keyed.forEach((k, i) => {
-        const rankCell = k.card.querySelector('.ls_rank');
-        if (rankCell) rankCell.textContent = (i + 1);
-  
-        k.card.classList.remove('chopped', 'dangerous');
-  
-        if (i === keyed.length - 1) k.card.classList.add('chopped');
-        if (Math.abs(k.proj - minProj) < EPS) k.card.classList.add('dangerous');
-  
-        containerTd.appendChild(k.card);
-      });
-  
-      // After reordering, mirror projections into team name cells (and wrap logo+name)
-      decorateProjectedScoreIntoTeamCell();
-    })();
-  }
-  
-  // === Helper to mirror projected score into .ls_og_cell under team name ===
-  function decorateProjectedScoreIntoTeamCell() {
-    const containerTd = document.querySelector('#other_games td');
-    if (!containerTd) return;
-  
-    function readProjFromCell(cell) {
-      if (!cell) return 0;
-      const span = cell.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
-      if (span) {
-        const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
-        if (mTxt) return parseFloat(mTxt[0]);
-        const title = span.getAttribute('title') || '';
-        const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
-        if (mTitle) return parseFloat(mTitle[1]);
-      }
-      const any = (cell.textContent || '').match(/-?\d+(?:\.\d+)?/);
-      return any ? parseFloat(any[0]) : 0;
-    }
-  
-    const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
-    cards.forEach(card => {
-      const paceCell = card.querySelector('td.ls_pace_box') ||
-                       card.querySelector('td[id^="ls_pace_box_"]');
-      if (!paceCell) return;
-  
-      const proj = readProjFromCell(paceCell);
-      if (!Number.isFinite(proj) || proj <= 0) return;
-  
-      const teamCell = card.querySelector('td.ls_og_cell');
-      if (!teamCell) return;
-  
-      // Wrap logo + name in a single row so flex-column doesn't stack them
-      if (!teamCell.querySelector('.ls_team_row')) {
-        const logo = teamCell.querySelector('img.ls_og_icon');
-        const name = teamCell.querySelector('span.ls_og_icon_full_name, span.ls_og_full_name');
-  
-        if (logo || name) {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'ls_team_row';
-  
-          if (logo) wrapper.appendChild(logo);
-          if (name) wrapper.appendChild(name);
-  
-          teamCell.insertBefore(wrapper, teamCell.firstChild);
-        }
-      }
-  
-      // Create/update the projection line below the team row
-      let line = teamCell.querySelector('.ls_proj_line');
-      if (!line) {
-        line = document.createElement('div');
-        line.className = 'ls_proj_line';
-        teamCell.appendChild(line);
-      }
-      line.textContent = proj.toFixed(1);
-    });
-  }
-  
 
-  
-  
-  
+            // === Tag games as final if an (F) marker exists ===
+            (function markFinalGames() {
+                const containerTd = document.querySelector('#other_games td');
+                if (!containerTd) return;
+
+                const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
+                cards.forEach(card => {
+                    // Primary signal: MFL adds a cell like <td class="ls_allplay_final"><div>(F)</div></td>
+                    let isFinal = false;
+
+                    const finalCell = card.querySelector('td.ls_allplay_final');
+                    if (finalCell) {
+                        const txt = (finalCell.textContent || '').trim();
+                        if (/\(F\)/i.test(txt)) isFinal = true;
+                    } else {
+                        // Fallback: any td that contains "(F)" text
+                        isFinal = Array.from(card.querySelectorAll('td'))
+                            .some(td => /\(F\)/i.test((td.textContent || '').trim()));
+                    }
+
+                    // Apply/remove class on the card
+                    card.classList.toggle('game_final', isFinal);
+                });
+            })();
+
+
 
             if (ls_hide_bye_teams) {
                 $("[id^=og_].ls_other_game_bye").each(function () {
