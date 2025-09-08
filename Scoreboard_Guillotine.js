@@ -2714,7 +2714,7 @@ if ($('#body_ajax_ls').length) {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
-           
+
             // ✅ make sure projection line is created immediately
             if (ls_vert_og) {
                 setTimeout(decorateProjectedScoreIntoTeamCell, 0);
@@ -2887,35 +2887,78 @@ if ($('#body_ajax_ls').length) {
                     return any ? parseFloat(any[0]) : 0;
                 }
 
-                const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
                 cards.forEach(card => {
                     const paceCell = card.querySelector('td.ls_pace_box') ||
                         card.querySelector('td[id^="ls_pace_box_"]');
                     if (!paceCell) return;
 
-                    const proj = readProjFromCell(paceCell);
+                    // Prefer FINAL points if this card is final
+                    let proj;
+                    const isFinal = card.classList.contains('game_final') ||
+                        Array.from(card.querySelectorAll('td'))
+                            .some(td => /\(F\)/i.test((td.textContent || '').trim()));
+
+                    if (isFinal) {
+                        const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
+                        const m = (ptsDiv && (ptsDiv.textContent || '').match(/-?\d+(?:\.\d+)?/));
+                        const finalPts = m ? parseFloat(m[0]) : NaN;
+                        if (Number.isFinite(finalPts)) {
+                            proj = finalPts;
+
+                            // Make sure the pace cell span also shows final (defensive/idempotent)
+                            let span = paceCell.querySelector(
+                                'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
+                            );
+                            if (!span) {
+                                span = document.createElement('span');
+                                span.className = 'ls_projected';
+                                paceCell.innerHTML = '';
+                                paceCell.appendChild(span);
+                            }
+                            span.textContent = finalPts.toFixed(1);
+                            span.className = 'ls_projected ls_final_projection';
+                            span.setAttribute('title', 'Final');
+                        }
+                    }
+
+                    // If not final (or no finalPts), fall back to reading the projection span
+                    if (!Number.isFinite(proj)) {
+                        const span = paceCell.querySelector(
+                            'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
+                        );
+                        if (span) {
+                            const m = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
+                            if (m) proj = parseFloat(m[0]);
+                            if (!Number.isFinite(proj)) {
+                                const t = (span.getAttribute('title') || '')
+                                    .match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+                                if (t) proj = parseFloat(t[1]);
+                            }
+                        }
+                        if (!Number.isFinite(proj)) {
+                            const any = (paceCell.textContent || '').match(/-?\d+(?:\.\d+)?/);
+                            proj = any ? parseFloat(any[0]) : NaN;
+                        }
+                    }
+
                     if (!Number.isFinite(proj) || proj <= 0) return;
 
+                    // Ensure logo+name are wrapped once
                     const teamCell = card.querySelector('td.ls_og_cell');
                     if (!teamCell) return;
-
-                    // Wrap logo + name in a single row so flex-column doesn't stack them
                     if (!teamCell.querySelector('.ls_team_row')) {
                         const logo = teamCell.querySelector('img.ls_og_icon');
                         const name = teamCell.querySelector('span.ls_og_icon_full_name, span.ls_og_full_name');
-
                         if (logo || name) {
                             const wrapper = document.createElement('div');
                             wrapper.className = 'ls_team_row';
-
                             if (logo) wrapper.appendChild(logo);
                             if (name) wrapper.appendChild(name);
-
                             teamCell.insertBefore(wrapper, teamCell.firstChild);
                         }
                     }
 
-                    // Create/update the projection line below the team row
+                    // Write/update the mirrored line
                     let line = teamCell.querySelector('.ls_proj_line');
                     if (!line) {
                         line = document.createElement('div');
@@ -2923,7 +2966,9 @@ if ($('#body_ajax_ls').length) {
                         teamCell.appendChild(line);
                     }
                     line.textContent = proj.toFixed(1);
+                    if (isFinal) line.classList.add('is_final'); else line.classList.remove('is_final');
                 });
+
             }
 
             // === Tag games as final if (F) marker exists ===
