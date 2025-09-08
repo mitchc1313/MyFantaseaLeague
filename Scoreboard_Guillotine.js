@@ -2688,10 +2688,11 @@ if ($('#body_ajax_ls').length) {
                             + ' class="ls_pace_box_' + game[j] + ' ls_projections ls_pace_box"'
                             + _style + '>';
 
-                        if (ls_includeProjections && S_markup) {
-                            html = html + S_markup;  // render only when enabled
+                        if (S_markup) {
+                            html = html + S_markup;  // always inject; _style/CSS can hide it
                         }
                         html = html + '</td>';
+
 
 
                         html = html + '<td align="right" style="border:none;"><div class="ogffpts_' + game[j] + '">';
@@ -2734,7 +2735,6 @@ if ($('#body_ajax_ls').length) {
                     card.classList.toggle('game_final', isFinal);
                 });
             })();
-
 
 
             if (ls_hide_bye_teams) {
