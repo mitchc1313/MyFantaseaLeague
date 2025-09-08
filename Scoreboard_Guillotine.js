@@ -2714,36 +2714,109 @@ if ($('#body_ajax_ls').length) {
             html = html + '</td>';
             html = html + '</tr>\n';
             load_elem("other_games", html);
-            /// After HTML is in the DOM, reorder using DOM numbers (no second render)
+            // After HTML is in the DOM, reorder using DOM numbers (no second render)
             if (ls_vert_og) {
                 (function domReorderByPointsThenProjection(pass = 1) {
                     const containerTd = document.querySelector('#other_games td');
                     if (!containerTd) return;
+
+                    // ---- helpers --------------------------------------------------------
+                    function readNumberFromText(s) {
+                        const m = String(s || '').match(/-?\d+(?:\.\d+)?/);
+                        return m ? parseFloat(m[0]) : NaN;
+                    }
 
                     function readProjFromCell(cell) {
                         if (!cell) return 0;
                         const span = cell.querySelector(
                             'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
                         );
-
                         if (span) {
-                            const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
-                            if (mTxt) return parseFloat(mTxt[0]);
+                            const n = readNumberFromText(span.textContent);
+                            if (Number.isFinite(n)) return n;
                             const title = span.getAttribute('title') || '';
-                            const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
-                            if (mTitle) return parseFloat(mTitle[1]);
+                            const t = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
+                            if (t) return parseFloat(t[1]);
                         }
-                        const any = (cell.textContent || '').match(/-?\d+(?:\.\d+)?/);
-                        return any ? parseFloat(any[0]) : 0;
+                        const any = readNumberFromText(cell.textContent);
+                        return Number.isFinite(any) ? any : 0;
                     }
 
+                    // If a card is final, make its projection = final points (and update UI)
+                    function syncFinalProjection(card) {
+                        // 1) detect final
+                        let isFinal = false;
+                        const explicitFinal = card.querySelector('td.ls_allplay_final');
+                        if (explicitFinal && /\(F\)/i.test((explicitFinal.textContent || '').trim())) {
+                            isFinal = true;
+                        } else {
+                            isFinal = Array.from(card.querySelectorAll('td'))
+                                .some(td => /\(F\)/i.test((td.textContent || '').trim()));
+                        }
+                        card.classList.toggle('game_final', isFinal);
+                        if (!isFinal) return;
+
+                        // 2) read final points
+                        const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
+                        const finalPts = ptsDiv ? readNumberFromText(ptsDiv.textContent) : NaN;
+                        if (!Number.isFinite(finalPts)) return;
+
+                        // 3) update pace cell span to final
+                        const paceCell = card.querySelector('td.ls_pace_box, td[id^="ls_pace_box_"]');
+                        if (paceCell) {
+                            let span = paceCell.querySelector(
+                                'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
+                            );
+                            if (!span) {
+                                span = document.createElement('span');
+                                span.className = 'ls_projected';
+                                paceCell.innerHTML = '';
+                                paceCell.appendChild(span);
+                            }
+                            span.textContent = finalPts.toFixed(1);
+                            span.className = 'ls_projected ls_final_projection';
+                            span.setAttribute('title', 'Final');
+                        }
+
+                        // 4) update mirrored line under team name (if present)
+                        const teamCell = card.querySelector('td.ls_og_cell');
+                        if (teamCell) {
+                            // ensure logo + name wrapper exists
+                            if (!teamCell.querySelector('.ls_team_row')) {
+                                const logo = teamCell.querySelector('img.ls_og_icon');
+                                const name = teamCell.querySelector('span.ls_og_icon_full_name, span.ls_og_full_name');
+                                if (logo || name) {
+                                    const wrapper = document.createElement('div');
+                                    wrapper.className = 'ls_team_row';
+                                    if (logo) wrapper.appendChild(logo);
+                                    if (name) wrapper.appendChild(name);
+                                    teamCell.insertBefore(wrapper, teamCell.firstChild);
+                                }
+                            }
+                            let line = teamCell.querySelector('.ls_proj_line');
+                            if (!line) {
+                                line = document.createElement('div');
+                                line.className = 'ls_proj_line';
+                                teamCell.appendChild(line);
+                            }
+                            line.textContent = finalPts.toFixed(1);
+                            line.classList.add('is_final');
+                        }
+                    }
+                    // ---------------------------------------------------------------------
+
                     const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
+
+                    // FIRST: for any finals, set their projection = final points (also updates UI)
+                    cards.forEach(syncFinalProjection);
+
+                    // Build keyed list for sorting (now projections reflect finals)
                     const keyed = cards.map(card => {
                         const paceCell = card.querySelector('td.ls_pace_box') ||
                             card.querySelector('td[id^="ls_pace_box_"]');
                         const fid = paceCell ? (paceCell.id || '').replace('ls_pace_box_', '') : '';
                         const ptsDiv = card.querySelector('div[class^="ogffpts_"]');
-                        const points = ptsDiv ? parseFloat((ptsDiv.textContent || '0').replace(/[^\d.-]/g, '')) || 0 : 0;
+                        const points = ptsDiv ? (readNumberFromText(ptsDiv.textContent) || 0) : 0;
                         const proj = readProjFromCell(paceCell);
                         return { card, fid, points, proj };
                     });
@@ -2762,7 +2835,7 @@ if ($('#body_ajax_ls').length) {
                         ('' + A.fid).localeCompare('' + B.fid)
                     );
 
-                    // Find the lowest valid projection
+                    // Find the lowest valid projection (post-sync)
                     const projVals = keyed.map(k => k.proj).filter(v => Number.isFinite(v) && v > 0);
                     const minProj = projVals.length ? Math.min(...projVals) : Infinity;
                     const EPS = 1e-6;
@@ -2779,11 +2852,10 @@ if ($('#body_ajax_ls').length) {
 
                         containerTd.appendChild(k.card);
                     });
-
-                    // After reordering, mirror projections into team name cells (and wrap logo+name)
                     decorateProjectedScoreIntoTeamCell();
                 })();
             }
+
 
             // === Helper to mirror projected score into .ls_og_cell under team name ===
             function decorateProjectedScoreIntoTeamCell() {
