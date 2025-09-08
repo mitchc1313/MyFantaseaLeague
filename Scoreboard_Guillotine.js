@@ -2506,7 +2506,9 @@ if ($('#body_ajax_ls').length) {
             if (!box) return NaN;
 
             // Any of these classes can hold the number
-            const span = box.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
+            const span = cell.querySelector(
+                'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
+            );
             if (span) {
                 // Prefer the visible number, e.g., ...>110.8</span>
                 const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
@@ -2693,10 +2695,11 @@ if ($('#body_ajax_ls').length) {
                             + ' class="ls_pace_box_' + game[j] + ' ls_projections ls_pace_box"'
                             + _style + '>';
 
-                        if (ls_includeProjections && S_markup) {
-                            html = html + S_markup;  // render only when enabled
+                        if (S_markup) {
+                            html = html + S_markup;  // always inject; CSS/_style can hide it
                         }
                         html = html + '</td>';
+
 
 
                         html = html + '<td align="right" style="border:none;"><div class="ogffpts_' + game[j] + '">';
@@ -2723,8 +2726,9 @@ if ($('#body_ajax_ls').length) {
                     function readProjFromCell(cell) {
                         if (!cell) return 0;
                         const span = cell.querySelector(
-                            'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected'
+                            'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
                         );
+
                         if (span) {
                             const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
                             if (mTxt) return parseFloat(mTxt[0]);
@@ -2791,7 +2795,10 @@ if ($('#body_ajax_ls').length) {
 
                 function readProjFromCell(cell) {
                     if (!cell) return 0;
-                    const span = cell.querySelector('span.ls_above_projected, span.ls_below_projected, span.ls_at_projected');
+                    const span = cell.querySelector(
+                        'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
+                    );
+
                     if (span) {
                         const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
                         if (mTxt) return parseFloat(mTxt[0]);
@@ -2842,22 +2849,8 @@ if ($('#body_ajax_ls').length) {
                 });
             }
 
-            // === Tag games as final if (F) marker exists ===
-            (function markFinalGames() {
-                const containerTd = document.querySelector('#other_games td');
-                if (!containerTd) return;
 
-                const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
-                cards.forEach(card => {
-                    // look for a td with class ls_allplay_final OR containing (F)
-                    const finalCell = card.querySelector('td.ls_allplay_final, td:has(div:contains("(F)"))');
-                    if (finalCell) {
-                        card.classList.add('game_final');
-                    } else {
-                        card.classList.remove('game_final');
-                    }
-                });
-            })();
+
 
 
 
