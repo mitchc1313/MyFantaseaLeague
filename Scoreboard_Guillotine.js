@@ -2711,30 +2711,7 @@ if ($('#body_ajax_ls').length) {
             html = html + '</tr>\n';
             load_elem("other_games", html);
 
-            // === Tag games as final if an (F) marker exists ===
-            (function markFinalGames() {
-                const containerTd = document.querySelector('#other_games td');
-                if (!containerTd) return;
 
-                const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
-                cards.forEach(card => {
-                    // Primary signal: MFL adds a cell like <td class="ls_allplay_final"><div>(F)</div></td>
-                    let isFinal = false;
-
-                    const finalCell = card.querySelector('td.ls_allplay_final');
-                    if (finalCell) {
-                        const txt = (finalCell.textContent || '').trim();
-                        if (/\(F\)/i.test(txt)) isFinal = true;
-                    } else {
-                        // Fallback: any td that contains "(F)" text
-                        isFinal = Array.from(card.querySelectorAll('td'))
-                            .some(td => /\(F\)/i.test((td.textContent || '').trim()));
-                    }
-
-                    // Apply/remove class on the card
-                    card.classList.toggle('game_final', isFinal);
-                });
-            })();
 
 
             if (ls_hide_bye_teams) {
