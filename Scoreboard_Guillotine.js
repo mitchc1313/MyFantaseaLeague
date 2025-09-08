@@ -2870,22 +2870,7 @@ if ($('#body_ajax_ls').length) {
                 const containerTd = document.querySelector('#other_games td');
                 if (!containerTd) return;
 
-                function readProjFromCell(cell) {
-                    if (!cell) return 0;
-                    const span = cell.querySelector(
-                        'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
-                    );
-
-                    if (span) {
-                        const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
-                        if (mTxt) return parseFloat(mTxt[0]);
-                        const title = span.getAttribute('title') || '';
-                        const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
-                        if (mTitle) return parseFloat(mTitle[1]);
-                    }
-                    const any = (cell.textContent || '').match(/-?\d+(?:\.\d+)?/);
-                    return any ? parseFloat(any[0]) : 0;
-                }
+                const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
 
                 cards.forEach(card => {
                     const paceCell = card.querySelector('td.ls_pace_box') ||
@@ -2905,7 +2890,7 @@ if ($('#body_ajax_ls').length) {
                         if (Number.isFinite(finalPts)) {
                             proj = finalPts;
 
-                            // Make sure the pace cell span also shows final (defensive/idempotent)
+                            // Ensure the pace cell also shows that final value (idempotent)
                             let span = paceCell.querySelector(
                                 'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
                             );
@@ -2921,7 +2906,7 @@ if ($('#body_ajax_ls').length) {
                         }
                     }
 
-                    // If not final (or no finalPts), fall back to reading the projection span
+                    // If not final (or no finalPts), fall back to reading the projection span/text
                     if (!Number.isFinite(proj)) {
                         const span = paceCell.querySelector(
                             'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
@@ -2943,7 +2928,7 @@ if ($('#body_ajax_ls').length) {
 
                     if (!Number.isFinite(proj) || proj <= 0) return;
 
-                    // Ensure logo+name are wrapped once
+                    // Ensure logo + name are wrapped together
                     const teamCell = card.querySelector('td.ls_og_cell');
                     if (!teamCell) return;
                     if (!teamCell.querySelector('.ls_team_row')) {
@@ -2968,8 +2953,8 @@ if ($('#body_ajax_ls').length) {
                     line.textContent = proj.toFixed(1);
                     if (isFinal) line.classList.add('is_final'); else line.classList.remove('is_final');
                 });
-
             }
+
 
             // === Tag games as final if (F) marker exists ===
             (function markFinalGames() {
