@@ -2505,27 +2505,24 @@ if ($('#body_ajax_ls').length) {
             const box = document.getElementById('ls_pace_box_' + fid);
             if (!box) return NaN;
 
-            // Any of these classes can hold the number
-            const span = cell.querySelector(
+            const span = box.querySelector(
                 'span.ls_above_projected, span.ls_below_projected, span.ls_at_projected, span.ls_projected'
             );
             if (span) {
-                // Prefer the visible number, e.g., ...>110.8</span>
                 const mTxt = (span.textContent || '').match(/-?\d+(?:\.\d+)?/);
                 if (mTxt) return parseFloat(mTxt[0]);
 
-                // Fallback to title="Original Projection: 118.1"
                 const title = span.getAttribute('title') || '';
                 const mTitle = title.match(/Original Projection:\s*(-?\d+(?:\.\d+)?)/i);
                 if (mTitle) return parseFloat(mTitle[1]);
             }
 
-            // Ultra-defensive: any number somewhere inside the cell
             const any = (box.textContent || '').match(/-?\d+(?:\.\d+)?/);
             if (any) return parseFloat(any[0]);
 
             return NaN;
         }
+
 
         function getProjection(fid) {
             const key = 'fid_' + fid;
@@ -2849,14 +2846,31 @@ if ($('#body_ajax_ls').length) {
                 });
             }
 
+            // === Tag games as final if (F) marker exists ===
+            (function markFinalGames() {
+                const containerTd = document.querySelector('#other_games td');
+                if (!containerTd) return;
 
+                const cards = Array.from(containerTd.querySelectorAll('div.ls_other_game'));
+                cards.forEach(card => {
+                    let isFinal = false;
 
+                    // Primary: explicit final cell
+                    const finalCell = card.querySelector('td.ls_allplay_final');
+                    if (finalCell) {
+                        const txt = (finalCell.textContent || '').trim();
+                        if (/\(F\)/i.test(txt)) isFinal = true;
+                    }
 
+                    // Fallback: any td whose text includes (F)
+                    if (!isFinal) {
+                        isFinal = Array.from(card.querySelectorAll('td'))
+                            .some(td => /\(F\)/i.test((td.textContent || '').trim()));
+                    }
 
-
-
-
-
+                    card.classList.toggle('game_final', isFinal);
+                });
+            })();
 
             if (ls_hide_bye_teams) {
                 $("[id^=og_].ls_other_game_bye").each(function () {
