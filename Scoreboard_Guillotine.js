@@ -2845,18 +2845,36 @@ if ($('#body_ajax_ls').length) {
                     const minProj = projVals.length ? Math.min(...projVals) : Infinity;
                     const EPS = 1e-6;
 
-                    // Re-append in order, renumber, and apply classes
-                    keyed.forEach((k, i) => {
-                        const rankCell = k.card.querySelector('.ls_rank');
-                        if (rankCell) rankCell.textContent = (i + 1);
-
-                        k.card.classList.remove('chopped', 'dangerous');
-
-                        if (i === keyed.length - 1) k.card.classList.add('chopped');
-                        if (Math.abs(k.proj - minProj) < EPS) k.card.classList.add('dangerous');
-
-                        containerTd.appendChild(k.card);
-                    });
+  // How many to eliminate this week (defensive guards)
+const nElim = Math.max(
+    0,
+    Math.min(
+      Number.parseInt(window.completedWeek, 10) || 0,
+      keyed.length
+    )
+  );
+  const cutoffIndex = keyed.length - nElim; // indices >= cutoffIndex are eliminated
+  
+  // Re-append in order, renumber, and apply classes
+  keyed.forEach((k, i) => {
+    const rankCell = k.card.querySelector('.ls_rank');
+    if (rankCell) rankCell.textContent = (i + 1);
+  
+    // reset classes we manage
+    k.card.classList.remove('chopped', 'dangerous', 'eliminated');
+  
+    // bottom-most always "chopped"
+    if (i === keyed.length - 1) k.card.classList.add('chopped');
+  
+    // lowest projection flag
+    if (Math.abs(k.proj - minProj) < EPS) k.card.classList.add('dangerous');
+  
+    // mark eliminated for the last N = completedWeek teams
+    if (i >= cutoffIndex) k.card.classList.add('eliminated');
+  
+    containerTd.appendChild(k.card);
+  });
+  
 
                     // ✅ ensure non-final cards get their mirrored line
                     decorateProjectedScoreIntoTeamCell();
@@ -3220,4 +3238,3 @@ $(document).on('click', '.scoringLinkDisable', function (e) {
     e.preventDefault();
     alert("Live Scoring Will Start 24 Hours Prior To Kickoff Of First Game Of The Week. Live Scoring is disabled during offseason.");
 });
-
