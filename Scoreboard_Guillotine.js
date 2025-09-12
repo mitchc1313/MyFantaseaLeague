@@ -3028,6 +3028,39 @@ const nElim = Math.max(
 
 
         ////////////////////////////////////////////////////////////////////
+        //                  FUNCTION - remove blank stats                //
+        ////////////////////////////////////////////////////////////////////
+        (function () {
+            const container = document.querySelector('#ajax_ls');
+            if (!container) return;
+          
+            function updatePlayerStats() {
+              const statsBlocks = container.querySelectorAll('.ls_player_stats');
+              statsBlocks.forEach(block => {
+                const text = (block.textContent || '').trim();
+                if (text === '- stats -') {
+                  block.classList.add('no_stats');
+                } else {
+                  block.classList.remove('no_stats');
+                }
+              });
+            }
+          
+            // Initial check
+            updatePlayerStats();
+          
+            // Observe for changes in #ajax_ls
+            const observer = new MutationObserver(updatePlayerStats);
+            observer.observe(container, {
+              childList: true,
+              subtree: true,
+              characterData: true
+            });
+          })();
+          
+
+
+        ////////////////////////////////////////////////////////////////////
         //                  FUNCTION - ls_get_icon_abbrev                 //
         ////////////////////////////////////////////////////////////////////
         function ls_get_icon_abbrev(fidKey) {
