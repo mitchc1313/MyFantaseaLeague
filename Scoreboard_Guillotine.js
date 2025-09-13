@@ -2845,36 +2845,37 @@ if ($('#body_ajax_ls').length) {
                     const minProj = projVals.length ? Math.min(...projVals) : Infinity;
                     const EPS = 1e-6;
 
-  // How many to eliminate this week (defensive guards)
-const nElim = Math.max(
-    0,
-    Math.min(
-      Number.parseInt(window.completedWeek, 10) || 0,
-      keyed.length
-    )
-  );
-  const cutoffIndex = keyed.length - nElim; // indices >= cutoffIndex are eliminated
-  
-  // Re-append in order, renumber, and apply classes
-  keyed.forEach((k, i) => {
-    const rankCell = k.card.querySelector('.ls_rank');
-    if (rankCell) rankCell.textContent = (i + 1);
-  
-    // reset classes we manage
-    k.card.classList.remove('chopped', 'dangerous', 'eliminated');
-  
-    // bottom-most always "chopped"
-    if (i === keyed.length - 1) k.card.classList.add('chopped');
-  
-    // lowest projection flag
-    if (Math.abs(k.proj - minProj) < EPS) k.card.classList.add('dangerous');
-  
-    // mark eliminated for the last N = completedWeek teams
-    if (i >= cutoffIndex) k.card.classList.add('eliminated');
-  
-    containerTd.appendChild(k.card);
-  });
-  
+ // --- Mark chopped / eliminated based on completedWeek ---
+const total = keyed.length;
+const cw = Number.parseInt(window.completedWeek, 10) || 0;
+
+// Number of teams to mark as chopped so far: Week 1 => 2, Week 2 => 3, ...
+const nChopped = Math.max(0, Math.min(total, cw + 1));
+
+// Starting index for chopped teams (inclusive)
+const chopStart = total - nChopped;
+
+// Re-append in order, renumber, and apply classes
+keyed.forEach((k, i) => {
+  const rankCell = k.card.querySelector('.ls_rank');
+  if (rankCell) rankCell.textContent = (i + 1);
+
+  // Reset classes we manage
+  k.card.classList.remove('chopped', 'eliminated', 'dangerous');
+
+  // Mark chopped (and eliminated) for the last N = completedWeek + 1 teams
+  if (i >= chopStart) {
+    k.card.classList.add('chopped', 'eliminated');
+  }
+
+  // Lowest projection flag
+  if (Number.isFinite(minProj) && Math.abs(k.proj - minProj) < EPS) {
+    k.card.classList.add('dangerous');
+  }
+
+  containerTd.appendChild(k.card);
+});
+
 
                     // ✅ ensure non-final cards get their mirrored line
                     decorateProjectedScoreIntoTeamCell();
