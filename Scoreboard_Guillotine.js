@@ -2845,17 +2845,18 @@ if ($('#body_ajax_ls').length) {
                     const minProj = projVals.length ? Math.min(...projVals) : Infinity;
                     const EPS = 1e-6;
 
- // --- Mark chopped / eliminated based on completedWeek ---
+// --- Mark chopped vs eliminated based on completedWeek ---
 const total = keyed.length;
-const cw = Number.parseInt(window.completedWeek, 10) || 0;
+const cw = Math.max(0, Number.parseInt(window.completedWeek, 10) || 0);
 
-// Number of teams to mark as chopped so far: Week 1 => 2, Week 2 => 3, ...
-const nChopped = Math.max(0, Math.min(total, cw + 1));
+// Count to tag
+const nChopped = Math.min(total, cw + 1);   // includes the team getting chopped this week
+const nEliminated = Math.min(total, cw);    // only prior eliminated teams
 
-// Starting index for chopped teams (inclusive)
-const chopStart = total - nChopped;
+// Inclusive start indices from the bottom
+const chopStart = total - nChopped;         // i >= chopStart => chopped
+const elimStart = total - nEliminated;      // i >= elimStart => eliminated
 
-// Re-append in order, renumber, and apply classes
 keyed.forEach((k, i) => {
   const rankCell = k.card.querySelector('.ls_rank');
   if (rankCell) rankCell.textContent = (i + 1);
@@ -2863,18 +2864,24 @@ keyed.forEach((k, i) => {
   // Reset classes we manage
   k.card.classList.remove('chopped', 'eliminated', 'dangerous');
 
-  // Mark chopped (and eliminated) for the last N = completedWeek + 1 teams
+  // Apply chopped to last (cw + 1)
   if (i >= chopStart) {
-    k.card.classList.add('chopped', 'eliminated');
+    k.card.classList.add('chopped');
   }
 
-  // Lowest projection flag
+  // Apply eliminated ONLY to last cw
+  if (nEliminated > 0 && i >= elimStart) {
+    k.card.classList.add('eliminated');
+  }
+
+  // Lowest projection flag (keep your existing minProj/EPS from above)
   if (Number.isFinite(minProj) && Math.abs(k.proj - minProj) < EPS) {
     k.card.classList.add('dangerous');
   }
 
   containerTd.appendChild(k.card);
 });
+
 
 
                     // ✅ ensure non-final cards get their mirrored line
