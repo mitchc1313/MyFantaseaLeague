@@ -3037,11 +3037,16 @@ const nElim = Math.max(
             function updatePlayerStats() {
               const statsBlocks = container.querySelectorAll('.ls_player_stats');
               statsBlocks.forEach(block => {
+                const parentTd = block.closest('td'); // climb up to the <td>
+                if (!parentTd) return;
+          
                 const text = (block.textContent || '').trim();
                 if (text === '- stats -') {
-                  block.classList.add('no_stats');
+                  parentTd.classList.add('no_stats');
+                  parentTd.classList.remove('has_stats');
                 } else {
-                  block.classList.remove('no_stats');
+                  parentTd.classList.add('has_stats');
+                  parentTd.classList.remove('no_stats');
                 }
               });
             }
