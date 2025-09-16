@@ -2845,42 +2845,41 @@ if ($('#body_ajax_ls').length) {
                     const minProj = projVals.length ? Math.min(...projVals) : Infinity;
                     const EPS = 1e-6;
 
-// --- Mark chopped vs eliminated based on completedWeek ---
+// --- Mark chopped vs eliminated based on completed weeks ---
 const total = keyed.length;
-const cw = Math.max(0, Number.parseInt(window.completedWeek, 10) || 0);
 
-// Count to tag
-const nChopped = Math.min(total, cw + 1);   // includes the team getting chopped this week
-const nEliminated = Math.min(total, cw);    // only prior eliminated teams
+// completed weeks = liveScoringWeek - 1 (fallback to completedWeek or 0)
+const lsw = Number.parseInt(window.liveScoringWeek, 10);
+let cw = Number.isFinite(lsw) ? (lsw - 1) : (Number.parseInt(window.completedWeek, 10) || 0);
+cw = Math.max(0, Math.min(cw, total)); // clamp
+
+// Counts
+const nEliminated = Math.min(total, cw);     // prior eliminated only
+const nChopped    = Math.min(total, cw + 1); // includes this week's chopped
 
 // Inclusive start indices from the bottom
-const chopStart = total - nChopped;         // i >= chopStart => chopped
-const elimStart = total - nEliminated;      // i >= elimStart => eliminated
+const elimStart = total - nEliminated; // i >= elimStart => eliminated
+const chopStart = total - nChopped;    // i >= chopStart => chopped
 
 keyed.forEach((k, i) => {
   const rankCell = k.card.querySelector('.ls_rank');
   if (rankCell) rankCell.textContent = (i + 1);
 
-  // Reset classes we manage
+  // reset classes we manage
   k.card.classList.remove('chopped', 'eliminated', 'dangerous');
 
-  // Apply chopped to last (cw + 1)
-  if (i >= chopStart) {
-    k.card.classList.add('chopped');
-  }
+  // apply classes
+  if (i >= chopStart) k.card.classList.add('chopped');       // includes this week's chop
+  if (i >= elimStart) k.card.classList.add('eliminated');    // prior weeks only
 
-  // Apply eliminated ONLY to last cw
-  if (nEliminated > 0 && i >= elimStart) {
-    k.card.classList.add('eliminated');
-  }
-
-  // Lowest projection flag (keep your existing minProj/EPS from above)
+  // lowest projection flag
   if (Number.isFinite(minProj) && Math.abs(k.proj - minProj) < EPS) {
     k.card.classList.add('dangerous');
   }
 
   containerTd.appendChild(k.card);
 });
+
 
 
 
