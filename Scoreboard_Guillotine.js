@@ -2845,40 +2845,40 @@ if ($('#body_ajax_ls').length) {
                     const minProj = projVals.length ? Math.min(...projVals) : Infinity;
                     const EPS = 1e-6;
 
-// --- Mark chopped vs eliminated based on completed weeks ---
-const total = keyed.length;
+                    // --- Mark chopped vs eliminated based on completed weeks ---
+                    const total = keyed.length;
 
-// completed weeks = liveScoringWeek - 1 (fallback to completedWeek or 0)
-const lsw = Number.parseInt(window.liveScoringWeek, 10);
-let cw = Number.isFinite(lsw) ? (lsw - 1) : (Number.parseInt(window.completedWeek, 10) || 0);
-cw = Math.max(0, Math.min(cw, total)); // clamp
+                    // completed weeks = liveScoringWeek - 1 (fallback to completedWeek or 0)
+                    const lsw = Number.parseInt(window.liveScoringWeek, 10);
+                    let cw = Number.isFinite(lsw) ? (lsw - 1) : (Number.parseInt(window.completedWeek, 10) || 0);
+                    cw = Math.max(0, Math.min(cw, total)); // clamp
 
-// Counts
-const nEliminated = Math.min(total, cw);     // prior eliminated only
-const nChopped    = Math.min(total, cw + 1); // includes this week's chopped
+                    // Counts
+                    const nEliminated = Math.min(total, cw);     // prior eliminated only
+                    const nChopped = Math.min(total, cw + 1); // includes this week's chopped
 
-// Inclusive start indices from the bottom
-const elimStart = total - nEliminated; // i >= elimStart => eliminated
-const chopStart = total - nChopped;    // i >= chopStart => chopped
+                    // Inclusive start indices from the bottom
+                    const elimStart = total - nEliminated; // i >= elimStart => eliminated
+                    const chopStart = total - nChopped;    // i >= chopStart => chopped
 
-keyed.forEach((k, i) => {
-  const rankCell = k.card.querySelector('.ls_rank');
-  if (rankCell) rankCell.textContent = (i + 1);
+                    keyed.forEach((k, i) => {
+                        const rankCell = k.card.querySelector('.ls_rank');
+                        if (rankCell) rankCell.textContent = (i + 1);
 
-  // reset classes we manage
-  k.card.classList.remove('chopped', 'eliminated', 'dangerous');
+                        // reset classes we manage
+                        k.card.classList.remove('chopped', 'eliminated', 'dangerous');
 
-  // apply classes
-  if (i >= chopStart) k.card.classList.add('chopped');       // includes this week's chop
-  if (i >= elimStart) k.card.classList.add('eliminated');    // prior weeks only
+                        // apply classes
+                        if (i >= chopStart) k.card.classList.add('chopped');       // includes this week's chop
+                        if (i >= elimStart) k.card.classList.add('eliminated');    // prior weeks only
 
-  // lowest projection flag
-  if (Number.isFinite(minProj) && Math.abs(k.proj - minProj) < EPS) {
-    k.card.classList.add('dangerous');
-  }
+                        // lowest projection flag
+                        if (Number.isFinite(minProj) && Math.abs(k.proj - minProj) < EPS) {
+                            k.card.classList.add('dangerous');
+                        }
 
-  containerTd.appendChild(k.card);
-});
+                        containerTd.appendChild(k.card);
+                    });
 
 
 
@@ -3040,36 +3040,36 @@ keyed.forEach((k, i) => {
         (function () {
             const container = document.querySelector('#ajax_ls');
             if (!container) return;
-          
+
             function updatePlayerStats() {
-              const statsBlocks = container.querySelectorAll('.ls_player_stats');
-              statsBlocks.forEach(block => {
-                const parentTd = block.closest('td'); // climb up to the <td>
-                if (!parentTd) return;
-          
-                const text = (block.textContent || '').trim();
-                if (text === '- stats -') {
-                  parentTd.classList.add('no_stats');
-                  parentTd.classList.remove('has_stats');
-                } else {
-                  parentTd.classList.add('has_stats');
-                  parentTd.classList.remove('no_stats');
-                }
-              });
+                const statsBlocks = container.querySelectorAll('.ls_player_stats');
+                statsBlocks.forEach(block => {
+                    const parentTd = block.closest('td'); // climb up to the <td>
+                    if (!parentTd) return;
+
+                    const text = (block.textContent || '').trim();
+                    if (text === '- stats -') {
+                        parentTd.classList.add('no_stats');
+                        parentTd.classList.remove('has_stats');
+                    } else {
+                        parentTd.classList.add('has_stats');
+                        parentTd.classList.remove('no_stats');
+                    }
+                });
             }
-          
+
             // Initial check
             updatePlayerStats();
-          
+
             // Observe for changes in #ajax_ls
             const observer = new MutationObserver(updatePlayerStats);
             observer.observe(container, {
-              childList: true,
-              subtree: true,
-              characterData: true
+                childList: true,
+                subtree: true,
+                characterData: true
             });
-          })();
-          
+        })();
+
 
 
         ////////////////////////////////////////////////////////////////////
