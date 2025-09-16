@@ -3082,7 +3082,7 @@ keyed.forEach((k, i) => {
                     return '<span class="ls_og_abbrev">' + franchiseDatabase[fidKey].abbrev + '</span>';
                     break;
                 case 1: //FULL NAME
-                    return '<span class="ls_og_full_name" style="display:inline-block;max-width:5rem;overflow:hidden">' + franchiseDatabase[fidKey].name + '</span>';
+                    return '<span class="ls_og_full_name" style="display:inline-block;overflow:hidden">' + franchiseDatabase[fidKey].name + '</span>';
                     break;
                 case 2: //ICON ON FAIL USE LOGO ON FAIL USE ABBREV
                     if (franchiseDatabase[fidKey].icon !== "")
@@ -3102,11 +3102,11 @@ keyed.forEach((k, i) => {
                     break;
                 case 4: //ICON+NAME ON FAIL USE LOGO+NAME ON FAIL USE NAME
                     if (franchiseDatabase[fidKey].icon !== "")
-                        return '<img class="ls_og_icon" src="' + franchiseDatabase[fidKey].icon + '" alt="' + franchiseDatabase[fidKey].name + '" title="' + franchiseDatabase[fidKey].name + '" /><span class="ls_og_icon_full_name" style="display:inline-block;max-width:3.125rem;overflow:hidden;vertical-align:middle;padding-left:0.25rem">' + franchiseDatabase[fidKey].name + '</span>';
+                        return '<img class="ls_og_icon" src="' + franchiseDatabase[fidKey].icon + '" alt="' + franchiseDatabase[fidKey].name + '" title="' + franchiseDatabase[fidKey].name + '" /><span class="ls_og_icon_full_name" style="display:inline-block;overflow:hidden;vertical-align:middle;padding-left:0.25rem">' + franchiseDatabase[fidKey].name + '</span>';
                     else if (franchiseDatabase[fidKey].logo !== "")
-                        return '<img class="ls_og_icon" src="' + franchiseDatabase[fidKey].logo + '" alt="' + franchiseDatabase[fidKey].name + '" title="' + franchiseDatabase[fidKey].name + '" /><span class="ls_og_icon_full_name" style="display:inline-block;max-width:3.125rem;overflow:hidden;vertical-align:middle;padding-left:0.25rem">' + franchiseDatabase[fidKey].name + '</span>';
+                        return '<img class="ls_og_icon" src="' + franchiseDatabase[fidKey].logo + '" alt="' + franchiseDatabase[fidKey].name + '" title="' + franchiseDatabase[fidKey].name + '" /><span class="ls_og_icon_full_name" style="display:inline-block;overflow:hidden;vertical-align:middle;padding-left:0.25rem">' + franchiseDatabase[fidKey].name + '</span>';
                     else
-                        return '<span class="ls_og_full_name" style="display:inline-block;max-width:5rem;overflow:hidden">' + franchiseDatabase[fidKey].name + '</span>';
+                        return '<span class="ls_og_full_name" style="display:inline-block;overflow:hidden">' + franchiseDatabase[fidKey].name + '</span>';
                     break;
                 default:
                     return '<span class="ls_og_abbrev">' + franchiseDatabase[fidKey].abbrev + '</span>';
