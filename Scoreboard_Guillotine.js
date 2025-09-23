@@ -2089,7 +2089,7 @@ if ($('#body_ajax_ls').length) {
             if (isAllPlay) {
                 // MFL Live Scoring Page Formatting
                 $('h4:first').remove();
-                $('#other_games').wrap('<div class="mobile-wrap ls-boxscore"></div>');
+                $('#other_games').wrap('<div class="ls-boxscore"></div>');
                 $('.ls-boxscore #other_games').wrap('<div class="ls_scroller"></div>');
                 $('div').has('div.ls-boxscore').addClass('ls-outer-table');
                 $('.ls-outer-table').css('margin-top', '0.313rem');
