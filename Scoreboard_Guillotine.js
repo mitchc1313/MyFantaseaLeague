@@ -2091,8 +2091,16 @@ if ($('#body_ajax_ls').length) {
                 $('h4:first').remove();
                 $('#other_games').wrap('<div class="ls-boxscore"></div>');
                 $('.ls-boxscore #other_games').wrap('<div class="ls_scroller"></div>');
-                $('table').has('div.ls-boxscore').addClass('ls-outer-table');
-                $('.ls-outer-table').css('margin-top', '0.313rem');
+                // Replace outer table with a div grid container
+                $('table').has('div.ls-boxscore').each(function () {
+                    const $tbl = $(this);
+                    const $grid = $('<div class="ls-outer-grid"></div>');
+                    $grid.append($tbl.contents());   // move children into new div
+                    $tbl.replaceWith($grid);         // replace table
+                });
+
+                // Apply spacing if needed
+                $('.ls-outer-grid').css('margin-top', '0.313rem');
 
                 // 1) Ensure matchup content is wrapped for later move
                 $('td.mobile-view').each(function () {
@@ -2119,11 +2127,11 @@ if ($('#body_ajax_ls').length) {
 
 
                 // 3) Remove any leftover container tables around the new blocks
-                $('div.mobile-wrap > table.ls-outer-table').each(function () {
-                    // If the table only housed our converted rows, unwrap it
-                    const $tbl = $(this);
-                    if (!$tbl.find('tr').length) $tbl.replaceWith($tbl.contents());
+                $('div.mobile-wrap > div.ls-outer-grid').each(function () {
+                    const $grid = $(this);
+                    $grid.replaceWith($grid.contents());
                 });
+
 
                 // Labels (unchanged)
                 $('.ls_marquee_label:contains("Playing")').addClass('playing').text('P');
