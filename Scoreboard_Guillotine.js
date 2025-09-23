@@ -121,7 +121,8 @@ if ($('#body_ajax_ls').length) {
         // LOADING CIRCLE AND ERROR MESSAGE && TRIGGER CLICK SWITCH GAME  //
         ////////////////////////////////////////////////////////////////////
         function ls_error_check() {
-            $('<div class="ls_loading_message" style="visibility:visible"><div id="MFLPlayerPopupLoading" style="top:auto;position:relative;transform:none"><center>Loading Live Scoreboard . . .<br><br><div class="MFLPlayerPopupLoader"></div></center></div></div>').insertBefore('#myNavigationHolder');
+            const $anchor = $('#myNavigationHolder, .ls-outer-grid, .ls-boxscore').first();
+            $('<div class="ls_loading_message" ...>').insertBefore($anchor.length ? $anchor : 'body');
 
             if (ls_loader) {
                 //do nothing
@@ -165,10 +166,12 @@ if ($('#body_ajax_ls').length) {
                         #body_ajax_ls .ls-outer-grid + .mobile-wrap{visibility:visible!important}\
                         </style>');
 
-                    if (!$('div[id*="og_"]').is(':visible')) {
-                        $('.ls-outer-table').replaceWith('<h3 class="warning" style="font-size:1.25rem;padding:1.25rem 0;visibility:visible">There are no fantasy matchups this week or all teams on bye</h3>');
+                    const $outer = $('.ls-outer-grid, .ls-outer-table'); // support both
+                    if (!$('div[id*="og_"]').is(':visible') && $outer.length) {
+                        $outer.replaceWith('<h3 class="warning" style="font-size:1.25rem;padding:1.25rem 0;visibility:visible">There are no fantasy matchups this week or all teams on bye</h3>');
                         $('#ls_ticker_tab_id,#ls_mfl_notes,.settings-mobile-wrap').remove();
                     }
+
                     clearInterval(errorClassCk, listenerCk);
                 }
             }, 10);
