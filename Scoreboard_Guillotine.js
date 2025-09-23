@@ -2200,7 +2200,9 @@ if ($('#body_ajax_ls').length) {
                 }
             }
 
-            $('<div id="ls_setting_drop"><div class="settings-mobile-wrap"><div class="ls_setting_container"><span class="ls_toggle_settings" style="cursor:pointer;font-size:1rem;padding-left:0.313rem;width:100%;display:block;"><i class="fa-regular fa-gears" aria-hidden="true"></i> Settings</span><div class="ls_append_input" style="display:none;margin-left:0.313rem"></div></div></div></div>').insertBefore('.ls-outer-table, .ls_players_block:first');
+            $('<div id="ls_setting_drop">...</div>')
+                .insertBefore($('.ls-outer-table, .ls_players_block:first, .td-boxscore:first, .ls_scroller:first, .ls-boxscore:first').first());
+
 
             // Wrap checkboxes (unchanged)
             $('input#hide_nonstarters_cb').wrap('<div class="hide_bench"></div>').after('<label for="hide_nonstarters_cb">Bench</label>');
@@ -2269,17 +2271,30 @@ if ($('#body_ajax_ls').length) {
                 '</div>' +
                 '</div>';
 
-            // Insert scoreboard holder just before the first players block
-            const $firstBlock = $('.ls_players_block').first();
-            if ($firstBlock.length) {
+            // Insert scoreboard holder just before the first players block (or best fallback)
+            let $anchor = $('.ls_players_block').first();
+
+            if (!$anchor.length) {
+                // Fallbacks when you removed ls_players_block
+                // 1) first .td-boxscore
+                $anchor = $('.td-boxscore').first();
+
+                // 2) if still no luck, try scroller/boxscore wrappers
+                if (!$anchor.length) $anchor = $('.ls_scroller').first();
+                if (!$anchor.length) $anchor = $('.ls-boxscore').first();
+                if (!$anchor.length) $anchor = $('#other_games').first();
+            }
+
+            if ($anchor.length) {
                 if (isAllPlay) {
-                    $(topAllPlay).insertBefore($firstBlock);
+                    $(topAllPlay).insertBefore($anchor);
                 } else if ($("#winprob_home").length && ls_show_win_probability && (liveScoringWeek >= real_ls_week)) {
-                    $(topWinProb).insertBefore($firstBlock);
+                    $(topWinProb).insertBefore($anchor);
                 } else {
-                    $(topBasic).insertBefore($firstBlock);
+                    $(topBasic).insertBefore($anchor);
                 }
             }
+
 
             if (isAllPlay) {
                 $('#LS_TopTableHolder #LS_HomeTeamName').append($('#ficon_home'));
