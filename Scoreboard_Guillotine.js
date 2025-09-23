@@ -3254,97 +3254,30 @@ if ($('#body_ajax_ls').length) {
     //                    FUNCTION - Cloning Elements               //
     ////////////////////////////////////////////////////////////////////
 
-    (function extractLsBlocks() {
-        // 0) Locate your source table
-        const $table = $('table.report.ls-outer-table').first();
-        if (!$table.length) return;
+    // === HOIST .ls-boxscore OUT OF THE TABLE AND WRAP WITH THE TABLE ===
+    (function hoistBoxscoreAndWrap() {
+        // Find any outer table that currently contains the boxscore block
+        const $tables = $('table.report.ls-outer-table:has(.mobile-wrap.ls-boxscore)');
 
-        // 1) Build the new parent container right after the table
-        const $root = $(`
-    <div id="ls-extract-root" class="ls-extract-root" aria-label="Live Scoring Layout">
-      <div class="ls-extract-top"></div>
-      <div class="ls-extract-body"></div>
-    </div>
-  `);
-        $table.after($root);
+        $tables.each(function (i) {
+            const $tbl = $(this);
+            const $box = $tbl.find('.mobile-wrap.ls-boxscore').first().detach(); // pull it out of the table
 
-        // 2) Collect the exact TDs you asked for, in DOM order
-        const $tds = $table.find('td.td-boxscore, td.LS_TopTableHolder, td.mobile-view.has_stats');
+            // Build a new parent container
+            const $container = $(
+                `<div class="ls-container" data-ls-container="${i}"></div>`
+            );
 
-        // 3) For each TD, create a corresponding DIV and clone its contents
-        const $topHolder = $root.find('.ls-extract-top');
-        const $bodyHolder = $root.find('.ls-extract-body');
+            // Insert container before the table, then put the hoisted box + table inside.
+            // Order A (boxscore above table):
+            $tbl.before($container);
+            $container.append($box, $tbl);
 
-        $tds.each(function (i) {
-            const $src = $(this);
-
-            // Map TD classes to DIV classes (preserve class names)
-            const classes = $src.attr('class') || '';
-            const $dst = $('<div/>', {
-                'class': `lsx-item ${classes
-                    .replace(/\bLS_TopTableHolder\b/, 'LS_TopTableHolder') // keep naming
-                    .replace(/\bmobile-view\b/g, 'mobile-view')            // keep useful hooks
-                    }`.trim(),
-                'data-lsx': String(i)
-            });
-
-            // Clone inner content but strip duplicate IDs
-            const $clone = $src.clone(true, true);
-            $clone.find('[id]').removeAttr('id');
-            // if the TD itself had an id:
-            $clone.removeAttr('id');
-
-            $dst.append($clone.contents());
-
-            // Put TopTableHolder clones in top area; others in body
-            if ($src.is('td.LS_TopTableHolder')) {
-                $topHolder.append($dst);
-            } else {
-                $bodyHolder.append($dst);
-            }
-
-            // Tag source with a key so we can sync updates
-            $src.attr('data-lsx', String(i));
+            // If you prefer the table above the boxscore, swap the append order:
+            // $container.append($tbl, $box);
         });
-
-        // 4) Hide the original table but leave it in the DOM for scripts to use
-        $table
-            .attr({ 'aria-hidden': 'true', 'data-ls-hidden': '1' })
-            .css({ position: 'absolute', left: '-99999px', top: '-99999px', height: 0, width: 0, overflow: 'hidden' });
-
-        // 5) Keep the mirror in sync when live scores update
-        const syncOne = (srcTd) => {
-            const key = $(srcTd).attr('data-lsx');
-            if (!key) return;
-            const $dst = $root.find(`.lsx-item[data-lsx="${key}"]`);
-            if (!$dst.length) return;
-
-            // Re-clone source TD contents
-            const $new = $(srcTd).clone(true, true);
-            $new.find('[id]').removeAttr('id');
-            $new.removeAttr('id');
-
-            $dst.empty().append($new.contents());
-        };
-
-        const mo = new MutationObserver((mutations) => {
-            const touched = new Set();
-            mutations.forEach(m => {
-                const td = $(m.target).closest('td.td-boxscore, td.LS_TopTableHolder, td.mobile-view.has_stats')[0];
-                if (td) touched.add(td);
-            });
-            touched.forEach(syncOne);
-        });
-
-        $tds.each(function () {
-            mo.observe(this, { childList: true, characterData: true, subtree: true });
-        });
-
-        // Optional: expose a manual refresh
-        window.lsExtractRefresh = function () {
-            $tds.each(function () { syncOne(this); });
-        };
     })();
+
 
 
 
