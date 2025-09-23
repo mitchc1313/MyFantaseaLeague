@@ -156,7 +156,15 @@ if ($('#body_ajax_ls').length) {
             var errorClassCk = setInterval(function () {
                 if (ls_has_triggered) {
                     $('.ls_loading_message,#ls_error').remove();
-                    $('head').append('<style>#body_ajax_ls #myNavigationHolder,#body_ajax_ls #ls_setting_drop,#body_ajax_ls table[style="margin-top: 0.313rem"],#body_ajax_ls table[style*="margin-top: 0.313rem"],#body_ajax_ls #ls_mfl_notes,#body_ajax_ls #ls_ticker_tab_id,#body_ajax_ls table[style*="margin-top: 0.313rem"] + div.mobile-wrap,#body_ajax_ls table[style="margin-top: 0.313rem"] + div.mobile-wrap{visibility:visible!important}</style>');
+                    $('head').append('<style>\
+                        #body_ajax_ls #myNavigationHolder,\
+                        #body_ajax_ls #ls_setting_drop,\
+                        #body_ajax_ls .ls-outer-grid,\
+                        #body_ajax_ls #ls_mfl_notes,\
+                        #body_ajax_ls #ls_ticker_tab_id,\
+                        #body_ajax_ls .ls-outer-grid + .mobile-wrap{visibility:visible!important}\
+                        </style>');
+
                     if (!$('div[id*="og_"]').is(':visible')) {
                         $('.ls-outer-table').replaceWith('<h3 class="warning" style="font-size:1.25rem;padding:1.25rem 0;visibility:visible">There are no fantasy matchups this week or all teams on bye</h3>');
                         $('#ls_ticker_tab_id,#ls_mfl_notes,.settings-mobile-wrap').remove();
@@ -2092,15 +2100,39 @@ if ($('#body_ajax_ls').length) {
                 $('#other_games').wrap('<div class="ls-boxscore"></div>');
                 $('.ls-boxscore #other_games').wrap('<div class="ls_scroller"></div>');
                 // Replace outer table with a div grid container
-                $('table').has('div.ls-boxscore').each(function () {
+                // 1) Replace outer tables with a div grid container
+                $('table:has(.ls-boxscore)').each(function () {
                     const $tbl = $(this);
                     const $grid = $('<div class="ls-outer-grid"></div>');
-                    $grid.append($tbl.contents());   // move children into new div
-                    $tbl.replaceWith($grid);         // replace table
+                    // move children (including TBODY/THEAD)
+                    $grid.append($tbl.contents());
+                    $tbl.replaceWith($grid);
                 });
 
-                // Apply spacing if needed
+                // 2) Strip table section wrappers so divs aren't trapped under TBODY/THEAD/TFOOT
+                $('.ls-outer-grid').find('thead, tbody, tfoot').each(function () {
+                    $(this).replaceWith($(this).contents());
+                });
+
+                // 3) Replace TRs with div rows
+                $('.ls-outer-grid').find('tr').each(function () {
+                    const $tr = $(this);
+                    const $row = $('<div class="ls-row"></div>');
+                    $tr.children('td, th').each(function () {
+                        const $cell = $('<div class="td-boxscore"></div>').append($(this).contents());
+                        $row.append($cell);
+                    });
+                    $tr.replaceWith($row);
+                });
+
+                // 4) If any TDs/THs slipped through (edge cases), convert them too
+                $('.ls-outer-grid').find('td, th').each(function () {
+                    $(this).replaceWith($('<div class="td-boxscore"></div>').append($(this).contents()));
+                });
+
+                // (optional) spacing
                 $('.ls-outer-grid').css('margin-top', '0.313rem');
+
 
                 // 1) Ensure matchup content is wrapped for later move
                 $('td.mobile-view').each(function () {
