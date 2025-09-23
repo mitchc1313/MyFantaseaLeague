@@ -2105,18 +2105,18 @@ if ($('#body_ajax_ls').length) {
                 // 2) Convert each TR with .mobile-view cells into DIV rows
                 $('tr:has(td.mobile-view)').each(function () {
                     const $tr = $(this);
-                    const $row = $('<div class="ls-row ls_players_block"></div>');
+                    const $cells = [];
 
-                    // Move each td.mobile-view -> div.td-boxscore
                     $tr.find('td.mobile-view').each(function () {
                         const $cell = $('<div class="td-boxscore"></div>');
-                        $cell.append($(this).contents()); // move inner content
-                        $row.append($cell);
+                        $cell.append($(this).contents());
+                        $cells.push($cell);
                     });
 
-                    // Replace the table row with our div row
-                    $tr.replaceWith($row);
+                    // Replace <tr> with just the collection of .td-boxscore divs
+                    $tr.replaceWith($cells);
                 });
+
 
                 // 3) Remove any leftover container tables around the new blocks
                 $('div.mobile-wrap > table.ls-outer-table').each(function () {
