@@ -3242,6 +3242,117 @@ if ($('#body_ajax_ls').length) {
 
     } // end if $('script[src*="mfl_live_scoring.js"]').length
 
+
+
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////
+    //                    FUNCTION - Cloning Elements               //
+    ////////////////////////////////////////////////////////////////////
+
+    (function extractLsBlocks() {
+        // 0) Locate your source table
+        const $table = $('table.report.ls-outer-table').first();
+        if (!$table.length) return;
+
+        // 1) Build the new parent container right after the table
+        const $root = $(`
+    <div id="ls-extract-root" class="ls-extract-root" aria-label="Live Scoring Layout">
+      <div class="ls-extract-top"></div>
+      <div class="ls-extract-body"></div>
+    </div>
+  `);
+        $table.after($root);
+
+        // 2) Collect the exact TDs you asked for, in DOM order
+        const $tds = $table.find('td.td-boxscore, td.LS_TopTableHolder, td.mobile-view.has_stats');
+
+        // 3) For each TD, create a corresponding DIV and clone its contents
+        const $topHolder = $root.find('.ls-extract-top');
+        const $bodyHolder = $root.find('.ls-extract-body');
+
+        $tds.each(function (i) {
+            const $src = $(this);
+
+            // Map TD classes to DIV classes (preserve class names)
+            const classes = $src.attr('class') || '';
+            const $dst = $('<div/>', {
+                'class': `lsx-item ${classes
+                    .replace(/\bLS_TopTableHolder\b/, 'LS_TopTableHolder') // keep naming
+                    .replace(/\bmobile-view\b/g, 'mobile-view')            // keep useful hooks
+                    }`.trim(),
+                'data-lsx': String(i)
+            });
+
+            // Clone inner content but strip duplicate IDs
+            const $clone = $src.clone(true, true);
+            $clone.find('[id]').removeAttr('id');
+            // if the TD itself had an id:
+            $clone.removeAttr('id');
+
+            $dst.append($clone.contents());
+
+            // Put TopTableHolder clones in top area; others in body
+            if ($src.is('td.LS_TopTableHolder')) {
+                $topHolder.append($dst);
+            } else {
+                $bodyHolder.append($dst);
+            }
+
+            // Tag source with a key so we can sync updates
+            $src.attr('data-lsx', String(i));
+        });
+
+        // 4) Hide the original table but leave it in the DOM for scripts to use
+        $table
+            .attr({ 'aria-hidden': 'true', 'data-ls-hidden': '1' })
+            .css({ position: 'absolute', left: '-99999px', top: '-99999px', height: 0, width: 0, overflow: 'hidden' });
+
+        // 5) Keep the mirror in sync when live scores update
+        const syncOne = (srcTd) => {
+            const key = $(srcTd).attr('data-lsx');
+            if (!key) return;
+            const $dst = $root.find(`.lsx-item[data-lsx="${key}"]`);
+            if (!$dst.length) return;
+
+            // Re-clone source TD contents
+            const $new = $(srcTd).clone(true, true);
+            $new.find('[id]').removeAttr('id');
+            $new.removeAttr('id');
+
+            $dst.empty().append($new.contents());
+        };
+
+        const mo = new MutationObserver((mutations) => {
+            const touched = new Set();
+            mutations.forEach(m => {
+                const td = $(m.target).closest('td.td-boxscore, td.LS_TopTableHolder, td.mobile-view.has_stats')[0];
+                if (td) touched.add(td);
+            });
+            touched.forEach(syncOne);
+        });
+
+        $tds.each(function () {
+            mo.observe(this, { childList: true, characterData: true, subtree: true });
+        });
+
+        // Optional: expose a manual refresh
+        window.lsExtractRefresh = function () {
+            $tds.each(function () { syncOne(this); });
+        };
+    })();
+
+
+
+
+
+
+
+
 } // END MFL LIVE SCORING
 
 // Add this outside of Live Scoring body id to target all links on page to add end week string UPDATED
