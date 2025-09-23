@@ -2093,14 +2093,43 @@ if ($('#body_ajax_ls').length) {
                 $('.ls-boxscore #other_games').wrap('<div class="ls_scroller"></div>');
                 $('table').has('div.ls-boxscore').addClass('ls-outer-table');
                 $('.ls-outer-table').css('margin-top', '0.313rem');
-                $('td.mobile-view[valign="middle"]').removeClass().addClass('td-boxscore').unwrap().wrap('<tr></tr>');
-                $('td.mobile-view').wrap('</tr><tr class="ls_players_table"></tr>');
-                $('td.mobile-view').wrapInner('<div class="mobile-wrap ls-matchup"></div>');
-                $('p').wrapAll('<div class="mobile-wrap ls-btm-table"></div>');
-                $('div.mobile-wrap > table.ls-outer-table').unwrap();
+
+                // 1) Ensure matchup content is wrapped for later move
+                $('td.mobile-view').each(function () {
+                    const $td = $(this);
+                    if (!$td.children('.mobile-wrap.ls-matchup').length) {
+                        $td.wrapInner('<div class="mobile-wrap ls-matchup"></div>');
+                    }
+                });
+
+                // 2) Convert each TR with .mobile-view cells into DIV rows
+                $('tr:has(td.mobile-view)').each(function () {
+                    const $tr = $(this);
+                    const $row = $('<div class="ls-row ls_players_block"></div>');
+
+                    // Move each td.mobile-view -> div.td-boxscore
+                    $tr.find('td.mobile-view').each(function () {
+                        const $cell = $('<div class="td-boxscore"></div>');
+                        $cell.append($(this).contents()); // move inner content
+                        $row.append($cell);
+                    });
+
+                    // Replace the table row with our div row
+                    $tr.replaceWith($row);
+                });
+
+                // 3) Remove any leftover container tables around the new blocks
+                $('div.mobile-wrap > table.ls-outer-table').each(function () {
+                    // If the table only housed our converted rows, unwrap it
+                    const $tbl = $(this);
+                    if (!$tbl.find('tr').length) $tbl.replaceWith($tbl.contents());
+                });
+
+                // Labels (unchanged)
                 $('.ls_marquee_label:contains("Playing")').addClass('playing').text('P');
                 $('.ls_marquee_label:contains("Yet"):contains("to"):contains("Play")').addClass('ytp').text('YTP');
                 $('.ls_marquee_label:contains("Minutes"):contains("Remaining")').addClass('pmr').text('PMR');
+
             } else {
                 // MFL Live Scoring Page Formatting
                 $('h4:first').remove();
@@ -2108,27 +2137,72 @@ if ($('#body_ajax_ls').length) {
                 $('.ls-boxscore #other_games').wrap('<div class="ls_scroller"></div>');
                 $('table').has('div.ls-boxscore').addClass('ls-outer-table');
                 $('.ls-outer-table').css('margin-top', '0.313rem');
-                $('td.mobile-view').wrapInner('<div class="mobile-wrap ls-matchup"></div>');
+
+                // 1) Ensure matchup content is wrapped for later move
+                $('td.mobile-view').each(function () {
+                    const $td = $(this);
+                    if (!$td.children('.mobile-wrap.ls-matchup').length) {
+                        $td.wrapInner('<div class="mobile-wrap ls-matchup"></div>');
+                    }
+                });
+
+                // 2) Convert each TR with .mobile-view cells into DIV rows
+                $('tr:has(td.mobile-view)').each(function () {
+                    const $tr = $(this);
+                    const $row = $('<div class="ls-row ls_players_block"></div>');
+
+                    $tr.find('td.mobile-view').each(function () {
+                        const $cell = $('<div class="td-boxscore"></div>');
+                        $cell.append($(this).contents());
+                        $row.append($cell);
+                    });
+
+                    $tr.replaceWith($row);
+                });
+
+                // Clean up padding rules that targeted table cells
                 $('td').has('div.ls-boxscore').css({
                     "padding": "0",
                     "text-align": "center"
                 });
-                $('div.mobile-wrap:first table:first').unwrap();
+
+                // Remove any leftover wrapper tables
+                $('div.mobile-wrap:first table:first').each(function () {
+                    const $tbl = $(this);
+                    if (!$tbl.find('tr').length) $tbl.replaceWith($tbl.contents());
+                });
+
                 $('p').wrapAll('<div class="mobile-wrap ls-btm-table"></div>');
-                $('div.mobile-wrap > table.ls-outer-table').unwrap();
+                $('div.mobile-wrap > table.ls-outer-table').each(function () {
+                    const $tbl = $(this);
+                    if (!$tbl.find('tr').length) $tbl.replaceWith($tbl.contents());
+                });
+
+                // Labels (unchanged)
                 $('.ls_marquee_label:contains("Playing")').addClass('playing').text('P');
                 $('.ls_marquee_label:contains("Yet"):contains("to"):contains("Play")').addClass('ytp').text('YTP');
                 $('.ls_marquee_label:contains("Minutes"):contains("Remaining")').addClass('pmr').text('PMR');
             }
+
             // REMEMBER CHECK BOX FOR NFL BOXSCORES
-            if (localStorage["ls_includeNFLBox_" + league_id] === "1") $("#hide_ticker_cb").parent().append(' | <input type="checkbox" name="hide_nfl_boxscore" checked="checked" id="hide_nfl_boxscore_cb" onclick="ls_hide_nfl_boxscore(this)"> Hide NFL');
-            else $("#hide_ticker_cb").parent().append(' | <input type="checkbox" name="hide_nfl_boxscore" id="hide_nfl_boxscore_cb" onclick="ls_hide_nfl_boxscore(this)"> Hide NFL');
+            if (localStorage["ls_includeNFLBox_" + league_id] === "1") {
+                $("#hide_ticker_cb").parent().append(' | <input type="checkbox" name="hide_nfl_boxscore" checked="checked" id="hide_nfl_boxscore_cb" onclick="ls_hide_nfl_boxscore(this)"> Hide NFL');
+            } else {
+                $("#hide_ticker_cb").parent().append(' | <input type="checkbox" name="hide_nfl_boxscore" id="hide_nfl_boxscore_cb" onclick="ls_hide_nfl_boxscore(this)"> Hide NFL');
+            }
+
             // REMEMBER CHECKBOX FOR PROJECTIONS
             if (ls_includeProjections) {
-                if (localStorage["ls_includeProjections_" + league_id] === "1") $("#hide_ticker_cb").parent().append(' | <input type="checkbox" name="hide_projections" checked="checked" id="hide_projections_cb" onclick="ls_hide_projections(this)"> Hide Pace');
-                else $("#hide_ticker_cb").parent().append(' | <input type="checkbox" name="hide_projections" id="hide_projections_cb" onclick="ls_hide_projections(this)"> Hide Pace');
+                if (localStorage["ls_includeProjections_" + league_id] === "1") {
+                    $("#hide_ticker_cb").parent().append(' | <input type="checkbox" name="hide_projections" checked="checked" id="hide_projections_cb" onclick="ls_hide_projections(this)"> Hide Pace');
+                } else {
+                    $("#hide_ticker_cb").parent().append(' | <input type="checkbox" name="hide_projections" id="hide_projections_cb" onclick="ls_hide_projections(this)"> Hide Pace');
+                }
             }
-            $('<div id="ls_setting_drop"><div class="settings-mobile-wrap"><div class="ls_setting_container"><span class="ls_toggle_settings" style="cursor:pointer;font-size:1rem;padding-left:0.313rem;width:100%;display:block;"><i class="fa-regular fa-gears" aria-hidden="true"></i> Settings</span><div class="ls_append_input" style="display:none;margin-left:0.313rem"></div></div></div></div>').insertBefore('.ls-outer-table');
+
+            $('<div id="ls_setting_drop"><div class="settings-mobile-wrap"><div class="ls_setting_container"><span class="ls_toggle_settings" style="cursor:pointer;font-size:1rem;padding-left:0.313rem;width:100%;display:block;"><i class="fa-regular fa-gears" aria-hidden="true"></i> Settings</span><div class="ls_append_input" style="display:none;margin-left:0.313rem"></div></div></div></div>').insertBefore('.ls-outer-table, .ls_players_block:first');
+
+            // Wrap checkboxes (unchanged)
             $('input#hide_nonstarters_cb').wrap('<div class="hide_bench"></div>').after('<label for="hide_nonstarters_cb">Bench</label>');
             $('input#hide_game_info_cb').wrap('<div class="hide_bench"></div>').after('<label for="hide_game_info_cb">Games</label>');
             $('input#hide_stats_cb').wrap('<div class="hide_bench"></div>').after('<label for="hide_stats_cb">Stats</label>');
@@ -2136,26 +2210,77 @@ if ($('#body_ajax_ls').length) {
             $('input#hide_nfl_boxscore_cb').wrap('<div class="hide_bench" id="ls_nfl_boxscore_wrapper"></div>').after('<label for="hide_nfl_boxscore_cb">NFL</label>');
             if (ls_includeProjections) $('input#hide_projections_cb').wrap('<div class="hide_bench" id="ls_pace_wrapper"></div>').after('<label for="hide_projections_cb">Pace</label>');
             $('.hide_bench').appendTo('.ls_append_input');
+
             $('#ls_setting_drop .ls_toggle_settings').on("click", function () {
                 $(".ls_append_input").slideToggle('500');
             });
+
             // Toggle class when player stats not selected to remove padding
             $('input[name="hide_stats"]').on("click", function () {
-                $('#roster_away td, #roster_home td').toggleClass('td-pad');
+                // target the new div cells instead of table tds
+                $('.ls_players_block .td-boxscore').toggleClass('td-pad');
             });
-            // Move MFL page bottom notes to live ticker table
+
+            // Move MFL page bottom notes to live ticker table (unchanged)
             $('<div id="ls_mfl_notes"><div class="ls_update_msg" style="display:inline;text-align:center">Data last updated on: </div> , stats will update roughly every 40 seconds while games are in progress.<br>Stats are unofficial and subject to change. Official results can be viewed on <a href="' + baseURLDynamic + '/' + year + '/options?L=' + league_id + '&O=22" target="_blank">Weekly Results</a></div>').insertAfter('#ls_ticker_tab_id');
             if (ls_orig_proj_when_final) $('#ls_mfl_notes').append('<br><span class="ls_projections ls_pace_legend"><span class="ls_pace_legend_title" style="padding:0 0.188rem">Pace Legend:</span><span class="ls_above_projected" style="padding:0 0.188rem">Above Projected</span><span class="ls_below_projected" style="padding:0 0.188rem">Below Projected</span><span class="ls_at_projected" style="padding:0 0.188rem">At Projected</span><span class="ls_projected" style="padding:0 0.188rem">Original Projection</span></span>');
             $('#last_update').appendTo('.ls_update_msg');
-            $('div.ls-btm-table').remove();
-            $('tr').has('.ls-matchup').addClass('ls_players_table');
-            if (isAllPlay) {
-                $('<tr><td id="LS_TopTableHolder"><div class="mobile-wrap"><table class="LS_MainScoreboard" style="table-layout:fixed"><tbody><tr><td colspan="2" rowspan="2" id="LS_CenterTop">Live Scoring</td><td colspan="3" id="LS_HomeTeamName"></td></tr><tr><td colspan="3" id="LS_HomeTeamRecord">0-0-0</td></tr><tr><td colspan="2" rowspan="2" id="LS_HomeScore"></td><td class="LS_ScoreboardTitle" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle" title="Players Currently Playing">P</td></tr><tr><td id="LS_HomePMR" class="prmin" title="Player Minutes Remaining"></td><td id="LS_HomeYTP" class="prmin" title="Players Yet to Play"></td><td id="LS_HomePlayers" class="prmin" title="Players Currently Playing"></td></tr></tbody></table></div></td></tr>').insertBefore('.ls_players_table');
-            } else if ($("#winprob_home").length && ls_show_win_probability && (liveScoringWeek >= real_ls_week)) {
-                $('<tr><td id="LS_TopTableHolder" colspan="2"><div class="mobile-wrap"><table class="LS_MainScoreboard" style="table-layout:fixed"><tbody><tr><td id="LS_AwayTeamName" class="ls-bye-hide"></td><td colspan="6" rowspan="3" id="LS_CenterTop" class="ls-bye-hide"><span class="hometeam ls-bye-hide">% WIN HOME</span><span class="awayteam ls-bye-hide">AWAY WIN %</span></td><td id="LS_HomeTeamName"></td></tr><tr><td id="LS_AwayTeamRecord" class="ls-bye-hide">0-0-0</td><td id="LS_HomeTeamRecord">0-0-0</td></tr><tr id="TeamWinPctRow"><td id="LS_AwayTeamPercent" class="ls-bye-hide"><span class="wp_bar" style="position:relative;display:block"><span style="display:inline-block;margin-left:0.313rem"></span>0%</span></td><td id="LS_HomeTeamPercent"><span class="wp_bar" style="position:relative;display:block"><span style="display:inline-block;margin-left:0.313rem"></span>0%</div></span></td></tr><tr><td rowspan="2" id="LS_AwayScore" class="ls-bye-hide"></td><td class="LS_ScoreboardTitle ls-bye-hide" title="Players Currently Playing">P</td><td class="LS_ScoreboardTitle ls-bye-hide" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle ls-bye-hide" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle" title="Players Currently Playing">P</td><td rowspan="2" id="LS_HomeScore"></td></tr><tr><td id="LS_AwayPlayers" class="prmin ls-bye-hide" title="Players Currently Playing"></td><td id="LS_AwayYTP" class="prmin ls-bye-hide" title="Players Yet to Play"></td><td id="LS_AwayPMR" class="prmin ls-bye-hide" title="Player Minutes Remaining"></td><td id="LS_HomePMR" class="prmin" title="Player Minutes Remaining"></td><td id="LS_HomeYTP" class="prmin" title="Players Yet to Play"></td><td id="LS_HomePlayers" class="prmin" title="Players Currently Playing"></td></tr></tbody></table></div></td></tr>').insertBefore('.ls_players_table');
-            } else {
-                $('<tr><td id="LS_TopTableHolder" colspan="2"><div class="mobile-wrap"><table class="LS_MainScoreboard" style="table-layout:fixed"><tbody><tr><td id="LS_AwayTeamName" class="ls-bye-hide"></td><td colspan="6" rowspan="2" id="LS_CenterTop" class="ls-bye-hide"><span class="hometeam ls-bye-hide">HOME</span><span class="awayteam ls-bye-hide">AWAY</span></td><td id="LS_HomeTeamName"></td></tr><tr><td id="LS_AwayTeamRecord" class="ls-bye-hide">0-0-0</td><td id="LS_HomeTeamRecord">0-0-0</td></tr><tr><td rowspan="2" id="LS_AwayScore" class="ls-bye-hide"></td><td class="LS_ScoreboardTitle ls-bye-hide" title="Players Currently Playing">P</td><td class="LS_ScoreboardTitle ls-bye-hide" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle ls-bye-hide" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle" title="Players Currently Playing">P</td><td rowspan="2" id="LS_HomeScore"></td></tr><tr><td id="LS_AwayPlayers" class="prmin ls-bye-hide" title="Players Currently Playing"></td><td id="LS_AwayYTP" class="prmin ls-bye-hide" title="Players Yet to Play"></td><td id="LS_AwayPMR" class="prmin ls-bye-hide" title="Player Minutes Remaining"></td><td id="LS_HomePMR" class="prmin" title="Player Minutes Remaining"></td><td id="LS_HomeYTP" class="prmin" title="Players Yet to Play"></td><td id="LS_HomePlayers" class="prmin" title="Players Currently Playing"></td></tr></tbody></table></div></td></tr>').insertBefore('.ls_players_table');
+
+            // Old: $('tr').has('.ls-matchup').addClass('ls_players_table');
+            // New: we already created .ls_players_block above
+
+            // === SCOREBOARD HEADER INSERT ===
+            // Convert prior <tr> injection to a <div> block so your layout stays div-based.
+            const topAllPlay =
+                '<div id="LS_TopTableHolder" class="ls-top-holder">' +
+                '<div class="mobile-wrap">' +
+                // Keeping the inner scoreboard as a table is fine; you can later convert it if desired.
+                '<table class="LS_MainScoreboard" style="table-layout:fixed"><tbody>' +
+                '<tr><td colspan="2" rowspan="2" id="LS_CenterTop">Live Scoring</td><td colspan="3" id="LS_HomeTeamName"></td></tr>' +
+                '<tr><td colspan="3" id="LS_HomeTeamRecord">0-0-0</td></tr>' +
+                '<tr><td colspan="2" rowspan="2" id="LS_HomeScore"></td><td class="LS_ScoreboardTitle" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle" title="Players Currently Playing">P</td></tr>' +
+                '<tr><td id="LS_HomePMR" class="prmin" title="Player Minutes Remaining"></td><td id="LS_HomeYTP" class="prmin" title="Players Yet to Play"></td><td id="LS_HomePlayers" class="prmin" title="Players Currently Playing"></td></tr>' +
+                '</tbody></table>' +
+                '</div>' +
+                '</div>';
+
+            const topWinProb =
+                '<div id="LS_TopTableHolder" class="ls-top-holder" data-mode="wp">' +
+                '<div class="mobile-wrap">' +
+                '<table class="LS_MainScoreboard" style="table-layout:fixed"><tbody>' +
+                '<tr><td id="LS_AwayTeamName" class="ls-bye-hide"></td><td colspan="6" rowspan="3" id="LS_CenterTop" class="ls-bye-hide"><span class="hometeam ls-bye-hide">% WIN HOME</span><span class="awayteam ls-bye-hide">AWAY WIN %</span></td><td id="LS_HomeTeamName"></td></tr>' +
+                '<tr><td id="LS_AwayTeamRecord" class="ls-bye-hide">0-0-0</td><td id="LS_HomeTeamRecord">0-0-0</td></tr>' +
+                '<tr id="TeamWinPctRow"><td id="LS_AwayTeamPercent" class="ls-bye-hide"><span class="wp_bar" style="position:relative;display:block"><span style="display:inline-block;margin-left:0.313rem"></span>0%</span></td><td id="LS_HomeTeamPercent"><span class="wp_bar" style="position:relative;display:block"><span style="display:inline-block;margin-left:0.313rem"></span>0%</span></td></tr>' +
+                '<tr><td rowspan="2" id="LS_AwayScore" class="ls-bye-hide"></td><td class="LS_ScoreboardTitle ls-bye-hide" title="Players Currently Playing">P</td><td class="LS_ScoreboardTitle ls-bye-hide" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle ls-bye-hide" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle" title="Players Currently Playing">P</td><td rowspan="2" id="LS_HomeScore"></td></tr>' +
+                '<tr><td id="LS_AwayPlayers" class="prmin ls-bye-hide" title="Players Currently Playing"></td><td id="LS_AwayYTP" class="prmin ls-bye-hide" title="Players Yet to Play"></td><td id="LS_AwayPMR" class="prmin ls-bye-hide" title="Player Minutes Remaining"></td><td id="LS_HomePMR" class="prmin" title="Player Minutes Remaining"></td><td id="LS_HomeYTP" class="prmin" title="Players Yet to Play"></td><td id="LS_HomePlayers" class="prmin" title="Players Currently Playing"></td></tr>' +
+                '</tbody></table>' +
+                '</div>' +
+                '</div>';
+
+            const topBasic =
+                '<div id="LS_TopTableHolder" class="ls-top-holder" data-mode="basic">' +
+                '<div class="mobile-wrap">' +
+                '<table class="LS_MainScoreboard" style="table-layout:fixed"><tbody>' +
+                '<tr><td id="LS_AwayTeamName" class="ls-bye-hide"></td><td colspan="6" rowspan="2" id="LS_CenterTop" class="ls-bye-hide"><span class="hometeam ls-bye-hide">HOME</span><span class="awayteam ls-bye-hide">AWAY</span></td><td id="LS_HomeTeamName"></td></tr>' +
+                '<tr><td id="LS_AwayTeamRecord" class="ls-bye-hide">0-0-0</td><td id="LS_HomeTeamRecord">0-0-0</td></tr>' +
+                '<tr><td rowspan="2" id="LS_AwayScore" class="ls-bye-hide"></td><td class="LS_ScoreboardTitle ls-bye-hide" title="Players Currently Playing">P</td><td class="LS_ScoreboardTitle ls-bye-hide" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle ls-bye-hide" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Player Minutes Remaining">PMR</td><td class="LS_ScoreboardTitle" title="Players Yet to Play">YTP</td><td class="LS_ScoreboardTitle" title="Players Currently Playing">P</td><td rowspan="2" id="LS_HomeScore"></td></tr>' +
+                '<tr><td id="LS_AwayPlayers" class="prmin ls-bye-hide" title="Players Currently Playing"></td><td id="LS_AwayYTP" class="prmin ls-bye-hide" title="Players Yet to Play"></td><td id="LS_AwayPMR" class="prmin ls-bye-hide" title="Player Minutes Remaining"></td><td id="LS_HomePMR" class="prmin" title="Player Minutes Remaining"></td><td id="LS_HomeYTP" class="prmin" title="Players Yet to Play"></td><td id="LS_HomePlayers" class="prmin" title="Players Currently Playing"></td></tr>' +
+                '</tbody></table>' +
+                '</div>' +
+                '</div>';
+
+            // Insert scoreboard holder just before the first players block
+            const $firstBlock = $('.ls_players_block').first();
+            if ($firstBlock.length) {
+                if (isAllPlay) {
+                    $(topAllPlay).insertBefore($firstBlock);
+                } else if ($("#winprob_home").length && ls_show_win_probability && (liveScoringWeek >= real_ls_week)) {
+                    $(topWinProb).insertBefore($firstBlock);
+                } else {
+                    $(topBasic).insertBefore($firstBlock);
+                }
             }
+
             if (isAllPlay) {
                 $('#LS_TopTableHolder #LS_HomeTeamName').append($('#ficon_home'));
                 $('#LS_TopTableHolder #LS_HomeTeamName').append($('#fname_home'));
@@ -2163,9 +2288,7 @@ if ($('#body_ajax_ls').length) {
                 $('#LS_TopTableHolder #LS_HomePlayers').append($('#playing_home'));
                 $('#LS_TopTableHolder #LS_HomeYTP').append($('#ytp_home'));
                 $('#LS_TopTableHolder #LS_HomePMR').append($('#pmr_home'));
-                if (ls_scoreboardName) {
-                    $("#LS_CenterTop").html(ls_scoreboardName);
-                }
+                if (ls_scoreboardName) { $("#LS_CenterTop").html(ls_scoreboardName); }
                 if ($('#LS_HomeTeamRecord:empty')) {
                     $('#LS_HomeTeamRecord').closest('tr').remove();
                     $('#LS_CenterTop').attr('rowspan', '1');
@@ -2184,18 +2307,20 @@ if ($('#body_ajax_ls').length) {
                 $('#LS_TopTableHolder #LS_AwayPMR').append($('#pmr_away'));
                 $('#LS_TopTableHolder #LS_HomePMR').append($('#pmr_home'));
 
+                // Update the click handlers to target new div structure
                 $('#LS_AwayTeamName,#LS_AwayTeamRecord,#LS_AwayScore').on("click", function () {
-                    $('.ls_players_table td.mobile-view:last-of-type').css("display", "none");
-                    $('.ls_players_table td.mobile-view:first-of-type').css("display", "table-cell");
+                    $('.ls_players_block .td-boxscore:last-of-type').css("display", "none");
+                    $('.ls_players_block .td-boxscore:first-of-type').css("display", "block");
                     $('#LS_AwayTeamName div').css("opacity", "1");
                     $('#LS_HomeTeamName div').css("opacity", ".3");
                 });
                 $('#LS_HomeTeamName,#LS_HomeTeamRecord,#LS_HomeScore').on("click", function () {
-                    $('.ls_players_table td.mobile-view:first-of-type').css("display", "none");
-                    $('.ls_players_table td.mobile-view:last-of-type').css("display", "table-cell");
+                    $('.ls_players_block .td-boxscore:first-of-type').css("display", "none");
+                    $('.ls_players_block .td-boxscore:last-of-type').css("display", "block");
                     $('#LS_HomeTeamName div').css("opacity", "1");
                     $('#LS_AwayTeamName div').css("opacity", ".3");
                 });
+
                 if (ls_scoreboardName) {
                     $("#LS_CenterTop").html("<span class='hometeam ls-bye-hide'>HOME</span><span class='awayteam ls-bye-hide'>AWAY</span>" + ls_scoreboardName);
                 }
@@ -2206,30 +2331,25 @@ if ($('#body_ajax_ls').length) {
                 $('#LS_TopTableHolder #LS_HomeTeamPercent span').html($('#winprob_home'));
             }
 
-            if (!showTeamName) {
-                $("#fname_away,#fname_home").css('display', 'none');
-            }
-            if (!showTeamIcon) {
-                $("#ficon_away,#ficon_home").css('display', 'none');
-            }
-            //SIMPLE MODAL
-            $("body").append('<div id="ls-modal-container" class="ls-modal"><div class="ls-modal-content"><div class="ls-modal-header"><span class="close" onclick="$(\'#ls-modal-container\').removeAttr(\'style\');const scorespop = document.querySelector(\'#ls-modal-content\');try{bodyScrollLock.enableBodyScroll(scorespop);}catch(er){}">X</span><h2 id="ls-modal-header-content"></h2></div><div class="ls-modal-body"><p id="ls-modal-content"></p></div></div></div><div id="ls-modal-container-2" class="ls-modal"><div class="ls-modal-content"><div class="ls-modal-header"><span class="close" onclick="if($(\'.hide-overlay\').is(\':visible\')){}else{const scorespop = document.querySelector(\'#ls-modal-content\');try {bodyScrollLock.enableBodyScroll(scorespop);} catch(er) {};};$(\'#ls-modal-container-2\').removeAttr(\'style\');$(\'#ls-modal-container\').removeClass(\'hide-overlay\')">X</span><h2 id="ls-modal-header-content"></h2></div><div class="ls-modal-body"><p id="ls-modal-content"></p></div></div></div>');
+            if (!showTeamName) { $("#fname_away,#fname_home").css('display', 'none'); }
+            if (!showTeamIcon) { $("#ficon_away,#ficon_home").css('display', 'none'); }
+
+            // SIMPLE MODAL (unchanged)
+            $("body").append(
+                '<div id="ls-modal-container" class="ls-modal"><div class="ls-modal-content"><div class="ls-modal-header"><span class="close" onclick="$(\'#ls-modal-container\').removeAttr(\'style\');const scorespop = document.querySelector(\'#ls-modal-content\');try{bodyScrollLock.enableBodyScroll(scorespop);}catch(er){}">X</span><h2 id="ls-modal-header-content"></h2></div><div class="ls-modal-body"><p id="ls-modal-content"></p></div></div></div><div id="ls-modal-container-2" class="ls-modal"><div class="ls-modal-content"><div class="ls-modal-header"><span class="close" onclick="if($(\'.hide-overlay\').is(\':visible\')){}else{const scorespop = document.querySelector(\'#ls-modal-content\');try {bodyScrollLock.enableBodyScroll(scorespop);} catch(er) {};};$(\'#ls-modal-container-2\').removeAttr(\'style\');$(\'#ls-modal-container\').removeClass(\'hide-overlay\')">X</span><h2 id="ls-modal-header-content"></h2></div><div class="ls-modal-body"><p id="ls-modal-content"></p></div></div></div>'
+            );
 
             $("#ls-modal-container").on("click", function () {
                 $("#ls-modal-container").css('display', 'none');
                 const scorespop = document.querySelector('#ls-modal-content');
-                try {
-                    bodyScrollLock.enableBodyScroll(scorespop);
-                } catch (er) { };
+                try { bodyScrollLock.enableBodyScroll(scorespop); } catch (er) { };
             });
             $("#ls-modal-container-2").on("click", function () {
                 if ($('.hide-overlay').is(':visible')) {
-                    //DO NOTHING
+                    // DO NOTHING
                 } else {
                     const scorespop = document.querySelector('#ls-modal-content');
-                    try {
-                        bodyScrollLock.enableBodyScroll(scorespop);
-                    } catch (er) { };
+                    try { bodyScrollLock.enableBodyScroll(scorespop); } catch (er) { };
                 }
                 $("#ls-modal-container-2").css('display', 'none');
                 $('#ls-modal-container').removeClass('hide-overlay');
@@ -2238,9 +2358,10 @@ if ($('#body_ajax_ls').length) {
             $(".ls-modal-content").on("click", function (e) {
                 e.stopPropagation();
             });
+
             ls_trigger_run = ls_trigger_run + 21;
-            //console.log("ls_setup_html + 21 " + ls_trigger_run); // REMOVE AFTER TESTING - CONSOLE LOGGING
         } // end ls_setup_html
+
 
 
         ////////////////////////////////////////////////////////////////////
