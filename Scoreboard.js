@@ -2576,62 +2576,56 @@ processAjaxLS();
 
 
 
-        ////////////////////////////////////////////////////////////////////
-        //                  FUNCTION - remove blank stats                //
-        //////////////////////////////////////////////////////////////////
-        (function () {
-            const container = document.querySelector('#ajax_ls');
-            if (!container) return;
+      ////////////////////////////////////////////////////////////////////
+//                  FUNCTION - remove blank stats                //
+//////////////////////////////////////////////////////////////////
+(function () {
+  const container = document.querySelector('#ajax_ls');
+  if (!container) return;
 
-            function isNoStatsText(raw) {
-                if (!raw) return true;
+  function isNoStatsText(raw) {
+    const txt = String(raw || '').replace(/\u00A0/g, ' ').trim();
+    if (!txt) return true;
+    if (/^[-–—\s]*stats[-–—\s]*$/i.test(txt)) return true;
+    if (!/\d/.test(txt)) return true; // no digits → likely no stats
+    return false;
+  }
 
-                // normalize whitespace & NBSPs
-                const txt = String(raw).replace(/\u00A0/g, ' ').trim();
+  function getPlayerTd(block) {
+    // Prefer the player cell
+    let td = block.closest('td.td-first-type');
+    if (td) return td;
 
-                // empty after trim -> no stats
-                if (txt === '') return true;
+    // Fallback: nearest TD that is NOT a wrapper (e.g., not mobile-view)
+    td = block.closest('td');
+    if (!td) return null;
+    if (td.classList.contains('mobile-view')) return null;
+    return td;
+  }
 
-                // variants like "- stats -", "— stats —", "-- stats --" (case-insensitive)
-                if (/^[-–—\s]*stats[-–—\s]*$/i.test(txt)) return true;
+  function updatePlayerStats() {
+    const statsBlocks = container.querySelectorAll('.ls_player_stats');
+    statsBlocks.forEach(block => {
+      const parentTd = getPlayerTd(block);
+      if (!parentTd) return;
 
-                // if there are no digits at all, likely no stat line (e.g., "DNP", "", etc.)
-                if (!/\d/.test(txt)) return true;
+      const inner = block.querySelector('div[class^="stats_"]');
+      const raw = inner ? inner.textContent : block.textContent;
+      const noStats = isNoStatsText(raw);
 
-                return false;
-            }
+      parentTd.classList.toggle('no_stats', noStats);
+      parentTd.classList.toggle('has_stats', !noStats);
+    });
+  }
 
-            function updatePlayerStats() {
-                const statsBlocks = container.querySelectorAll('.ls_player_stats');
-                statsBlocks.forEach(block => {
-                    const parentTd = block.closest('td');
-                    if (!parentTd) return;
+  // Initial check
+  updatePlayerStats();
 
-                    // Prefer the inner stats_* div if present; fall back to the whole block’s text
-                    const inner = block.querySelector('div[class^="stats_"]');
-                    const raw = inner ? inner.textContent : block.textContent;
+  // Watch for changes
+  const observer = new MutationObserver(updatePlayerStats);
+  observer.observe(container, { childList: true, subtree: true, characterData: true });
+})();
 
-                    if (isNoStatsText(raw)) {
-                        parentTd.classList.add('no_stats');
-                        parentTd.classList.remove('has_stats');
-                    } else {
-                        parentTd.classList.add('has_stats');
-                        parentTd.classList.remove('no_stats');
-                    }
-                });
-            }
-
-            // Initial check
-            updatePlayerStats();
-
-            // Observe the #ajax_ls area for dynamic updates
-            const observer = new MutationObserver(updatePlayerStats);
-            observer.observe(container, {
-                childList: true,
-                subtree: true,
-                characterData: true
-            });
-        })();
 
 
 
@@ -2846,4 +2840,5 @@ $(document).on('click', '.scoringLinkDisable', function (e) {
     e.preventDefault();
     alert("Live Scoring Will Start 24 Hours Prior To Kickoff Of First Game Of The Week. Live Scoring is disabled during offseason.");
 });
+
 
