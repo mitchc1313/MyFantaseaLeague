@@ -156,14 +156,44 @@ if ($('#body_ajax_ls').length) {
             var errorClassCk = setInterval(function () {
                 if (ls_has_triggered) {
                     $('.ls_loading_message,#ls_error').remove();
-                    $('head').append('<style>#body_ajax_ls #myNavigationHolder,#body_ajax_ls #ls_setting_drop,#body_ajax_ls table[style="margin-top: 0.313rem"],#body_ajax_ls table[style*="margin-top: 0.313rem"],#body_ajax_ls #ls_mfl_notes,#body_ajax_ls #ls_ticker_tab_id,#body_ajax_ls table[style*="margin-top: 0.313rem"] + div.mobile-wrap,#body_ajax_ls table[style="margin-top: 0.313rem"] + div.mobile-wrap{visibility:visible!important}</style>');
-                    if (!$('div[id*="og_"]').is(':visible')) {
-                        $('.ls-outer-table').replaceWith('<h3 class="warning" style="font-size:1.25rem;padding:1.25rem 0;visibility:visible">There are no fantasy matchups this week or all teams on bye</h3>');
-                        $('#ls_ticker_tab_id,#ls_mfl_notes,.settings-mobile-wrap').remove();
+
+                    // Inject (or update) the unhide CSS once
+                    if (!document.getElementById('ls-unhide-style')) {
+                        $('head').append(
+                            '<style id="ls-unhide-style">\
+                        #body_ajax_ls #myNavigationHolder,\
+                        #body_ajax_ls #ls_setting_drop,\
+                        #body_ajax_ls .ls-outer-grid,\
+                        #body_ajax_ls .ls-outer-table,\
+                        #body_ajax_ls #ls_mfl_notes,\
+                        #body_ajax_ls #ls_ticker_tab_id,\
+                        #body_ajax_ls .ls-outer-grid + .mobile-wrap,\
+                        #body_ajax_ls .ls-outer-table + .mobile-wrap,\
+                        #body_ajax_ls .mobile-wrap.ls-boxscore,\
+                        #body_ajax_ls .ls-container{visibility:visible!important}\
+                        </style>'
+                        );
                     }
-                    clearInterval(errorClassCk, listenerCk);
+
+                    // Unhide the hoisted boxscore explicitly
+                    $('.mobile-wrap.ls-boxscore.ls-wait').removeClass('ls-wait');
+
+                    // Empty-week message (support either wrapper class)
+                    if (!$('div[id*="og_"]').is(':visible')) {
+                        const $outer = $('.ls-outer-grid, .ls-outer-table').first();
+                        if ($outer.length) {
+                            $outer.replaceWith(
+                                '<h3 class="warning" style="font-size:1.25rem;padding:1.25rem 0;visibility:visible">There are no fantasy matchups this week or all teams on bye</h3>'
+                            );
+                            $('#ls_ticker_tab_id,#ls_mfl_notes,.settings-mobile-wrap').remove();
+                        }
+                    }
+
+                    clearInterval(errorClassCk);
+                    clearInterval(listenerCk);
                 }
             }, 10);
+
 
             var listenerCk = setInterval(function () {
                 if (listenerCleared) {
@@ -3256,27 +3286,39 @@ if ($('#body_ajax_ls').length) {
 
     // === HOIST .ls-boxscore OUT OF THE TABLE AND WRAP WITH THE TABLE ===
     (function hoistBoxscoreAndWrap() {
+        // Add the "wait" CSS once
+        if (!document.getElementById('ls-wait-style')) {
+            $('head').append(
+                '<style id="ls-wait-style">#body_ajax_ls .ls-wait{visibility:hidden!important}</style>'
+            );
+        }
+
         // Find any outer table that currently contains the boxscore block
         const $tables = $('table.report.ls-outer-table:has(.mobile-wrap.ls-boxscore)');
 
         $tables.each(function (i) {
             const $tbl = $(this);
-            const $box = $tbl.find('.mobile-wrap.ls-boxscore').first().detach(); // pull it out of the table
+            const $box = $tbl.find('.mobile-wrap.ls-boxscore').first();
+            if (!$box.length) return;
+
+            // Hide it BEFORE/AS we hoist so it doesn't flash
+            $box.addClass('ls-wait');
+
+            // Pull it out of the table
+            const $detachedBox = $box.detach();
 
             // Build a new parent container
-            const $container = $(
-                `<div class="ls-container" data-ls-container="${i}"></div>`
-            );
+            const $container = $(`<div class="ls-container" data-ls-container="${i}"></div>`);
 
             // Insert container before the table, then put the hoisted box + table inside.
-            // Order A (boxscore above table):
             $tbl.before($container);
-            $container.append($box, $tbl);
+            $container.append($detachedBox, $tbl);
 
-            // If you prefer the table above the boxscore, swap the append order:
-            // $container.append($tbl, $box);
+            // If you prefer the table above the boxscore, swap the order:
+            // $container.append($tbl, $detachedBox);
         });
     })();
+
 
 
 
