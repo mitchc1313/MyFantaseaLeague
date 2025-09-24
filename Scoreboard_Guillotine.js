@@ -755,10 +755,6 @@ if ($('#body_ajax_ls').length) {
 
                     #body_ajax_ls #roster_away .no_stats td,
                     #body_ajax_ls #roster_home .no_stats td { padding-bottom: 0; }
-
-                    #body_ajax_ls .no_stats div.ls_player_stats {
-                    display: none !important;
-                    }
                 </style>
                 `);
             if (isAllPlay) {
