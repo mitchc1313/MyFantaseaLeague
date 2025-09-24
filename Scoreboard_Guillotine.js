@@ -162,7 +162,7 @@ if ($('#body_ajax_ls').length) {
                         #body_ajax_ls table[style*="margin-top: 0.313rem"],\
                         #body_ajax_ls #ls_mfl_notes,#body_ajax_ls #ls_ticker_tab_id,\
                         #body_ajax_ls table[style*="margin-top: 0.313rem"] + div.mobile-wrap,\
-                        #body_ajax_ls mobile-wrap.ls-boxscore,\
+                        #body_ajax_ls .mobile-wrap.ls-boxscore,\
                         #body_ajax_ls table[style="margin-top: 0.313rem"] + div.mobile-wrap{visibility:visible!important}</style>');
                     if (!$('div[id*="og_"]').is(':visible')) {
                         $('.ls-outer-table').replaceWith('<h3 class="warning" style="font-size:1.25rem;padding:1.25rem 0;visibility:visible">There are no fantasy matchups this week or all teams on bye</h3>');
