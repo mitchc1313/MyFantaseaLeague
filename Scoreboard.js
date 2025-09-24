@@ -2574,6 +2574,67 @@ processAjaxLS();
         } // end build_other_games
 
 
+
+
+        ////////////////////////////////////////////////////////////////////
+        //                  FUNCTION - remove blank stats                //
+        //////////////////////////////////////////////////////////////////
+        (function () {
+            const container = document.querySelector('#ajax_ls');
+            if (!container) return;
+
+            function isNoStatsText(raw) {
+                if (!raw) return true;
+
+                // normalize whitespace & NBSPs
+                const txt = String(raw).replace(/\u00A0/g, ' ').trim();
+
+                // empty after trim -> no stats
+                if (txt === '') return true;
+
+                // variants like "- stats -", "— stats —", "-- stats --" (case-insensitive)
+                if (/^[-–—\s]*stats[-–—\s]*$/i.test(txt)) return true;
+
+                // if there are no digits at all, likely no stat line (e.g., "DNP", "", etc.)
+                if (!/\d/.test(txt)) return true;
+
+                return false;
+            }
+
+            function updatePlayerStats() {
+                const statsBlocks = container.querySelectorAll('.ls_player_stats');
+                statsBlocks.forEach(block => {
+                    const parentTd = block.closest('td');
+                    if (!parentTd) return;
+
+                    // Prefer the inner stats_* div if present; fall back to the whole block’s text
+                    const inner = block.querySelector('div[class^="stats_"]');
+                    const raw = inner ? inner.textContent : block.textContent;
+
+                    if (isNoStatsText(raw)) {
+                        parentTd.classList.add('no_stats');
+                        parentTd.classList.remove('has_stats');
+                    } else {
+                        parentTd.classList.add('has_stats');
+                        parentTd.classList.remove('no_stats');
+                    }
+                });
+            }
+
+            // Initial check
+            updatePlayerStats();
+
+            // Observe the #ajax_ls area for dynamic updates
+            const observer = new MutationObserver(updatePlayerStats);
+            observer.observe(container, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+        })();
+
+
+
         ////////////////////////////////////////////////////////////////////
         //                  FUNCTION - ls_get_icon_abbrev                 //
         ////////////////////////////////////////////////////////////////////
@@ -2785,3 +2846,4 @@ $(document).on('click', '.scoringLinkDisable', function (e) {
     e.preventDefault();
     alert("Live Scoring Will Start 24 Hours Prior To Kickoff Of First Game Of The Week. Live Scoring is disabled during offseason.");
 });
+
