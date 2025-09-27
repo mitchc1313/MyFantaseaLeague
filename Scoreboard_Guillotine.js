@@ -2527,7 +2527,7 @@ if ($('#body_ajax_ls').length) {
                 $('.ls-boxscore #other_games').wrap('<div class="ls_scroller"></div>');
                 $('table').has('div.ls-boxscore').addClass('ls-outer-table');
                 $('.ls-outer-table').css('margin-top', '0.313rem');
-                $('td.mobile-view[valign="middle"]').removeClass().addClass('td-boxscore').unwrap().wrap('<tr></tr>');
+                $('td.mobile-view[valign="middle"]').removeClass().addClass('td-boxscore').unwrap().wrap('<tr style="display: none;"></tr>');
                 $('td.mobile-view').wrap('</tr><tr class="ls_players_table"></tr>');
                 $('td.mobile-view').wrapInner('<div class="mobile-wrap ls-matchup"></div>');
                 $('p').wrapAll('<div class="mobile-wrap ls-btm-table"></div>');
