@@ -326,7 +326,7 @@
   /* Allows precise placement */
   bottom: 88%;
   /* Moves it directly below the parent */
-  left: -12px;
+  left: 50%;
   /* Aligns it with the parent's left edge */
   width: 100%;
   /* Match the parent's width */
@@ -334,6 +334,7 @@
   /* Pushes it below the parent visually */
   padding-bottom: 0px;
   text-align: right;
+  transform: translateX(-50%);
 }
 
 .lineupContainer .player-projected-points::after,
@@ -974,9 +975,7 @@
     padding-bottom: 0;
     display: none;
   }
-  .lineupContainer .player-projected-points::before {
-    left: -14px;
-  }
+  
   .lineupContainer .player-projected-points {
     text-align: right;
     margin-right: 0px;
