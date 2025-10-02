@@ -1023,4 +1023,31 @@
     justify-content: center;
     margin: auto;
   }
-}/*# sourceMappingURL=LineupStyle.css.map */
+}
+
+@media and (max-width: 460px) {
+ .lineupContainer .player-projected-points {
+ font-size: 16px;
+   line-height:16px;
+ }
+  .lineupContainer .player-projected-points::before {
+    content: "PROJ";
+    font-size:10px;
+    padding-right: 14px;
+}
+
+  .lineupContainer .player-projected-points::after, .lineupContainer .player-projected-points.contest-league::after {
+  font-size:10px;
+  }
+
+  .lineupContainer .player-card {
+    grid-template-columns: 55px 50px auto 1fr 1fr;
+  }
+
+  .lineupContainer .bench-btn, .lineupContainer .add-btn {
+        margin-right: 15px;
+  }
+  
+}
+
+/*# sourceMappingURL=LineupStyle.css.map */
