@@ -1025,7 +1025,7 @@
   }
 }
 
-@media and (max-width: 460px) {
+@media only screen and (max-width: 460px) {
  .lineupContainer .player-projected-points {
  font-size: 16px;
    line-height:16px;
