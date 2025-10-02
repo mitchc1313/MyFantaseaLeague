@@ -1034,6 +1034,7 @@
     content: "PROJ";
     font-size:10px;
     padding-right: 14px;
+    line-height: 22px;
 }
 
   .lineupContainer .player-projected-points::after, .lineupContainer .player-projected-points.contest-league::after {
