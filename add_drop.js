@@ -118,7 +118,29 @@ function sortSyncCurRosterOrder() {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 if (thisProgram === "add_drop") {
 	const style = document.createElement("style");
-	style.textContent = `#add_drop table,#add_drop .mobile-wrap{visibility:visible;}`;
+	style.textContent = `
+		#add_drop table,#add_drop .mobile-wrap{visibility:visible;}
+		
+		/* Base row + explicit selected state */
+		.add-drop-player-row{
+		  position:relative;
+		  background: var(--row-bg, #fff);
+		  -webkit-tap-highlight-color: rgba(0,0,0,0);
+		}
+		.add-drop-player-row.selected-player{
+		  background: rgba(5, 40, 56, .1);
+		}
+		
+		/* Kill :hover paints on touch so they can't stick */
+		@media (hover:none) and (pointer:coarse){
+		  .add-drop-player-row:hover{ background: var(--row-bg, #fff) !important; }
+		}
+		
+		/* Avoid sticky focus outlines on the toggle button */
+		.add-drop-player-row .select-btn:focus,
+		.add-drop-player-row .deselect-btn:focus{ outline: none; }
+		`;
+
 	if (typeof franchise_id === "undefined") {
 		document.body.appendChild(style);
 	} else if (typeof playerDatabaseObj === "undefined") {
@@ -163,6 +185,14 @@ if (thisProgram === "add_drop") {
 		}
 		if (typeof showWaiverCommentBox === "undefined") {
 			var showWaiverCommentBox = true;
+		}
+
+		function iosRepaint(row){
+		  // Drop any sticky focus/active states first
+		  row.blur?.();
+		  row.querySelectorAll('a,button').forEach(el => el.blur?.());
+		  // Force a reflow so iOS throws away the stale layer
+		  void row.offsetWidth;
 		}
 
 		const addDropContainer = document.querySelector("#add_drop");
@@ -888,6 +918,8 @@ if (thisProgram === "add_drop") {
 
 					if (selected === row) {
 						row.classList.remove("selected-player");
+						iosRepaint(row);
+						
 						setSelected(null);
 						field.value = "";
 						button.textContent = isAdd ? "Add" : "Drop";
@@ -905,6 +937,7 @@ if (thisProgram === "add_drop") {
 							}
 						}
 						row.classList.add("selected-player");
+						iosRepaint(selected);
 						setSelected(row);
 						field.value = playerId;
 						button.textContent = "Deselect";
