@@ -608,6 +608,7 @@
 .lineupContainer span.injury-status {
   color: var(--red-color-warning);
   font-size: 14px;
+  padding-left: 4px;
 }
 
 .lineupContainer .player-card.bye-week,
