@@ -919,91 +919,93 @@ if (thisProgram === "add_drop") {
 				}
 
 				function handlePlayerRowClick(row, type) {
-					const playerId = row.dataset.playerId;
-					const button = row.querySelector("button");
-					const isAdd = type === "add";
-
-					const addField = document.getElementById("add_pid_field_id");
-					const dropField = document.getElementById("drop_pid_field_id");
-
-					const selected = isAdd ? selectedAdd : selectedDrop;
-					const setSelected = isAdd ? (val) => (selectedAdd = val) : (val) => (selectedDrop = val);
-					const field = isAdd ? addField : dropField;
-					const summaryEl = document.getElementById(isAdd ? "add_name_field_id" : "drop_name_field_id");
-
-					if (selected === row) {
-						row.classList.remove("selected-player");
-						iosRepaint(row);
-						
-						setSelected(null);
-						field.value = "";
-						button.textContent = isAdd ? "Add" : "Drop";
-						button.classList.remove("deselect-btn");
-						button.classList.add("select-btn");
-						summaryEl.textContent = isAdd ? "Select Player To Add" : "Select Player To Drop";
-					} else {
-						if (selected) {
-							selected.classList.remove("selected-player");
-							iosRepaint(selected);
-							const prevBtn = selected.querySelector("button");
-							if (prevBtn) {
-								prevBtn.textContent = isAdd ? "Add" : "Drop";
-								prevBtn.classList.remove("deselect-btn");
-								prevBtn.classList.add("select-btn");
-							}
-						}
-						row.classList.add("selected-player");
-						iosRepaint(selected);
-						setSelected(row);
-						field.value = playerId;
-						button.textContent = "Deselect";
-						button.classList.remove("select-btn");
-						button.classList.add("deselect-btn");
-
-						const strongEl = row.querySelector(".player-info strong");
-						let nameText = "";
-
-						if (strongEl) {
-							const cloned = strongEl.cloneNode(true); // avoid mutating original DOM
-							const statusSpan = cloned.querySelector(".player-status");
-							if (statusSpan) statusSpan.remove(); // remove span
-
-							nameText = cloned.textContent.replace(/\(R\)/g, "").trim(); // remove (R) and trim
-						}
-						const pos = row.querySelector(".player-pos")?.textContent || "";
-						const team = row.querySelector(".player-info small")?.textContent?.split("&bull;")[0]?.trim() || "";
-						summaryEl.textContent = `${pos} ${nameText}`;
-					}
-					// ðŸ”½ ADD THIS AT THE VERY END
-					const WaiverInputRow = document.getElementById("force_waiver_claim_p");
-					if (WaiverInputRow) {
-						const addHasValue = !!addField?.value;
-						const dropHasValue = !!dropField?.value;
-
-						if (!addHasValue && !dropHasValue) {
-							WaiverInputRow.classList.add("hidden");
-
-							const forceWaiverCheckbox = document.getElementById("FORCE_WAIVER");
-							if (forceWaiverCheckbox && forceWaiverCheckbox.checked) {
-								forceWaiverCheckbox.click(); // this will uncheck and trigger onchange
-							}
-						} else {
-							WaiverInputRow.classList.remove("hidden");
-						}
-					}
-
-					const submitBtn = document.getElementById("add_drop_submit");
-					if (submitBtn) {
-						const addHasValue = !!addField?.value;
-						const dropHasValue = !!dropField?.value;
-
-						if (!addHasValue && !dropHasValue) {
-							submitBtn.disabled = true;
-						} else {
-							submitBtn.disabled = false;
-						}
-					}
-
+				  const playerId = row?.dataset?.playerId;
+				  const button = row?.querySelector("button");
+				  const isAdd = type === "add";
+				
+				  const addField = document.getElementById("add_pid_field_id");
+				  const dropField = document.getElementById("drop_pid_field_id");
+				
+				  const selected = isAdd ? selectedAdd : selectedDrop;
+				  const setSelected = isAdd ? (val) => (selectedAdd = val) : (val) => (selectedDrop = val);
+				  const field = isAdd ? addField : dropField;
+				  const summaryEl = document.getElementById(isAdd ? "add_name_field_id" : "drop_name_field_id");
+				
+				  if (selected === row) {
+				    // deselect same row
+				    row.classList.remove("selected-player");
+				    iosRepaint(row);
+				
+				    setSelected(null);
+				    if (field) field.value = "";
+				    if (button) {
+				      button.textContent = isAdd ? "Add" : "Drop";
+				      button.classList.remove("deselect-btn");
+				      button.classList.add("select-btn");
+				    }
+				    if (summaryEl) summaryEl.textContent = isAdd ? "Select Player To Add" : "Select Player To Drop";
+				
+				  } else {
+				    // deselect previously selected (if any)
+				    if (selected) {
+				      selected.classList.remove("selected-player");
+				      iosRepaint(selected);
+				      const prevBtn = selected.querySelector("button");
+				      if (prevBtn) {
+				        prevBtn.textContent = isAdd ? "Add" : "Drop";
+				        prevBtn.classList.remove("deselect-btn");
+				        prevBtn.classList.add("select-btn");
+				      }
+				    }
+				
+				    // select new row
+				    row.classList.add("selected-player");
+				    iosRepaint(row); // ✅ repaint the NEW row, not `selected`
+				    setSelected(row);
+				    if (field) field.value = playerId || "";
+				
+				    if (button) {
+				      button.textContent = "Deselect";
+				      button.classList.remove("select-btn");
+				      button.classList.add("deselect-btn");
+				    }
+				
+				    // update summary
+				    const strongEl = row.querySelector(".player-info strong");
+				    let nameText = "";
+				    if (strongEl) {
+				      const cloned = strongEl.cloneNode(true);
+				      const statusSpan = cloned.querySelector(".player-status");
+				      if (statusSpan) statusSpan.remove();
+				      nameText = cloned.textContent.replace(/\(R\)/g, "").trim();
+				    }
+				    const pos = row.querySelector(".player-pos")?.textContent || "";
+				    if (summaryEl) summaryEl.textContent = `${pos} ${nameText}`;
+				  }
+				
+				  // waiver toggle visibility
+				  const WaiverInputRow = document.getElementById("force_waiver_claim_p");
+				  if (WaiverInputRow) {
+				    const addHasValue = !!addField?.value;
+				    const dropHasValue = !!dropField?.value;
+				    if (!addHasValue && !dropHasValue) {
+				      WaiverInputRow.classList.add("hidden");
+				      const forceWaiverCheckbox = document.getElementById("FORCE_WAIVER");
+				      if (forceWaiverCheckbox && forceWaiverCheckbox.checked) {
+				        forceWaiverCheckbox.click();
+				      }
+				    } else {
+				      WaiverInputRow.classList.remove("hidden");
+				    }
+				  }
+				
+				  // submit btn enable/disable
+				  const submitBtn = document.getElementById("add_drop_submit");
+				  if (submitBtn) {
+				    const addHasValue = !!addField?.value;
+				    const dropHasValue = !!dropField?.value;
+				    submitBtn.disabled = !(addHasValue || dropHasValue);
+				  }
 				}
 
 				function handleSubmitButtonChange() {
