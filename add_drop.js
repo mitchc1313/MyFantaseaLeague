@@ -187,13 +187,26 @@ if (thisProgram === "add_drop") {
 			var showWaiverCommentBox = true;
 		}
 
-		function iosRepaint(row){
-		  // Drop any sticky focus/active states first
-		  row.blur?.();
-		  row.querySelectorAll('a,button').forEach(el => el.blur?.());
-		  // Force a reflow so iOS throws away the stale layer
-		  void row.offsetWidth;
+		function iosRepaint(el) {
+		  if (!el || !(el.nodeType === 1)) return;        // guard against null / non-elements
+		
+		  // Blur any focused descendants so :focus / :active paints can't stick
+		  try {
+		    var focusables = el.querySelectorAll('a,button,input,textarea,select,[tabindex]');
+		    for (var i = 0; i < focusables.length; i++) {
+		      if (focusables[i] && typeof focusables[i].blur === 'function') focusables[i].blur();
+		    }
+		    if (typeof el.blur === 'function') el.blur();
+		  } catch (_) {}
+		
+		  // iOS Safari: tiny layer flip to force repaint
+		  var prev = el.style.webkitTransform;
+		  el.style.webkitTransform = 'translateZ(0)';
+		  // force reflow
+		  void el.offsetHeight;
+		  el.style.webkitTransform = prev || '';
 		}
+
 
 		const addDropContainer = document.querySelector("#add_drop");
 		if (addDropContainer) {
@@ -539,13 +552,15 @@ if (thisProgram === "add_drop") {
 				if (dropFieldName) dropFieldName.remove();
 				if (addBtn) addBtn.remove();
 
-				const removeHiddenInput = document.getElementById("AddDropForm");
-				const allHiddenInputs = Array.from(addDropContainer.querySelectorAll('input[type="hidden"]'));
-				allHiddenInputs.forEach(input => {
-					if (!AddDropForm.contains(input)) {
-						input.remove();
-					}
-				});
+				// Remove hidden inputs that aren't inside the newly created form
+				const addDropFormEl = document.getElementById("AddDropForm");
+				if (addDropFormEl) {
+				  const allHiddenInputs = Array.from(addDropContainer.querySelectorAll('input[type="hidden"]'));
+				  allHiddenInputs.forEach(input => {
+				    if (!addDropFormEl.contains(input)) input.remove();
+				  });
+				}
+
 
 				const searchInput = document.getElementById("addDropSearch");
 				const positionFilter = document.getElementById("position-filter");
@@ -929,6 +944,7 @@ if (thisProgram === "add_drop") {
 					} else {
 						if (selected) {
 							selected.classList.remove("selected-player");
+							iosRepaint(selected);
 							const prevBtn = selected.querySelector("button");
 							if (prevBtn) {
 								prevBtn.textContent = isAdd ? "Add" : "Drop";
