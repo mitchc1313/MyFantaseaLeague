@@ -133,7 +133,7 @@
   grid-area: image;
   position: relative;
   /* Keep as positioning context for child elements */
-  width: 60px;
+  width: 66px;
   /* Keep fixed width for the image */
   height: 100%;
   /* Maintain consistent dimensions */
@@ -965,8 +965,13 @@
   }
   .lineupContainer .player-image-container {
     align-items: baseline;
-    width: 50px;
+    width: 60px;
   }
+
+  .lineupContainer .player-image-container.is-defense {
+    align-items: center;
+  }
+  
   .lineupContainer .first-name {
     padding-top: 5px;
     grid-row: 1/3;
