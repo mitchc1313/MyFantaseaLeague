@@ -133,7 +133,7 @@
   grid-area: image;
   position: relative;
   /* Keep as positioning context for child elements */
-  width: 66px;
+  width: 65px;
   /* Keep fixed width for the image */
   height: 100%;
   /* Maintain consistent dimensions */
@@ -970,6 +970,10 @@
   .lineupContainer .player-image-container {
     align-items: baseline;
     width: 60px;
+  }
+
+  #lineup .lineupContainer .player-image-container {
+    width: 50px;
   }
 
   .lineupContainer .player-image-container.is-defense {
