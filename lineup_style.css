@@ -141,6 +141,10 @@
   /* Allow the `.overlay-top` to extend outside */
   display: flex;
   justify-content: center;
+  align-items: baseline;
+}
+
+.lineupContainer .player-image-container.is-defense {
   align-items: center;
 }
 
